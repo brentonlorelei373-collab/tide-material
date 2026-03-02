@@ -454,9 +454,172 @@
     .px-content { transition: all 0.3s ease; }
     .px-content.collapsed { display: none; }
 
+    /* ====== 故事工坊 ====== */
+    body:not(.story-mode) .add-story-btn { display: none !important; }
+    body:not(.story-mode) .add-story-btn-text { display: none !important; }
+
+    .add-story-btn {
+      position: absolute; bottom: 10px; right: 10px; z-index: 10;
+      width: 32px; height: 32px; border-radius: 50%;
+      background: rgba(0,0,0,0.55); backdrop-filter: blur(8px);
+      border: none; cursor: pointer; display: flex; align-items: center; justify-content: center;
+      opacity: 0; transition: all 0.2s ease; color: white;
+    }
+    .add-story-btn:hover { background: rgba(88,86,214,0.85); transform: scale(1.1); }
+    .add-story-btn:active { transform: scale(0.9); }
+    .img-card:hover .add-story-btn { opacity: 1; }
+
+    .add-story-btn-text {
+      display: inline-flex; align-items: center; gap: 4px;
+      font-size: 12px; color: #5856d6; font-weight: 500;
+      cursor: pointer; background: none; border: none; padding: 0;
+      transition: color 0.2s; font-family: inherit;
+    }
+    .add-story-btn-text:hover { color: #4240b0; }
+
+    .story-content { transition: all 0.3s ease; }
+    .story-content.collapsed { display: none; }
+
+    .story-item-card {
+      display: flex; align-items: center; gap: 10px;
+      padding: 8px 10px; border-radius: 10px; background: #f5f5f7;
+      transition: all 0.2s ease; position: relative;
+    }
+    .story-item-card:hover { background: #ededf0; }
+    .story-item-card .story-item-thumb {
+      width: 36px; height: 36px; border-radius: 8px; object-fit: cover; flex-shrink: 0;
+    }
+    .story-item-card .story-item-icon {
+      width: 36px; height: 36px; border-radius: 8px; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center; font-size: 16px;
+    }
+    .story-item-remove {
+      position: absolute; top: -4px; right: -4px; width: 18px; height: 18px;
+      border-radius: 50%; background: #ff3b30; border: 2px solid white;
+      display: flex; align-items: center; justify-content: center;
+      opacity: 0; transition: opacity 0.2s; cursor: pointer; color: white; font-size: 10px;
+    }
+    .story-item-card:hover .story-item-remove { opacity: 1; }
+
+    .story-skeleton {
+      display: flex; flex-wrap: wrap; gap: 6px; padding: 0 16px 10px;
+    }
+    .story-skel-item {
+      display: flex; align-items: center; gap: 4px;
+      padding: 3px 8px; border-radius: 8px; font-size: 11px;
+    }
+    .story-skel-item.filled { background: #e8f5e9; color: #34c759; }
+    .story-skel-item.empty { background: #f5f5f7; color: #aeaeb2; }
+
+    .story-generate-btn {
+      width: 100%; padding: 10px; border-radius: 12px; border: none;
+      background: linear-gradient(135deg, #5856d6, #af52de);
+      color: white; font-size: 14px; font-weight: 600; cursor: pointer;
+      font-family: inherit; letter-spacing: -0.01em;
+      transition: opacity 0.2s, transform 0.1s;
+    }
+    .story-generate-btn:hover { opacity: 0.9; }
+    .story-generate-btn:active { transform: scale(0.98); }
+    .story-generate-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+    /* 叙事卡片全屏 overlay */
+    .narrative-overlay {
+      position: fixed; inset: 0; z-index: 200;
+      background: rgba(0,0,0,0.6); backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      display: flex; align-items: flex-start; justify-content: center;
+      overflow-y: auto; padding: 40px 20px 60px;
+      opacity: 0; pointer-events: none;
+      transition: opacity 0.35s ease;
+    }
+    .narrative-overlay.show { opacity: 1; pointer-events: auto; }
+
+    .narrative-card {
+      width: 100%; max-width: 420px; background: #fff;
+      border-radius: 24px; overflow: hidden;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+      transform: translateY(20px) scale(0.96);
+      transition: transform 0.4s cubic-bezier(0.25,0.1,0.25,1);
+    }
+    .narrative-overlay.show .narrative-card {
+      transform: translateY(0) scale(1);
+    }
+
+    .nc-cover { position: relative; width: 100%; aspect-ratio: 4/3; overflow: hidden; }
+    .nc-cover img { width: 100%; height: 100%; object-fit: cover; }
+    .nc-cover-overlay {
+      position: absolute; inset: 0;
+      background: linear-gradient(to top, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.1) 40%, transparent 70%);
+      display: flex; flex-direction: column; justify-content: flex-end; padding: 28px 24px;
+    }
+    .nc-tag {
+      display: inline-flex; align-items: center; gap: 5px;
+      background: rgba(255,255,255,0.18); backdrop-filter: blur(8px);
+      padding: 4px 10px; border-radius: 16px;
+      font-size: 10px; color: rgba(255,255,255,0.9); font-weight: 500;
+      width: fit-content; margin-bottom: 12px;
+    }
+    .nc-title { font-size: 24px; font-weight: 700; color: #fff; line-height: 1.25; letter-spacing: -0.03em; text-shadow: 0 1px 8px rgba(0,0,0,0.3); }
+    .nc-sub { font-size: 13px; color: rgba(255,255,255,0.7); margin-top: 6px; }
+    .nc-body { padding: 24px; }
+    .nc-section { margin-bottom: 24px; }
+    .nc-label { display: inline-flex; align-items: center; gap: 5px; font-size: 10px; font-weight: 600; color: #86868b; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 10px; }
+    .nc-label .nc-dot { width: 5px; height: 5px; border-radius: 50%; }
+    .nc-text { font-size: 14px; line-height: 1.7; color: #1d1d1f; letter-spacing: -0.01em; }
+    .nc-text.opening { font-size: 15px; color: #424245; line-height: 1.75; }
+    .nc-divider { width: 28px; height: 2px; background: #d2d2d7; border-radius: 1px; margin: 24px 0; }
+    .nc-mid-img { width: 100%; border-radius: 14px; overflow: hidden; margin: 4px 0; }
+    .nc-mid-img img { width: 100%; display: block; }
+    .nc-news { background: #f5f5f7; border-radius: 14px; padding: 16px; margin-top: 2px; }
+    .nc-news-src { font-size: 10px; font-weight: 600; color: #34c759; text-transform: uppercase; letter-spacing: 0.04em; }
+    .nc-news-time { font-size: 10px; color: #86868b; margin-left: 6px; }
+    .nc-news h4 { font-size: 14px; font-weight: 600; line-height: 1.45; color: #1d1d1f; margin: 8px 0 4px; }
+    .nc-news p { font-size: 12px; line-height: 1.6; color: #6e6e73; }
+    .nc-quote { background: linear-gradient(135deg, #f5f5f7, #e8e8ed); border-radius: 18px; padding: 28px 24px; margin-top: 2px; }
+    .nc-quote-mark { font-size: 56px; line-height: 0.5; color: #d2d2d7; font-family: Georgia, serif; }
+    .nc-quote-text { font-size: 17px; font-weight: 500; line-height: 1.5; color: #1d1d1f; font-style: italic; margin: 12px 0; letter-spacing: -0.02em; }
+    .nc-quote-author { font-size: 13px; color: #6e6e73; }
+    .nc-footer { padding: 0 24px 20px; border-top: 1px solid rgba(210,210,215,0.5); margin: 0 24px; padding-top: 16px; }
+    .nc-footer-row { display: flex; align-items: center; justify-content: space-between; }
+    .nc-brand { display: flex; align-items: center; gap: 5px; font-size: 10px; color: #86868b; font-weight: 500; }
+    .nc-sources { font-size: 9px; color: #aeaeb2; text-align: right; }
+
+    .nc-actions {
+      display: flex; gap: 8px; max-width: 420px; width: 100%; margin-top: 20px;
+    }
+    .nc-act-btn {
+      flex: 1; height: 42px; border-radius: 12px; border: none;
+      font-size: 13px; font-weight: 500; cursor: pointer;
+      display: flex; align-items: center; justify-content: center; gap: 5px;
+      font-family: inherit; transition: all 0.2s;
+    }
+    .nc-act-btn.sec { background: rgba(255,255,255,0.15); color: #fff; border: 1px solid rgba(255,255,255,0.2); }
+    .nc-act-btn.sec:hover { background: rgba(255,255,255,0.25); }
+    .nc-act-btn.pri { background: #fff; color: #1d1d1f; }
+    .nc-act-btn.pri:hover { background: #f0f0f0; }
+    .nc-act-btn.ai { background: linear-gradient(135deg, #af52de, #5856d6); color: #fff; }
+    .nc-act-btn.ai:hover { opacity: 0.9; }
+
+    .nc-close {
+      position: fixed; top: 16px; right: 16px; z-index: 201;
+      width: 36px; height: 36px; border-radius: 50%;
+      background: rgba(255,255,255,0.15); border: none; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: background 0.2s; opacity: 0; pointer-events: none;
+    }
+    .narrative-overlay.show .nc-close { opacity: 1; pointer-events: auto; }
+    .nc-close:hover { background: rgba(255,255,255,0.3); }
+
+    /* prompt 预览 */
+    .nc-prompt { background: #1d1d1f; border-radius: 14px; padding: 20px; max-width: 420px; width: 100%; margin-top: 16px; display: none; }
+    .nc-prompt.show { display: block; }
+    .nc-prompt pre { font-size: 11px; line-height: 1.65; color: #e8e8ed; white-space: pre-wrap; word-break: break-word; font-family: 'SF Mono', Menlo, monospace; }
+
     @media (max-width: 480px) {
       .pixel-studio { left: 8px; right: 8px; width: auto; bottom: 88px; }
       .pixel-fab { bottom: 20px; right: 20px; width: 50px; height: 50px; }
+      .narrative-overlay { padding: 20px 12px 40px; }
+      .nc-title { font-size: 20px; }
     }
   </style>
 </head>
@@ -761,18 +924,18 @@
           <button class="mini-switch" id="pxFeatureSwitch" onclick="togglePxFeature()"></button>
         </div>
 
-        <!-- 未来功能占位 -->
-        <div class="studio-feature-item" style="opacity:0.5;">
+        <!-- 故事工坊 -->
+        <div class="studio-feature-item">
           <div class="flex items-center gap-3">
-            <div class="feature-icon" style="background:linear-gradient(135deg,#ff9500,#ff3b30);">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+            <div class="feature-icon" style="background:linear-gradient(135deg,#5856d6,#af52de);">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
             </div>
             <div>
-              <p class="text-[13px] font-medium text-apple-text-primary leading-tight">更多功能</p>
-              <p class="text-[11px] text-apple-text-tertiary mt-0.5">敬请期待...</p>
+              <p class="text-[13px] font-medium text-apple-text-primary leading-tight">故事工坊</p>
+              <p class="text-[11px] text-apple-text-tertiary mt-0.5">搜索灵感 · 生成叙事卡片</p>
             </div>
           </div>
-          <div class="text-[11px] text-apple-text-tertiary px-2">即将推出</div>
+          <button class="mini-switch" id="storyFeatureSwitch" onclick="toggleStoryFeature()"></button>
         </div>
       </div>
 
@@ -857,6 +1020,56 @@
             <button onclick="studioExportAll()" id="studioExportAllBtn" class="hidden text-[12px] text-apple-purple hover:text-purple-700 transition-colors duration-200 bg-transparent border-none cursor-pointer">导出全部帧</button>
             <button onclick="studioExport()" class="text-[12px] bg-[#af52de] hover:bg-[#9b3dc8] text-white px-4 py-1.5 rounded-full transition-colors duration-200 border-none cursor-pointer">导出当前帧</button>
           </div>
+        </div>
+      </div>
+
+      <!-- ====== 故事工坊内容区（子功能，默认隐藏）====== -->
+      <div class="story-content collapsed" id="storyContentArea">
+        <div class="border-t border-[#d2d2d7]/40"></div>
+        <div class="flex items-center justify-between px-4 pt-3 pb-1">
+          <p class="text-[12px] font-semibold" style="color:#5856d6;">故事工坊</p>
+          <span id="storyItemCount" class="text-[11px] text-apple-text-tertiary">0 个素材</span>
+        </div>
+
+        <!-- 故事骨架指示器 -->
+        <div class="story-skeleton" id="storySkeleton">
+          <span class="story-skel-item empty">🏠 场景</span>
+          <span class="story-skel-item empty">📌 情节</span>
+          <span class="story-skel-item empty">🌍 背景</span>
+          <span class="story-skel-item empty">💬 主题</span>
+        </div>
+
+        <!-- 已收集素材列表 -->
+        <div class="px-4 pb-2 space-y-2" id="storyItemList" style="max-height:180px;overflow-y:auto;">
+          <p class="text-[12px] text-apple-text-tertiary text-center py-4">搜索素材后点击 📝 添加到故事</p>
+        </div>
+
+        <!-- 生成按钮 -->
+        <div class="px-4 py-3">
+          <button class="story-generate-btn" id="storyGenBtn" onclick="generateNarrative()" disabled>
+            ✨ 生成叙事卡片
+          </button>
+          <p class="text-[10px] text-apple-text-tertiary text-center mt-2">至少添加 1 个素材即可生成</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==================== 叙事卡片 Overlay ==================== -->
+    <div class="narrative-overlay" id="narrativeOverlay">
+      <button class="nc-close" onclick="closeNarrative()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+      <div style="display:flex;flex-direction:column;align-items:center;width:100%;">
+        <div class="narrative-card" id="narrativeCardEl">
+          <!-- 由 JS 动态填充 -->
+        </div>
+        <div class="nc-actions" id="narrativeActions">
+          <button class="nc-act-btn sec" onclick="copyNarrativeText()">📋 复制文本</button>
+          <button class="nc-act-btn ai" onclick="togglePromptPreview()">✨ AI 提示词</button>
+          <button class="nc-act-btn pri" onclick="exportNarrativeImage()">📥 导出长图</button>
+        </div>
+        <div class="nc-prompt" id="promptPreview">
+          <pre id="promptPreviewText"></pre>
         </div>
       </div>
     </div>
@@ -1247,11 +1460,14 @@
     }
 
     function renderPhotos(photos, append) {
+      if (!append) storySourceData.photo = photos; else storySourceData.photo = storySourceData.photo.concat(photos);
       const grid = document.getElementById('imageGrid');
       if (!append && photos.length === 0) { grid.innerHTML = emptyMsg('没有找到相关图片'); return; }
       const fragment = document.createDocumentFragment();
+      const baseIdx = append ? storySourceData.photo.length - photos.length : 0;
       photos.forEach((photo, i) => {
         const isFav = favoriteIds.has(String(photo.id));
+        const si = baseIdx + i;
         const item = document.createElement('div');
         item.className = 'masonry-item';
         item.style.animation = `fadeIn 0.4s cubic-bezier(0.25,0.1,0.25,1) ${i*0.04}s both`;
@@ -1260,6 +1476,7 @@
                onclick="openModal('photo',{id:${photo.id},url:'${photo.src.large2x}',thumb:'${photo.src.medium}',photographer:'${esc(photo.photographer)}',w:${photo.width},h:${photo.height},original:'${photo.src.original}'})">
             <img src="${photo.src.medium}" alt="${esc(photo.alt||photo.photographer)}" loading="lazy" class="w-full block" style="aspect-ratio:${photo.width}/${photo.height}" />
             <button class="add-studio-btn" onclick="event.stopPropagation();addToStudio('${photo.src.medium}')" title="添加到创作台"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></button>
+            <button class="add-story-btn" onclick="event.stopPropagation();addFromSearch('photo',${si})" title="加入故事"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></button>
             <button class="fav-btn ${isFav?'is-fav':''}" onclick="event.stopPropagation();toggleFavorite(${photo.id},'${photo.src.large2x}','${photo.src.medium}','${esc(photo.photographer)}',${photo.width},${photo.height},'${photo.src.original}',this)">
               <svg viewBox="0 0 24 24" fill="${isFav?'#FF3B30':'none'}" stroke="${isFav?'#FF3B30':'#86868b'}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
             </button>
@@ -1288,14 +1505,17 @@
     }
 
     function renderVideos(videos, append) {
+      if (!append) storySourceData.video = videos; else storySourceData.video = storySourceData.video.concat(videos);
       const grid = document.getElementById('imageGrid');
       if (!append && videos.length === 0) { grid.innerHTML = emptyMsg('没有找到相关视频'); return; }
       const fragment = document.createDocumentFragment();
+      const baseIdx = append ? storySourceData.video.length - videos.length : 0;
       videos.forEach((v, i) => {
         const thumb = v.image;
         const duration = v.duration ? formatDuration(v.duration) : '';
         const videoFile = v.video_files?.find(f => f.quality === 'sd' || f.quality === 'hd') || v.video_files?.[0];
         const videoUrl = videoFile?.link || '';
+        const si = baseIdx + i;
         const item = document.createElement('div');
         item.className = 'masonry-item';
         item.style.animation = `fadeIn 0.4s cubic-bezier(0.25,0.1,0.25,1) ${i*0.04}s both`;
@@ -1304,6 +1524,7 @@
                onclick="openModal('video',{id:'v${v.id}',url:'${videoUrl}',thumb:'${thumb}',photographer:'${esc(v.user?.name||'')}',w:${v.width||0},h:${v.height||0},original:'${videoUrl}'})">
             <img src="${thumb}" alt="${esc(v.user?.name||'')}" loading="lazy" class="w-full block" style="aspect-ratio:${v.width||16}/${v.height||9}" />
             <button class="add-studio-btn" onclick="event.stopPropagation();addToStudio('${thumb}')" title="添加到创作台"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></button>
+            <button class="add-story-btn" onclick="event.stopPropagation();addFromSearch('video',${si})" title="加入故事"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></button>
             <div class="video-play-btn">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="#1d1d1f"><polygon points="5 3 19 12 5 21 5 3"/></svg>
             </div>
@@ -1340,14 +1561,17 @@
     }
 
     function renderGifs(gifs, append) {
+      if (!append) storySourceData.gif = gifs; else storySourceData.gif = storySourceData.gif.concat(gifs);
       const grid = document.getElementById('imageGrid');
       if (!append && gifs.length === 0) { grid.innerHTML = emptyMsg('没有找到相关 GIF'); return; }
       const fragment = document.createDocumentFragment();
+      const baseIdx = append ? storySourceData.gif.length - gifs.length : 0;
       gifs.forEach((g, i) => {
         const thumb = g.images?.fixed_width?.url || g.images?.original?.url || '';
         const original = g.images?.original?.url || '';
         const w = parseInt(g.images?.original?.width) || 200;
         const h = parseInt(g.images?.original?.height) || 200;
+        const si = baseIdx + i;
         const item = document.createElement('div');
         item.className = 'masonry-item';
         item.style.animation = `fadeIn 0.4s cubic-bezier(0.25,0.1,0.25,1) ${i*0.04}s both`;
@@ -1356,6 +1580,7 @@
                onclick="openModal('photo',{id:'g${g.id}',url:'${original}',thumb:'${thumb}',photographer:'${esc(g.username||'GIPHY')}',w:${w},h:${h},original:'${original}'})">
             <img src="${thumb}" alt="${esc(g.title||'')}" loading="lazy" class="w-full block" style="aspect-ratio:${w}/${h}" />
             <button class="add-studio-btn" onclick="event.stopPropagation();addToStudio('${original}')" title="添加到创作台"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></button>
+            <button class="add-story-btn" onclick="event.stopPropagation();addFromSearch('gif',${si})" title="加入故事"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></button>
             <span class="gif-badge">GIF</span>
             <div class="img-overlay absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-0 transition-opacity duration-300 flex flex-col justify-end p-4 pointer-events-none rounded-2xl">
               <p class="text-white text-[13px] font-medium">${g.username || 'GIPHY'}</p>
@@ -1381,10 +1606,13 @@
     }
 
     function renderIllustrations(hits, append) {
+      if (!append) storySourceData.illustration = hits; else storySourceData.illustration = storySourceData.illustration.concat(hits);
       const grid = document.getElementById('imageGrid');
       if (!append && hits.length === 0) { grid.innerHTML = emptyMsg('没有找到相关插画'); return; }
       const fragment = document.createDocumentFragment();
+      const baseIdx = append ? storySourceData.illustration.length - hits.length : 0;
       hits.forEach((h, i) => {
+        const si = baseIdx + i;
         const item = document.createElement('div');
         item.className = 'masonry-item';
         item.style.animation = `fadeIn 0.4s cubic-bezier(0.25,0.1,0.25,1) ${i*0.04}s both`;
@@ -1393,6 +1621,7 @@
                onclick="openModal('photo',{id:'px${h.id}',url:'${h.largeImageURL}',thumb:'${h.webformatURL}',photographer:'${esc(h.user||'')}',w:${h.imageWidth||0},h:${h.imageHeight||0},original:'${h.largeImageURL}'})">
             <img src="${h.webformatURL}" alt="${esc(h.tags||'')}" loading="lazy" class="w-full block" style="aspect-ratio:${h.webformatWidth||h.imageWidth||4}/${h.webformatHeight||h.imageHeight||3}" />
             <button class="add-studio-btn" onclick="event.stopPropagation();addToStudio('${h.webformatURL}')" title="添加到创作台"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></button>
+            <button class="add-story-btn" onclick="event.stopPropagation();addFromSearch('illustration',${si})" title="加入故事"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></button>
             <div class="img-overlay absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-0 transition-opacity duration-300 flex flex-col justify-end p-4 pointer-events-none rounded-2xl">
               <p class="text-white text-[13px] font-medium">${h.user || 'Pixabay'}</p>
               <p class="text-white/60 text-[11px] mt-0.5">${h.imageWidth} × ${h.imageHeight}</p>
@@ -1418,6 +1647,7 @@
     }
 
     function renderNews(articles) {
+      storySourceData.news = articles;
       const grid = document.getElementById('textGrid');
       if (articles.length === 0) { grid.innerHTML = emptyMsg('没有找到相关新闻'); return; }
       grid.innerHTML = articles.map((a, i) => {
@@ -1436,6 +1666,7 @@
               <div class="flex items-center gap-4 mt-3">
                 <a href="${a.url}" target="_blank" class="apple-link text-[13px] font-normal">阅读原文 →</a>
                 <button onclick="copyText('${esc(a.title||'')}')" class="text-[13px] text-apple-text-tertiary hover:text-apple-text-primary transition-colors cursor-pointer bg-transparent border-none">复制标题</button>
+                <button onclick="addFromSearch('news',${i})" class="add-story-btn-text">📝 加入故事</button>
               </div>
             </div>
           </div>
@@ -1457,6 +1688,7 @@
     }
 
     function renderBooks(books) {
+      storySourceData.book = books;
       const grid = document.getElementById('textGrid');
       if (books.length === 0) { grid.innerHTML = emptyMsg('没有找到相关图书'); return; }
       grid.innerHTML = books.map((b, i) => {
@@ -1476,6 +1708,7 @@
               <div class="flex items-center gap-4 mt-3">
                 <a href="${olUrl}" target="_blank" class="apple-link text-[13px] font-normal">查看详情 →</a>
                 <button onclick="copyText('${esc(b.title||'')}')" class="text-[13px] text-apple-text-tertiary hover:text-apple-text-primary transition-colors cursor-pointer bg-transparent border-none">复制书名</button>
+                <button onclick="addFromSearch('book',${i})" class="add-story-btn-text">📝 加入故事</button>
               </div>
             </div>
           </div>
@@ -1510,6 +1743,7 @@
     }
 
     function renderWiki(articles) {
+      storySourceData.wiki = articles;
       const grid = document.getElementById('textGrid');
       if (articles.length === 0) { grid.innerHTML = emptyMsg('没有找到相关百科'); return; }
       grid.innerHTML = articles.map((a, i) => {
@@ -1527,6 +1761,7 @@
               <div class="flex items-center gap-4 mt-3">
                 <a href="${wikiUrl}" target="_blank" class="apple-link text-[13px] font-normal">阅读完整词条 →</a>
                 <button onclick="copyText(\`${esc(a.title)}: ${esc(snippet.substring(0,100))}\`)" class="text-[13px] text-apple-text-tertiary hover:text-apple-text-primary transition-colors cursor-pointer bg-transparent border-none">复制摘要</button>
+                <button onclick="addFromSearch('wiki',${i})" class="add-story-btn-text">📝 加入故事</button>
               </div>
             </div>
           </div>
@@ -1548,6 +1783,7 @@
     }
 
     function renderQuotes(quotes) {
+      storySourceData.quote = quotes;
       const grid = document.getElementById('textGrid');
       if (quotes.length === 0) { grid.innerHTML = emptyMsg('没有找到相关名言'); return; }
       grid.innerHTML = quotes.map((q, i) => `
@@ -1559,6 +1795,7 @@
               <div class="flex items-center justify-between">
                 <p class="text-[14px] text-apple-text-secondary">— ${esc(q.author || '佚名')}</p>
                 <button onclick="copyText(\`${esc(q.content)} — ${esc(q.author||'佚名')}\`)" class="text-[13px] text-apple-text-tertiary hover:text-apple-text-primary transition-colors cursor-pointer bg-transparent border-none">复制</button>
+                <button onclick="addFromSearch('quote',${i})" class="add-story-btn-text">📝 加入故事</button>
               </div>
               ${q.tags?.length ? `<div class="flex gap-2 mt-3">${q.tags.slice(0,3).map(t => `<span class="text-[11px] text-apple-text-tertiary bg-[#f5f5f7] px-3 py-1 rounded-full">${t}</span>`).join('')}</div>` : ''}
             </div>
@@ -1734,6 +1971,13 @@
         document.getElementById('pxFeatureSwitch').classList.remove('on');
         document.getElementById('pxContentArea').classList.add('collapsed');
       }
+      // 重置故事工坊子功能
+      if (storyFeatureOn) {
+        storyFeatureOn = false;
+        document.body.classList.remove('story-mode');
+        document.getElementById('storyFeatureSwitch').classList.remove('on');
+        document.getElementById('storyContentArea').classList.add('collapsed');
+      }
     }
 
     function togglePxMode() {
@@ -1759,6 +2003,13 @@
       // 关闭时停止播放
       if (!pxFeatureOn && pxStudio.isPlaying) {
         studioTogglePlay();
+      }
+      // 互斥：关闭故事工坊
+      if (pxFeatureOn && storyFeatureOn) {
+        storyFeatureOn = false;
+        document.body.classList.remove('story-mode');
+        document.getElementById('storyFeatureSwitch').classList.remove('on');
+        document.getElementById('storyContentArea').classList.add('collapsed');
       }
     }
 
@@ -2087,10 +2338,526 @@
       });
     }
 
+    // ============ 故事工坊 ============
+    let storyFeatureOn = false;
+    let storyItems = [];
+    let storySourceData = { photo: [], video: [], gif: [], illustration: [], news: [], book: [], wiki: [], quote: [] };
+
+    function toggleStoryFeature() {
+      storyFeatureOn = !storyFeatureOn;
+      document.body.classList.toggle('story-mode', storyFeatureOn);
+      document.getElementById('storyFeatureSwitch').classList.toggle('on', storyFeatureOn);
+      document.getElementById('storyContentArea').classList.toggle('collapsed', !storyFeatureOn);
+      // 互斥：关闭像素块化
+      if (storyFeatureOn && pxFeatureOn) {
+        pxFeatureOn = false;
+        document.body.classList.remove('px-mode');
+        document.getElementById('pxFeatureSwitch').classList.remove('on');
+        document.getElementById('pxContentArea').classList.add('collapsed');
+        if (pxStudio.isPlaying) studioTogglePlay();
+      }
+    }
+
+    function addFromSearch(type, index) {
+      const src = storySourceData[type];
+      if (!src || !src[index]) return;
+      const d = src[index];
+      let item;
+      switch(type) {
+        case 'photo':
+          item = { thumb: d.src?.medium || '', alt: d.alt || d.photographer || '', photographer: d.photographer || '' };
+          break;
+        case 'video':
+          item = { thumb: d.image || '', alt: d.user?.name || '', photographer: d.user?.name || '' };
+          break;
+        case 'gif':
+          item = { thumb: d.images?.fixed_width?.url || '', alt: d.title || '', photographer: d.username || 'GIPHY' };
+          break;
+        case 'illustration':
+          item = { thumb: d.webformatURL || '', alt: d.tags || '', photographer: d.user || 'Pixabay' };
+          break;
+        case 'news':
+          item = { title: d.title || '', description: d.description || '', source: d.source?.name || '', time: d.publishedAt || '', image: d.image || '' };
+          break;
+        case 'book':
+          item = { title: d.title || '', author: (d.author_name||[]).slice(0,2).join(', '), year: d.first_publish_year || 0, subjects: (d.subject||[]).slice(0,3).join(' · '), cover: d.cover_i ? `https://covers.openlibrary.org/b/id/${d.cover_i}-M.jpg` : '' };
+          break;
+        case 'wiki':
+          item = { title: d.title || '', snippet: d.snippet ? d.snippet.replace(/<[^>]*>/g, '') : '' };
+          // 尝试拉取完整摘要
+          fetchWikiExtract(d.title, storyItems.length);
+          break;
+        case 'quote':
+          item = { content: d.content || d.q || '', author: d.author || d.a || '', tags: d.tags || [] };
+          break;
+        default: return;
+      }
+      const id = type + '_' + Date.now() + '_' + Math.random().toString(36).slice(2,6);
+      storyItems.push({ id, type, ...item, addedAt: Date.now() });
+      renderStoryPanel();
+      // 如果故事功能未打开，自动打开
+      if (!storyFeatureOn) toggleStoryFeature();
+      if (!studioPanelOpen) openStudioPanel();
+    }
+
+    async function fetchWikiExtract(title, itemIndex) {
+      try {
+        const url = `https://zh.wikipedia.org/w/api.php?action=query&titles=${encodeURIComponent(title)}&prop=extracts&exintro=true&explaintext=true&format=json&origin=*`;
+        const res = await fetch(url);
+        if (!res.ok) return;
+        const data = await res.json();
+        const pages = data.query?.pages;
+        if (!pages) return;
+        const page = Object.values(pages)[0];
+        if (page && page.extract && page.extract.length > 20) {
+          // 找到对应 item 并更新
+          const item = storyItems.find(it => it.type === 'wiki' && it.title === title);
+          if (item) {
+            item.snippet = page.extract.substring(0, 800);
+            item.fullExtract = true;
+          }
+        }
+      } catch(e) { /* 静默失败，用原始 snippet */ }
+    }
+
+    function removeFromStory(id) {
+      storyItems = storyItems.filter(it => it.id !== id);
+      renderStoryPanel();
+    }
+
+    function renderStoryPanel() {
+      const list = document.getElementById('storyItemList');
+      const countEl = document.getElementById('storyItemCount');
+      const genBtn = document.getElementById('storyGenBtn');
+      countEl.textContent = storyItems.length + ' 个素材';
+      genBtn.disabled = storyItems.length === 0;
+
+      // 骨架指示器
+      const hasType = t => storyItems.some(it => it.type === t);
+      const skelMap = [
+        { types: ['photo','video','gif','illustration'], label: '🏠 场景', key: 'visual' },
+        { types: ['news'], label: '📌 情节', key: 'news' },
+        { types: ['wiki','book'], label: '🌍 背景', key: 'world' },
+        { types: ['quote'], label: '💬 主题', key: 'theme' },
+      ];
+      document.getElementById('storySkeleton').innerHTML = skelMap.map(s => {
+        const filled = s.types.some(t => hasType(t));
+        return `<span class="story-skel-item ${filled ? 'filled' : 'empty'}">${s.label}</span>`;
+      }).join('');
+
+      // 素材列表
+      if (storyItems.length === 0) {
+        list.innerHTML = '<p class="text-[12px] text-apple-text-tertiary text-center py-4">搜索素材后点击 📝 添加到故事</p>';
+        return;
+      }
+      const iconMap = { photo: '📷', video: '🎬', gif: '✨', illustration: '🎨', news: '📰', book: '📚', wiki: '🌐', quote: '💬' };
+      list.innerHTML = storyItems.map(it => {
+        const hasThumb = ['photo','video','gif','illustration'].includes(it.type) && it.thumb;
+        const newsThumb = it.type === 'news' && it.image;
+        const bookThumb = it.type === 'book' && it.cover;
+        const thumbSrc = hasThumb ? it.thumb : (newsThumb ? it.image : (bookThumb ? it.cover : ''));
+        const label = it.title || it.alt || it.content || '';
+        const shortLabel = label.length > 28 ? label.substring(0, 28) + '...' : label;
+        return `<div class="story-item-card">
+          ${thumbSrc ? `<img src="${thumbSrc}" class="story-item-thumb" onerror="this.style.display='none'" />` : `<div class="story-item-icon" style="background:#f0f0f0;">${iconMap[it.type]||'📄'}</div>`}
+          <div style="flex:1;min-width:0;">
+            <p class="text-[12px] font-medium text-apple-text-primary leading-tight truncate">${shortLabel || iconMap[it.type]}</p>
+            <p class="text-[10px] text-apple-text-tertiary mt-0.5">${iconMap[it.type]} ${it.type}</p>
+          </div>
+          <button class="story-item-remove" onclick="removeFromStory('${it.id}')">✕</button>
+        </div>`;
+      }).join('');
+    }
+
+    // ============ 叙事模板引擎 ============
+    const storyTitlePatterns = [
+      '当{kw}改变一切', '{kw}：一个正在发生的故事', '关于{kw}的叙事',
+      '{kw}的时代', '我们与{kw}之间', '在{kw}的世界里',
+      '{kw}：此刻与未来', '当我们谈论{kw}时',
+    ];
+    const storyOpenings = [
+      '每个时代都有它的关键词。而我们这个时代的关键词，是{kw}。',
+      '有些故事，在它被讲述之前，就已经开始了。这是一个关于{kw}的故事。',
+      '如果你仔细观察，会发现世界正在因为{kw}而悄然改变。',
+      '在纷繁复杂的信息洪流中，{kw}是一个值得驻足思考的话题。',
+      '时间会证明，{kw}是这个时代最重要的注脚之一。',
+    ];
+    const storyTransitions = {
+      toEvent: [
+        '然而，平静之下暗流涌动。',
+        '直到有一天，一切被打破——',
+        '在这样的背景下，一件事改变了所有人的认知。',
+        '而最近发生的事，让一切从理论变成了现实。',
+      ],
+      toTheme: [
+        '面对这一切，有一种更深沉的声音——',
+        '或许，答案早已有人给出。',
+        '在喧嚣之外，有人曾这样思考过——',
+        '这让人不禁想起那句话——',
+      ],
+      toWorld: [
+        '要理解这一切，我们需要追溯更深的背景。',
+        '事情并非偶然。',
+        '这背后，是一个更大的图景。',
+      ],
+      closing: [
+        '这不仅是一个关于{kw}的叙事，更是关于我们自己的故事。',
+        '{kw}的未来，终将由每一个关注它的人共同书写。',
+        '故事还在继续。而你，已经是其中的一部分。',
+        '未来已来，只是尚未均匀分布。而我们正站在{kw}的分界线上。',
+      ],
+    };
+
+    function pick(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+    function tpl(str, kw) { return str.replace(/\{kw\}/g, kw); }
+
+    // ============ 智能封面选择 ============
+    function pickBestCover(photos, keyword) {
+      if (photos.length === 0) return null;
+      if (photos.length === 1) return { cover: photos[0], rest: [] };
+
+      const kw = (keyword || '').toLowerCase();
+      // 评分：alt/photographer 与关键词的相关性
+      const scored = photos.map((p, i) => {
+        let score = 0;
+        const alt = (p.alt || '').toLowerCase();
+        const photographer = (p.photographer || '').toLowerCase();
+        // 完全包含关键词
+        if (alt.includes(kw)) score += 10;
+        // 关键词的各个词命中
+        kw.split(/\s+/).forEach(w => {
+          if (w.length > 1 && alt.includes(w)) score += 3;
+        });
+        // 优先选尺寸更大的（更适合封面）
+        const w = p.width || 0, h = p.height || 0;
+        if (w > 0 && h > 0) {
+          const ratio = w / h;
+          // 横向图更适合做封面（4:3 左右）
+          if (ratio >= 1.2 && ratio <= 1.8) score += 2;
+        }
+        // 靠前的图有小加分
+        score -= i * 0.1;
+        return { photo: p, score, index: i };
+      });
+
+      scored.sort((a, b) => b.score - a.score);
+      const best = scored[0].photo;
+      const rest = photos.filter(p => p !== best);
+      return { cover: best, rest };
+    }
+
+    // ============ 叙事卡片生成（AI 优先 + 模板降级）============
+    async function generateNarrative() {
+      if (storyItems.length === 0) return;
+      const kw = currentQuery || '未知';
+
+      // 分类素材
+      const photos = storyItems.filter(it => ['photo','video','gif','illustration'].includes(it.type));
+      const newsItems = storyItems.filter(it => it.type === 'news');
+      const wikiItems = storyItems.filter(it => it.type === 'wiki');
+      const bookItems = storyItems.filter(it => it.type === 'book');
+      const quoteItems = storyItems.filter(it => it.type === 'quote');
+      const worldItems = [...wikiItems, ...bookItems];
+
+      // 智能选择封面
+      const coverResult = pickBestCover(photos, kw);
+      const coverPhoto = coverResult ? coverResult.cover : null;
+      const midPhotos = coverResult ? coverResult.rest : [];
+
+      // 显示加载状态
+      const genBtn = document.getElementById('storyGenBtn');
+      const origBtnText = genBtn.textContent;
+      genBtn.textContent = '✨ AI 正在创作...';
+      genBtn.disabled = true;
+
+      // 先尝试 AI 生成
+      let aiNarrative = null;
+      try {
+        const materials = storyItems.map(it => ({
+          type: it.type,
+          title: it.title || '',
+          alt: it.alt || '',
+          photographer: it.photographer || '',
+          snippet: it.snippet || '',
+          author: it.author || '',
+          year: it.year || '',
+          subjects: it.subjects || '',
+          content: it.content || '',
+          description: it.description || '',
+          source: it.source || '',
+        }));
+
+        const res = await fetch('/api/narrative/generate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + authToken },
+          body: JSON.stringify({ keyword: kw, materials })
+        });
+
+        const data = await res.json();
+        if (data.success && data.narrative) {
+          aiNarrative = data.narrative;
+        }
+      } catch (e) {
+        console.warn('AI 叙事生成失败，使用模板降级:', e);
+      }
+
+      // 恢复按钮
+      genBtn.textContent = origBtnText;
+      genBtn.disabled = storyItems.length === 0;
+
+      // 使用 AI 结果或模板降级
+      const isAI = !!aiNarrative;
+      const title = isAI ? aiNarrative.title : tpl(pick(storyTitlePatterns), kw);
+      const subtitle = isAI ? aiNarrative.subtitle : `关于「${kw}」的叙事`;
+      const opening = isAI ? aiNarrative.opening : tpl(pick(storyOpenings), kw);
+      const bgText = isAI ? aiNarrative.background : '';
+      const eventText = isAI ? aiNarrative.event : '';
+      const reflectionText = isAI ? aiNarrative.reflection : '';
+      const closingText = isAI ? aiNarrative.closing : tpl(pick(storyTransitions.closing), kw);
+      const toEventTrans = isAI ? aiNarrative.toEvent : pick(storyTransitions.toEvent);
+      const toReflectionTrans = isAI ? aiNarrative.toReflection : pick(storyTransitions.toTheme);
+
+      // 组装叙事卡片 HTML
+      let html = '';
+
+      // 封面
+      if (coverPhoto) {
+        html += `<div class="nc-cover">
+          <img src="${coverPhoto.thumb}" alt="" crossorigin="anonymous" />
+          <div class="nc-cover-overlay">
+            <div class="nc-tag">
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="none"><rect width="24" height="24" rx="5" fill="white"/><text x="12" y="17" text-anchor="middle" fill="#1d1d1f" font-size="14" font-weight="700" font-family="sans-serif">T</text></svg>
+              TIDE · 叙事卡片
+            </div>
+            <div class="nc-title">${escHtml(title)}</div>
+            <div class="nc-sub">${escHtml(subtitle)}</div>
+          </div>
+        </div>`;
+      } else {
+        html += `<div style="background:linear-gradient(135deg,#1d1d1f,#424245);padding:40px 24px;">
+          <div class="nc-tag">
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none"><rect width="24" height="24" rx="5" fill="white"/><text x="12" y="17" text-anchor="middle" fill="#1d1d1f" font-size="14" font-weight="700" font-family="sans-serif">T</text></svg>
+            TIDE · 叙事卡片
+          </div>
+          <div class="nc-title" style="margin-top:16px;">${escHtml(title)}</div>
+          <div class="nc-sub">${escHtml(subtitle)}</div>
+        </div>`;
+      }
+
+      html += '<div class="nc-body">';
+
+      // 开场白
+      html += `<div class="nc-section"><p class="nc-text opening">${escHtml(opening)}</p></div>`;
+      html += '<div class="nc-divider"></div>';
+
+      // 世界/背景段
+      if (worldItems.length > 0) {
+        html += '<div class="nc-section">';
+        html += '<div class="nc-label"><span class="nc-dot" style="background:#5ac8fa;"></span> 背景</div>';
+        // AI 生成的背景描述
+        if (bgText) {
+          html += `<p class="nc-text" style="margin-bottom:12px;">${escHtml(bgText)}</p>`;
+        }
+        // 原始素材卡片
+        worldItems.forEach(w => {
+          if (w.type === 'wiki') {
+            const text = (w.snippet || '').substring(0, 500);
+            html += `<p class="nc-text">${escHtml(text)}</p>`;
+          } else if (w.type === 'book') {
+            html += `<p class="nc-text">📚 《${escHtml(w.title)}》—— ${escHtml(w.author)}${w.year ? ' (' + w.year + ')' : ''}${w.subjects ? '。涉及领域：' + escHtml(w.subjects) : ''}</p>`;
+          }
+        });
+        html += '</div>';
+
+        if (midPhotos.length > 0) {
+          html += `<div class="nc-mid-img"><img src="${midPhotos[0].thumb}" alt="" crossorigin="anonymous" /></div>`;
+        }
+        html += '<div class="nc-divider"></div>';
+      }
+
+      // 事件段
+      if (newsItems.length > 0) {
+        html += '<div class="nc-section">';
+        html += '<div class="nc-label"><span class="nc-dot" style="background:#34c759;"></span> 事件</div>';
+        // 过渡句
+        html += `<p class="nc-text" style="margin-bottom:12px;">${escHtml(toEventTrans)}</p>`;
+        // AI 生成的事件叙事
+        if (eventText) {
+          html += `<p class="nc-text" style="margin-bottom:14px;color:#424245;font-style:italic;">${escHtml(eventText)}</p>`;
+        }
+        newsItems.forEach(n => {
+          const time = n.time ? new Date(n.time).toLocaleDateString('zh-CN', { year: 'numeric', month: 'short', day: 'numeric' }) : '';
+          html += `<div class="nc-news">
+            <span class="nc-news-src">${escHtml(n.source || '新闻')}</span><span class="nc-news-time">${time ? ' · ' + time : ''}</span>
+            <h4>${escHtml(n.title)}</h4>
+            ${n.description ? `<p>${escHtml(n.description)}</p>` : ''}
+          </div>`;
+        });
+        html += '</div>';
+        if (midPhotos.length > 1) {
+          html += `<div class="nc-mid-img"><img src="${midPhotos[1].thumb}" alt="" crossorigin="anonymous" /></div>`;
+        }
+        html += '<div class="nc-divider"></div>';
+      }
+
+      // 主题/名言段
+      if (quoteItems.length > 0) {
+        html += '<div class="nc-section">';
+        html += '<div class="nc-label"><span class="nc-dot" style="background:#af52de;"></span> 思考</div>';
+        // 过渡句
+        html += `<p class="nc-text" style="margin-bottom:14px;">${escHtml(toReflectionTrans)}</p>`;
+        // AI 生成的反思文字
+        if (reflectionText) {
+          html += `<p class="nc-text" style="margin-bottom:16px;color:#424245;">${escHtml(reflectionText)}</p>`;
+        }
+        quoteItems.forEach(q => {
+          html += `<div class="nc-quote">
+            <span class="nc-quote-mark">"</span>
+            <p class="nc-quote-text">${escHtml(q.content)}</p>
+            <p class="nc-quote-author">—— ${escHtml(q.author || '佚名')}</p>
+          </div>`;
+        });
+        html += '</div>';
+        html += '<div class="nc-divider"></div>';
+      }
+
+      // 收束
+      html += `<div class="nc-section">
+        <p class="nc-text" style="color:#424245;">${escHtml(closingText)}</p>
+      </div>`;
+
+      html += '</div>'; // nc-body end
+
+      // 页脚
+      const sources = [...new Set(storyItems.map(it => {
+        const m = { photo:'Pexels', video:'Pexels', gif:'GIPHY', illustration:'Pixabay', news:'GNews', book:'Open Library', wiki:'Wikipedia', quote:'Quotable' };
+        return m[it.type] || '';
+      }))].filter(Boolean).join(' · ');
+
+      html += `<div class="nc-footer"><div class="nc-footer-row">
+        <div class="nc-brand">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none"><rect width="24" height="24" rx="5" fill="#1d1d1f"/><text x="12" y="17" text-anchor="middle" fill="white" font-size="13" font-weight="700" font-family="sans-serif">T</text></svg>
+          TIDE Material · ${isAI ? 'AI 叙事' : '叙事卡片'}
+        </div>
+        <div class="nc-sources">素材: ${sources}</div>
+      </div></div>`;
+
+      document.getElementById('narrativeCardEl').innerHTML = html;
+
+      // 生成 AI 提示词
+      generateAIPrompt(kw, photos, newsItems, worldItems, quoteItems);
+
+      // 显示 overlay
+      document.getElementById('narrativeOverlay').classList.add('show');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function escHtml(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+    function generateAIPrompt(kw, photos, newsItems, worldItems, quoteItems) {
+      let p = `## 角色\n你是一位擅长叙事创作的写作大师。请基于以下素材创作一篇约2000字的叙事作品。\n\n`;
+
+      if (photos.length > 0) {
+        p += `## 场景意象\n`;
+        photos.forEach(ph => { p += `- ${ph.alt || '一张氛围感图片'} (摄影: ${ph.photographer || '未知'})\n`; });
+        p += `（请将这些视觉意象融入场景描写中）\n\n`;
+      }
+
+      if (worldItems.length > 0) {
+        p += `## 世界背景\n`;
+        worldItems.forEach(w => {
+          if (w.type === 'wiki') p += `${w.title}: ${(w.snippet||'').substring(0,400)}\n\n`;
+          else if (w.type === 'book') p += `参考书目:《${w.title}》${w.author} ${w.year?'('+w.year+')':''}${w.subjects?' 涉及:'+w.subjects:''}\n\n`;
+        });
+      }
+
+      if (newsItems.length > 0) {
+        p += `## 情节种子\n`;
+        newsItems.forEach(n => { p += `${n.title}\n${n.description || ''}\n（来源: ${n.source}，请将此真实事件虚构化为故事情节）\n\n`; });
+      }
+
+      if (quoteItems.length > 0) {
+        p += `## 主题锚点\n`;
+        quoteItems.forEach(q => { p += `"${q.content}" —— ${q.author || '佚名'}\n（请融入角色对白或叙述中呼应此主题）\n\n`; });
+      }
+
+      p += `## 创作要求\n`;
+      p += `- 体裁: 叙事散文或短篇小说\n`;
+      p += `- 字数: 约 2000 字\n`;
+      p += `- 视角: 第三人称\n`;
+      p += `- 结构: 以场景描写开篇 → 引入事件 → 展开思考 → 以主题呼应收束\n`;
+      p += `- 基调: 冷静、克制、有画面感\n`;
+      p += `- 将新闻事件虚构化，不使用真实公司/人名\n`;
+      p += `- 用中文创作\n`;
+
+      document.getElementById('promptPreviewText').textContent = p;
+    }
+
+    function closeNarrative() {
+      document.getElementById('narrativeOverlay').classList.remove('show');
+      document.body.style.overflow = '';
+      document.getElementById('promptPreview').classList.remove('show');
+    }
+
+    function copyNarrativeText() {
+      const card = document.getElementById('narrativeCardEl');
+      const text = card.innerText || card.textContent || '';
+      navigator.clipboard.writeText(text).then(() => {
+        const btn = event.target.closest('.nc-act-btn');
+        if (btn) { const o = btn.textContent; btn.textContent = '✅ 已复制'; setTimeout(() => btn.textContent = o, 1500); }
+      });
+    }
+
+    function togglePromptPreview() {
+      const el = document.getElementById('promptPreview');
+      el.classList.toggle('show');
+      if (el.classList.contains('show')) {
+        // 自动复制
+        const text = document.getElementById('promptPreviewText').textContent;
+        navigator.clipboard.writeText(text).then(() => {
+          const btn = event.target.closest('.nc-act-btn');
+          if (btn) { const o = btn.textContent; btn.textContent = '✅ 已复制到剪贴板'; setTimeout(() => btn.textContent = o, 2000); }
+        }).catch(() => {});
+      }
+    }
+
+    function exportNarrativeImage() {
+      const card = document.getElementById('narrativeCardEl');
+      // 使用 canvas 绘制导出
+      const btn = event.target.closest('.nc-act-btn');
+      if (btn) { btn.textContent = '⏳ 生成中...'; }
+
+      // 动态加载 html2canvas
+      if (typeof html2canvas === 'undefined') {
+        const s = document.createElement('script');
+        s.src = 'https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js';
+        s.onload = () => doExport(card, btn);
+        s.onerror = () => { if (btn) btn.textContent = '📥 导出长图'; alert('导出库加载失败，请复制文本使用'); };
+        document.head.appendChild(s);
+      } else {
+        doExport(card, btn);
+      }
+    }
+
+    function doExport(card, btn) {
+      html2canvas(card, { useCORS: true, allowTaint: false, scale: 2, backgroundColor: '#ffffff' }).then(canvas => {
+        const link = document.createElement('a');
+        link.download = 'tide-narrative-' + Date.now() + '.png';
+        link.href = canvas.toDataURL('image/png');
+        link.click();
+        if (btn) btn.textContent = '📥 导出长图';
+      }).catch(err => {
+        console.warn('导出失败:', err);
+        if (btn) btn.textContent = '📥 导出长图';
+        alert('图片导出失败（可能是跨域限制），请使用复制文本功能');
+      });
+    }
+
     // ============ 键盘事件 ============
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape') {
-        if (!document.getElementById('modal').classList.contains('hidden')) closeModal();
+        if (document.getElementById('narrativeOverlay').classList.contains('show')) closeNarrative();
+        else if (!document.getElementById('modal').classList.contains('hidden')) closeModal();
         else if (panelOpen) closePanel();
       }
       if (e.key === 'Enter') {

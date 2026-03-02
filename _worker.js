@@ -1,11 +1,13 @@
-// ============ TIDE Material API v2 ============
+// ============ TIDE Material API v3 — 超级素材搜索 ============
 // Cloudflare Pages _worker.js
-// 功能: 用户认证, Pexels搜索代理, 频率限制, Session过期, 登录保护, 收藏
+// 功能: 用户认证, 多API搜索代理(Pexels/Pixabay/GIPHY/GNews), 频率限制, Session过期, 登录保护, 收藏
 
 // ============ 配置 ============
-const PEXELS_API_KEY = 'QzRQUCCS2KSutNKlsXUE81M0zkPm56V01Nh0DrTW4nZZQOY939KBxhct';
+// API Keys 从 Cloudflare 环境变量读取（通过 wrangler secret put 设置）
+// 在 handleApi 中从 env 读取并传递给各 handler
+
 const SESSION_EXPIRY_DAYS = 7;
-const SEARCH_LIMIT_PER_HOUR = 30;
+const SEARCH_LIMIT_PER_HOUR = 50; // 提升到50次，因为现在有更多搜索类型
 const MAX_LOGIN_ATTEMPTS = 5;
 const LOCKOUT_MINUTES = 15;
 
@@ -45,31 +47,35 @@ async function hashPassword(password, salt) {
 
 async function ensureDB(env) {
   try {
-    // 快速检查：如果 rate_limits 表已存在则跳过
+    try {
+      const cols = await env.DB.prepare("PRAGMA table_info(sessions)").all();
+      const hasExpires = cols.results.some(c => c.name === 'expires_at');
+      if (!hasExpires) {
+        await env.DB.prepare("ALTER TABLE sessions ADD COLUMN expires_at TEXT").run();
+      }
+    } catch (e) { /* ignore */ }
+
     const check = await env.DB.prepare(
-      "SELECT name FROM sqlite_master WHERE type='table' AND name='rate_limits'"
+      "SELECT name FROM sqlite_master WHERE type='table' AND name='login_attempts'"
     ).first();
     if (check) return;
 
-    // 创建新表
-    await env.DB.exec(`
-      CREATE TABLE IF NOT EXISTS rate_limits (
+    await env.DB.batch([
+      env.DB.prepare(`CREATE TABLE IF NOT EXISTS rate_limits (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         user_id INTEGER NOT NULL,
         action TEXT NOT NULL,
         window_key TEXT NOT NULL,
         count INTEGER DEFAULT 1,
         UNIQUE(user_id, action, window_key)
-      );
-
-      CREATE TABLE IF NOT EXISTS login_attempts (
+      )`),
+      env.DB.prepare(`CREATE TABLE IF NOT EXISTS login_attempts (
         username TEXT PRIMARY KEY,
         attempts INTEGER DEFAULT 0,
         first_attempt_at TEXT,
         locked_until TEXT
-      );
-
-      CREATE TABLE IF NOT EXISTS favorites (
+      )`),
+      env.DB.prepare(`CREATE TABLE IF NOT EXISTS favorites (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         user_id INTEGER NOT NULL,
         photo_id TEXT NOT NULL,
@@ -81,22 +87,14 @@ async function ensureDB(env) {
         original_url TEXT,
         created_at TEXT DEFAULT (datetime('now')),
         UNIQUE(user_id, photo_id)
-      );
-    `);
-
-    // 尝试给 sessions 表添加过期字段（已存在则忽略）
-    try {
-      await env.DB.exec("ALTER TABLE sessions ADD COLUMN created_at TEXT DEFAULT (datetime('now'))");
-    } catch (e) { /* 列可能已存在 */ }
-    try {
-      await env.DB.exec("ALTER TABLE sessions ADD COLUMN expires_at TEXT");
-    } catch (e) { /* 列可能已存在 */ }
+      )`)
+    ]);
   } catch (e) {
     console.error('DB init error:', e);
   }
 }
 
-// ============ Session 管理（含过期检查）============
+// ============ Session 管理 ============
 
 async function getUser(request, env) {
   const token = request.headers.get('Authorization')?.replace('Bearer ', '');
@@ -108,7 +106,6 @@ async function getUser(request, env) {
 
   if (!session) return null;
 
-  // 检查 Session 是否过期
   const expiresAt = session.expires_at
     ? new Date(session.expires_at)
     : session.created_at
@@ -142,7 +139,7 @@ async function createSession(env, userId) {
 // ============ 频率限制 ============
 
 async function checkRateLimit(env, userId, action, maxCount) {
-  const windowKey = new Date().toISOString().slice(0, 13); // 按小时窗口 "2026-03-02T07"
+  const windowKey = new Date().toISOString().slice(0, 13);
 
   const existing = await env.DB.prepare(
     'SELECT count FROM rate_limits WHERE user_id = ? AND action = ? AND window_key = ?'
@@ -158,7 +155,6 @@ async function checkRateLimit(env, userId, action, maxCount) {
     return { allowed: true, remaining: maxCount - existing.count - 1, limit: maxCount };
   }
 
-  // 清理旧窗口记录
   await env.DB.prepare(
     'DELETE FROM rate_limits WHERE user_id = ? AND action = ? AND window_key != ?'
   ).bind(userId, action, windowKey).run();
@@ -185,7 +181,6 @@ async function isLoginLocked(env, username) {
       const minutesLeft = Math.ceil((lockedUntil - new Date()) / 60000);
       return { locked: true, minutesLeft };
     }
-    // 锁定已过期，重置
     await env.DB.prepare(
       'UPDATE login_attempts SET attempts = 0, locked_until = NULL WHERE username = ?'
     ).bind(username).run();
@@ -230,57 +225,36 @@ async function handleRegister(request, env) {
   try {
     const { username, password } = await request.json();
 
-    if (!username || !password) {
-      return json({ error: '用户名和密码不能为空' }, 400);
-    }
-    if (username.length < 3 || username.length > 20) {
-      return json({ error: '用户名长度需要 3-20 个字符' }, 400);
-    }
-    if (password.length < 6) {
-      return json({ error: '密码至少需要 6 个字符' }, 400);
-    }
+    if (!username || !password) return json({ error: '用户名和密码不能为空' }, 400);
+    if (username.length < 3 || username.length > 20) return json({ error: '用户名长度需要 3-20 个字符' }, 400);
+    if (password.length < 6) return json({ error: '密码至少需要 6 个字符' }, 400);
 
-    const existing = await env.DB.prepare(
-      'SELECT id FROM users WHERE username = ?'
-    ).bind(username).first();
-
-    if (existing) {
-      return json({ error: '用户名已被注册' }, 409);
-    }
+    const existing = await env.DB.prepare('SELECT id FROM users WHERE username = ?').bind(username).first();
+    if (existing) return json({ error: '用户名已被注册' }, 409);
 
     const salt = generateSalt();
     const passwordHash = await hashPassword(password, salt);
-
     const result = await env.DB.prepare(
       'INSERT INTO users (username, password_hash, salt) VALUES (?, ?, ?)'
     ).bind(username, passwordHash, salt).run();
 
     const token = await createSession(env, result.meta.last_row_id);
-
     return json({ success: true, message: '注册成功', token, username });
   } catch (error) {
     return json({ error: '注册失败: ' + error.message }, 500);
   }
 }
 
-// ============ 登录（含防暴力破解）============
+// ============ 登录 ============
 
 async function handleLogin(request, env) {
   try {
     const { username, password } = await request.json();
+    if (!username || !password) return json({ error: '用户名和密码不能为空' }, 400);
 
-    if (!username || !password) {
-      return json({ error: '用户名和密码不能为空' }, 400);
-    }
-
-    // 检查是否被锁定
     const lockStatus = await isLoginLocked(env, username);
     if (lockStatus.locked) {
-      return json({
-        error: `登录已被锁定，请 ${lockStatus.minutesLeft} 分钟后再试`,
-        locked: true,
-        minutesLeft: lockStatus.minutesLeft
-      }, 429);
+      return json({ error: `登录已被锁定，请 ${lockStatus.minutesLeft} 分钟后再试`, locked: true, minutesLeft: lockStatus.minutesLeft }, 429);
     }
 
     const user = await env.DB.prepare(
@@ -289,26 +263,19 @@ async function handleLogin(request, env) {
 
     if (!user) {
       const result = await recordFailedLogin(env, username);
-      if (result.locked) {
-        return json({ error: `连续登录失败 ${MAX_LOGIN_ATTEMPTS} 次，账户已锁定 ${LOCKOUT_MINUTES} 分钟`, locked: true }, 429);
-      }
+      if (result.locked) return json({ error: `连续登录失败 ${MAX_LOGIN_ATTEMPTS} 次，账户已锁定 ${LOCKOUT_MINUTES} 分钟`, locked: true }, 429);
       return json({ error: `用户名或密码错误（还可尝试 ${result.attemptsLeft} 次）` }, 401);
     }
 
     const passwordHash = await hashPassword(password, user.salt);
     if (passwordHash !== user.password_hash) {
       const result = await recordFailedLogin(env, username);
-      if (result.locked) {
-        return json({ error: `连续登录失败 ${MAX_LOGIN_ATTEMPTS} 次，账户已锁定 ${LOCKOUT_MINUTES} 分钟`, locked: true }, 429);
-      }
+      if (result.locked) return json({ error: `连续登录失败 ${MAX_LOGIN_ATTEMPTS} 次，账户已锁定 ${LOCKOUT_MINUTES} 分钟`, locked: true }, 429);
       return json({ error: `用户名或密码错误（还可尝试 ${result.attemptsLeft} 次）` }, 401);
     }
 
-    // 登录成功，清除失败记录
     await clearLoginAttempts(env, username);
-
     const token = await createSession(env, user.id);
-
     return json({ success: true, token, username: user.username });
   } catch (error) {
     return json({ error: '登录失败: ' + error.message }, 500);
@@ -320,9 +287,7 @@ async function handleLogin(request, env) {
 async function handleLogout(request, env) {
   try {
     const token = request.headers.get('Authorization')?.replace('Bearer ', '');
-    if (token) {
-      await env.DB.prepare('DELETE FROM sessions WHERE token = ?').bind(token).run();
-    }
+    if (token) await env.DB.prepare('DELETE FROM sessions WHERE token = ?').bind(token).run();
     return json({ success: true });
   } catch (error) {
     return json({ error: '登出失败' }, 500);
@@ -341,51 +306,236 @@ async function handleMe(request, env) {
   }
 }
 
-// ============ Pexels 搜索代理（含频率限制）============
+// ============ 搜索：Pexels 图片 ============
 
-async function handleSearch(request, env, url) {
+async function handleSearchPhoto(request, env, url) {
   try {
     const user = await getUser(request, env);
     if (!user) return json({ error: '未登录' }, 401);
 
-    // 频率限制检查
     const rateCheck = await checkRateLimit(env, user.id, 'search', SEARCH_LIMIT_PER_HOUR);
-    if (!rateCheck.allowed) {
-      return json({
-        error: '本小时搜索次数已用完，请稍后再试',
-        rate: { remaining: 0, limit: rateCheck.limit }
-      }, 429);
-    }
+    if (!rateCheck.allowed) return json({ error: '本小时搜索次数已用完，请稍后再试', rate: { remaining: 0, limit: rateCheck.limit } }, 429);
 
     const query = url.searchParams.get('query') || '';
     const page = url.searchParams.get('page') || '1';
     const perPage = url.searchParams.get('per_page') || '20';
-
-    if (!query.trim()) {
-      return json({ error: '搜索词不能为空' }, 400);
-    }
+    if (!query.trim()) return json({ error: '搜索词不能为空' }, 400);
 
     const pexelsUrl = `https://api.pexels.com/v1/search?query=${encodeURIComponent(query)}&per_page=${perPage}&page=${page}`;
-    const pexelsRes = await fetch(pexelsUrl, {
-      headers: { 'Authorization': PEXELS_API_KEY }
-    });
+    const pexelsRes = await fetch(pexelsUrl, { headers: { 'Authorization': env.PEXELS_API_KEY } });
 
     if (!pexelsRes.ok) {
-      if (pexelsRes.status === 429) {
-        return json({ error: 'Pexels API 配额已达上限，请稍后再试' }, 429);
-      }
+      if (pexelsRes.status === 429) return json({ error: 'Pexels API 配额已达上限' }, 429);
       throw new Error('Pexels API 返回 ' + pexelsRes.status);
     }
 
     const data = await pexelsRes.json();
-
-    return json({
-      ...data,
-      _rate: { remaining: rateCheck.remaining, limit: rateCheck.limit }
-    });
+    return json({ ...data, _rate: { remaining: rateCheck.remaining, limit: rateCheck.limit } });
   } catch (error) {
     return json({ error: '搜索失败: ' + error.message }, 500);
   }
+}
+
+// ============ 搜索：Pexels 视频 ============
+
+async function handleSearchVideo(request, env, url) {
+  try {
+    const user = await getUser(request, env);
+    if (!user) return json({ error: '未登录' }, 401);
+
+    const rateCheck = await checkRateLimit(env, user.id, 'search', SEARCH_LIMIT_PER_HOUR);
+    if (!rateCheck.allowed) return json({ error: '本小时搜索次数已用完', rate: { remaining: 0, limit: rateCheck.limit } }, 429);
+
+    const query = url.searchParams.get('query') || '';
+    const page = url.searchParams.get('page') || '1';
+    const perPage = url.searchParams.get('per_page') || '15';
+    if (!query.trim()) return json({ error: '搜索词不能为空' }, 400);
+
+    const pexelsUrl = `https://api.pexels.com/videos/search?query=${encodeURIComponent(query)}&per_page=${perPage}&page=${page}`;
+    const pexelsRes = await fetch(pexelsUrl, { headers: { 'Authorization': env.PEXELS_API_KEY } });
+
+    if (!pexelsRes.ok) {
+      if (pexelsRes.status === 429) return json({ error: 'Pexels Video API 配额已达上限' }, 429);
+      throw new Error('Pexels Video API 返回 ' + pexelsRes.status);
+    }
+
+    const data = await pexelsRes.json();
+    return json({ ...data, _rate: { remaining: rateCheck.remaining, limit: rateCheck.limit } });
+  } catch (error) {
+    return json({ error: '视频搜索失败: ' + error.message }, 500);
+  }
+}
+
+// ============ 搜索：Pixabay 插画 ============
+
+async function handleSearchIllustration(request, env, url) {
+  try {
+    if (!env.PIXABAY_API_KEY) return json({ error: 'Pixabay API Key 未配置，请在 Cloudflare 环境变量中设置 PIXABAY_API_KEY' }, 503);
+
+    const user = await getUser(request, env);
+    if (!user) return json({ error: '未登录' }, 401);
+
+    const rateCheck = await checkRateLimit(env, user.id, 'search', SEARCH_LIMIT_PER_HOUR);
+    if (!rateCheck.allowed) return json({ error: '本小时搜索次数已用完', rate: { remaining: 0, limit: rateCheck.limit } }, 429);
+
+    const query = url.searchParams.get('query') || '';
+    const page = url.searchParams.get('page') || '1';
+    const perPage = url.searchParams.get('per_page') || '20';
+    if (!query.trim()) return json({ error: '搜索词不能为空' }, 400);
+
+    const pixabayUrl = `https://pixabay.com/api/?key=${env.PIXABAY_API_KEY}&q=${encodeURIComponent(query)}&per_page=${perPage}&page=${page}&image_type=illustration&safesearch=true`;
+    const pixRes = await fetch(pixabayUrl);
+
+    if (!pixRes.ok) throw new Error('Pixabay API 返回 ' + pixRes.status);
+
+    const data = await pixRes.json();
+    return json({ ...data, _rate: { remaining: rateCheck.remaining, limit: rateCheck.limit } });
+  } catch (error) {
+    return json({ error: '插画搜索失败: ' + error.message }, 500);
+  }
+}
+
+// ============ 搜索：GIPHY GIF ============
+
+async function handleSearchGif(request, env, url) {
+  try {
+    if (!env.GIPHY_API_KEY) return json({ error: 'GIPHY API Key 未配置，请在 Cloudflare 环境变量中设置 GIPHY_API_KEY' }, 503);
+
+    const user = await getUser(request, env);
+    if (!user) return json({ error: '未登录' }, 401);
+
+    const rateCheck = await checkRateLimit(env, user.id, 'search', SEARCH_LIMIT_PER_HOUR);
+    if (!rateCheck.allowed) return json({ error: '本小时搜索次数已用完', rate: { remaining: 0, limit: rateCheck.limit } }, 429);
+
+    const query = url.searchParams.get('query') || '';
+    const offset = url.searchParams.get('offset') || '0';
+    const limit = url.searchParams.get('limit') || '20';
+    if (!query.trim()) return json({ error: '搜索词不能为空' }, 400);
+
+    const giphyUrl = `https://api.giphy.com/v1/gifs/search?api_key=${env.GIPHY_API_KEY}&q=${encodeURIComponent(query)}&limit=${limit}&offset=${offset}&rating=g&lang=en`;
+    const giphyRes = await fetch(giphyUrl);
+
+    if (!giphyRes.ok) throw new Error('GIPHY API 返回 ' + giphyRes.status);
+
+    const data = await giphyRes.json();
+    return json({ ...data, _rate: { remaining: rateCheck.remaining, limit: rateCheck.limit } });
+  } catch (error) {
+    return json({ error: 'GIF搜索失败: ' + error.message }, 500);
+  }
+}
+
+// ============ 搜索：GNews 新闻 ============
+
+async function handleSearchNews(request, env, url) {
+  try {
+    if (!env.GNEWS_API_KEY) return json({ error: 'GNews API Key 未配置，请在 Cloudflare 环境变量中设置 GNEWS_API_KEY' }, 503);
+
+    const user = await getUser(request, env);
+    if (!user) return json({ error: '未登录' }, 401);
+
+    const rateCheck = await checkRateLimit(env, user.id, 'search', SEARCH_LIMIT_PER_HOUR);
+    if (!rateCheck.allowed) return json({ error: '本小时搜索次数已用完', rate: { remaining: 0, limit: rateCheck.limit } }, 429);
+
+    const query = url.searchParams.get('query') || '';
+    if (!query.trim()) return json({ error: '搜索词不能为空' }, 400);
+
+    // 检测是否包含中文字符，自动选择语言
+    const hasChinese = /[\u4e00-\u9fff]/.test(query);
+    const lang = hasChinese ? 'zh' : 'en';
+    const gnewsUrl = `https://gnews.io/api/v4/search?q=${encodeURIComponent(query)}&lang=${lang}&max=10&token=${env.GNEWS_API_KEY}`;
+    const gnewsRes = await fetch(gnewsUrl);
+
+    if (!gnewsRes.ok) throw new Error('GNews API 返回 ' + gnewsRes.status);
+
+    const data = await gnewsRes.json();
+    return json({ ...data, _rate: { remaining: rateCheck.remaining, limit: rateCheck.limit } });
+  } catch (error) {
+    return json({ error: '新闻搜索失败: ' + error.message }, 500);
+  }
+}
+
+// ============ 搜索：名言（后端代理）============
+
+async function handleSearchQuotes(request, env, url) {
+  try {
+    const query = url.searchParams.get('query') || '';
+    if (!query.trim()) return json({ error: '搜索词不能为空' }, 400);
+
+    let quotes = [];
+
+    // 方案1: 尝试 Quotable API
+    try {
+      const res = await fetch(`https://api.quotable.io/search/quotes?query=${encodeURIComponent(query)}&limit=10`);
+      if (res.ok) {
+        const data = await res.json();
+        quotes = (data.results || []).map(r => ({ content: r.content, author: r.author, tags: r.tags || [] }));
+      }
+    } catch (e) { /* fallback */ }
+
+    // 方案2: 如果 Quotable 失败，用 ZenQuotes
+    if (quotes.length === 0) {
+      try {
+        const res = await fetch('https://zenquotes.io/api/quotes');
+        if (res.ok) {
+          const data = await res.json();
+          if (Array.isArray(data)) {
+            const q = query.toLowerCase();
+            // 过滤匹配关键词的名言
+            const matched = data.filter(d => d.q && (d.q.toLowerCase().includes(q) || d.a?.toLowerCase().includes(q)));
+            const source = matched.length > 0 ? matched : data;
+            quotes = source.filter(d => d.q && d.a !== 'zenquotes.io').slice(0, 15).map(d => ({ content: d.q, author: d.a || 'Unknown', tags: [] }));
+          }
+        }
+      } catch (e) { /* fallback */ }
+    }
+
+    // 方案3: 如果全部失败，用 Forismatic + 内置名言库
+    if (quotes.length === 0) {
+      quotes = getBuiltinQuotes(query);
+    }
+
+    return json({ quotes });
+  } catch (error) {
+    return json({ error: '名言搜索失败: ' + error.message }, 500);
+  }
+}
+
+// 内置名言库（兜底）
+function getBuiltinQuotes(query) {
+  const allQuotes = [
+    { content: "The only way to do great work is to love what you do.", author: "Steve Jobs", tags: ["success", "work", "inspirational"] },
+    { content: "Innovation distinguishes between a leader and a follower.", author: "Steve Jobs", tags: ["success", "leadership"] },
+    { content: "Life is what happens when you're busy making other plans.", author: "John Lennon", tags: ["life", "wisdom"] },
+    { content: "The future belongs to those who believe in the beauty of their dreams.", author: "Eleanor Roosevelt", tags: ["inspirational", "success"] },
+    { content: "It is during our darkest moments that we must focus to see the light.", author: "Aristotle", tags: ["inspirational", "wisdom"] },
+    { content: "The only impossible journey is the one you never begin.", author: "Tony Robbins", tags: ["inspirational", "success"] },
+    { content: "In the middle of difficulty lies opportunity.", author: "Albert Einstein", tags: ["wisdom", "success"] },
+    { content: "Success is not final, failure is not fatal: it is the courage to continue that counts.", author: "Winston Churchill", tags: ["success", "courage"] },
+    { content: "Believe you can and you're halfway there.", author: "Theodore Roosevelt", tags: ["inspirational", "success"] },
+    { content: "The best time to plant a tree was 20 years ago. The second best time is now.", author: "Chinese Proverb", tags: ["wisdom", "life"] },
+    { content: "Happiness is not something ready made. It comes from your own actions.", author: "Dalai Lama", tags: ["happiness", "wisdom"] },
+    { content: "Be yourself; everyone else is already taken.", author: "Oscar Wilde", tags: ["life", "wisdom"] },
+    { content: "Two things are infinite: the universe and human stupidity; and I'm not sure about the universe.", author: "Albert Einstein", tags: ["wisdom", "humor"] },
+    { content: "You miss 100% of the shots you don't take.", author: "Wayne Gretzky", tags: ["success", "inspirational"] },
+    { content: "The only limit to our realization of tomorrow will be our doubts of today.", author: "Franklin D. Roosevelt", tags: ["inspirational", "success"] },
+    { content: "Do what you can, with what you have, where you are.", author: "Theodore Roosevelt", tags: ["inspirational", "life"] },
+    { content: "Everything you've ever wanted is on the other side of fear.", author: "George Addair", tags: ["courage", "inspirational"] },
+    { content: "The mind is everything. What you think you become.", author: "Buddha", tags: ["wisdom", "life"] },
+    { content: "Strive not to be a success, but rather to be of value.", author: "Albert Einstein", tags: ["success", "life"] },
+    { content: "The best revenge is massive success.", author: "Frank Sinatra", tags: ["success", "inspirational"] },
+    { content: "Love all, trust a few, do wrong to none.", author: "William Shakespeare", tags: ["love", "wisdom"] },
+    { content: "To love and be loved is to feel the sun from both sides.", author: "David Viscott", tags: ["love", "happiness"] },
+    { content: "Where there is love there is life.", author: "Mahatma Gandhi", tags: ["love", "life"] },
+    { content: "The greatest glory in living lies not in never falling, but in rising every time we fall.", author: "Nelson Mandela", tags: ["inspirational", "courage"] },
+    { content: "It does not matter how slowly you go as long as you do not stop.", author: "Confucius", tags: ["wisdom", "success"] },
+  ];
+  const q = query.toLowerCase();
+  const matched = allQuotes.filter(quote =>
+    quote.content.toLowerCase().includes(q) ||
+    quote.author.toLowerCase().includes(q) ||
+    quote.tags.some(t => t.includes(q))
+  );
+  return matched.length > 0 ? matched : allQuotes.slice(0, 10);
 }
 
 // ============ 搜索历史 ============
@@ -394,11 +544,9 @@ async function handleGetHistory(request, env) {
   try {
     const user = await getUser(request, env);
     if (!user) return json({ error: '未登录' }, 401);
-
     const { results } = await env.DB.prepare(
       'SELECT id, query, created_at FROM search_history WHERE user_id = ? ORDER BY created_at DESC LIMIT 50'
     ).bind(user.id).all();
-
     return json({ history: results });
   } catch (error) {
     return json({ error: '获取历史失败' }, 500);
@@ -409,20 +557,14 @@ async function handleSaveHistory(request, env) {
   try {
     const user = await getUser(request, env);
     if (!user) return json({ error: '未登录' }, 401);
-
     const { query } = await request.json();
     if (!query) return json({ error: '搜索词不能为空' }, 400);
-
     const last = await env.DB.prepare(
       'SELECT query FROM search_history WHERE user_id = ? ORDER BY created_at DESC LIMIT 1'
     ).bind(user.id).first();
-
     if (!last || last.query !== query) {
-      await env.DB.prepare(
-        'INSERT INTO search_history (user_id, query) VALUES (?, ?)'
-      ).bind(user.id, query).run();
+      await env.DB.prepare('INSERT INTO search_history (user_id, query) VALUES (?, ?)').bind(user.id, query).run();
     }
-
     return json({ success: true });
   } catch (error) {
     return json({ error: '保存历史失败' }, 500);
@@ -435,11 +577,9 @@ async function handleGetFavorites(request, env) {
   try {
     const user = await getUser(request, env);
     if (!user) return json({ error: '未登录' }, 401);
-
     const { results } = await env.DB.prepare(
       'SELECT id, photo_id, photo_url, photo_thumb, photographer, width, height, original_url, created_at FROM favorites WHERE user_id = ? ORDER BY created_at DESC LIMIT 200'
     ).bind(user.id).all();
-
     return json({ favorites: results });
   } catch (error) {
     return json({ error: '获取收藏失败' }, 500);
@@ -450,17 +590,11 @@ async function handleAddFavorite(request, env) {
   try {
     const user = await getUser(request, env);
     if (!user) return json({ error: '未登录' }, 401);
-
     const { photo_id, photo_url, photo_thumb, photographer, width, height, original_url } = await request.json();
-
-    if (!photo_id || !photo_url) {
-      return json({ error: '参数缺失' }, 400);
-    }
-
+    if (!photo_id || !photo_url) return json({ error: '参数缺失' }, 400);
     await env.DB.prepare(
       'INSERT OR IGNORE INTO favorites (user_id, photo_id, photo_url, photo_thumb, photographer, width, height, original_url) VALUES (?, ?, ?, ?, ?, ?, ?, ?)'
     ).bind(user.id, String(photo_id), photo_url, photo_thumb || photo_url, photographer || '', width || 0, height || 0, original_url || photo_url).run();
-
     return json({ success: true });
   } catch (error) {
     return json({ error: '收藏失败: ' + error.message }, 500);
@@ -471,17 +605,141 @@ async function handleRemoveFavorite(request, env) {
   try {
     const user = await getUser(request, env);
     if (!user) return json({ error: '未登录' }, 401);
-
     const { photo_id } = await request.json();
     if (!photo_id) return json({ error: '参数缺失' }, 400);
-
-    await env.DB.prepare(
-      'DELETE FROM favorites WHERE user_id = ? AND photo_id = ?'
-    ).bind(user.id, String(photo_id)).run();
-
+    await env.DB.prepare('DELETE FROM favorites WHERE user_id = ? AND photo_id = ?').bind(user.id, String(photo_id)).run();
     return json({ success: true });
   } catch (error) {
     return json({ error: '取消收藏失败' }, 500);
+  }
+}
+
+// ============ AI 叙事生成 ============
+
+async function handleGenerateNarrative(request, env) {
+  try {
+    const user = await getUser(request, env);
+    if (!user) return json({ error: '未登录' }, 401);
+
+    // AI 频率限制：每小时 20 次
+    const rateCheck = await checkRateLimit(env, user.id, 'ai_narrative', 20);
+    if (!rateCheck.allowed) return json({ error: '本小时 AI 生成次数已用完，请稍后再试' }, 429);
+
+    const { keyword, materials } = await request.json();
+    if (!keyword || !materials || materials.length === 0) {
+      return json({ error: '关键词和素材不能为空' }, 400);
+    }
+
+    // 检查 AI binding 是否可用
+    if (!env.AI) {
+      return json({ error: 'AI 未配置', fallback: true }, 503);
+    }
+
+    // 组装素材上下文
+    let context = '';
+
+    const photos = materials.filter(m => ['photo','video','gif','illustration'].includes(m.type));
+    const newsItems = materials.filter(m => m.type === 'news');
+    const wikiItems = materials.filter(m => m.type === 'wiki');
+    const bookItems = materials.filter(m => m.type === 'book');
+    const quoteItems = materials.filter(m => m.type === 'quote');
+
+    if (photos.length > 0) {
+      context += '【视觉素材】\n';
+      photos.forEach(p => { context += `- ${p.alt || '一张图片'} (摄影师: ${p.photographer || '未知'})\n`; });
+      context += '\n';
+    }
+
+    if (wikiItems.length > 0) {
+      context += '【百科背景】\n';
+      wikiItems.forEach(w => { context += `${w.title}: ${(w.snippet || '').substring(0, 400)}\n`; });
+      context += '\n';
+    }
+
+    if (bookItems.length > 0) {
+      context += '【参考书目】\n';
+      bookItems.forEach(b => { context += `《${b.title}》${b.author || ''} ${b.year ? '(' + b.year + ')' : ''} ${b.subjects ? '涉及领域: ' + b.subjects : ''}\n`; });
+      context += '\n';
+    }
+
+    if (newsItems.length > 0) {
+      context += '【相关新闻】\n';
+      newsItems.forEach(n => { context += `${n.title}\n${n.description || ''}\n来源: ${n.source || '未知'}\n\n`; });
+    }
+
+    if (quoteItems.length > 0) {
+      context += '【名言引用】\n';
+      quoteItems.forEach(q => { context += `"${q.content}" —— ${q.author || '佚名'}\n`; });
+      context += '\n';
+    }
+
+    const systemPrompt = `你是 TIDE 叙事卡片的创作引擎。你的任务是基于用户提供的主题关键词和多类型素材（图片、新闻、百科、书籍、名言），生成一段精炼、有叙事感的中文短文。
+
+要求：
+1. 返回严格 JSON 格式，包含以下字段：
+   - "title": 叙事标题（10-20字，有文学感，与关键词相关）
+   - "subtitle": 副标题（简短一句话）
+   - "opening": 开场白（2-3句，引出主题，有画面感）
+   - "background": 如果有百科/书籍素材，写一段知识性背景描述（2-4句）；没有则返回空字符串
+   - "event": 如果有新闻素材，写一段将新闻事件融入叙事的段落（2-3句）；没有则返回空字符串
+   - "reflection": 如果有名言素材，写一段融入名言的思考段落（2-3句，不要直接引用原文，用叙事方式呼应）；没有则返回空字符串
+   - "closing": 收束语（1-2句，余韵悠长）
+   - "toEvent": 从背景到事件的过渡句（1句）
+   - "toReflection": 从事件到思考的过渡句（1句）
+2. 文风：冷静、克制、有画面感、略带诗意
+3. 不要使用 markdown 格式，纯文本
+4. 只返回 JSON，不要任何额外说明`;
+
+    const userPrompt = `主题关键词：${keyword}\n\n素材：\n${context}\n\n请生成叙事卡片内容（严格 JSON 格式）。`;
+
+    const aiResponse = await env.AI.run('@cf/meta/llama-3.1-8b-instruct', {
+      messages: [
+        { role: 'system', content: systemPrompt },
+        { role: 'user', content: userPrompt }
+      ],
+      max_tokens: 1200,
+      temperature: 0.7,
+    });
+
+    const text = aiResponse.response || '';
+
+    // 尝试解析 JSON
+    let parsed = null;
+    try {
+      // 尝试直接解析
+      parsed = JSON.parse(text);
+    } catch (e) {
+      // 尝试从文本中提取 JSON
+      const jsonMatch = text.match(/\{[\s\S]*\}/);
+      if (jsonMatch) {
+        try { parsed = JSON.parse(jsonMatch[0]); } catch (e2) { /* fallback */ }
+      }
+    }
+
+    if (parsed && parsed.title) {
+      return json({
+        success: true,
+        narrative: {
+          title: parsed.title || '',
+          subtitle: parsed.subtitle || '',
+          opening: parsed.opening || '',
+          background: parsed.background || '',
+          event: parsed.event || '',
+          reflection: parsed.reflection || '',
+          closing: parsed.closing || '',
+          toEvent: parsed.toEvent || '',
+          toReflection: parsed.toReflection || '',
+        },
+        _rate: { remaining: rateCheck.remaining, limit: 20 }
+      });
+    }
+
+    // AI 返回格式异常，告知前端用模板降级
+    return json({ error: 'AI 返回格式异常', fallback: true, raw: text.substring(0, 500) }, 200);
+
+  } catch (error) {
+    console.error('AI narrative error:', error);
+    return json({ error: 'AI 生成失败: ' + error.message, fallback: true }, 200);
   }
 }
 
@@ -491,7 +749,6 @@ async function handleApi(request, env, url) {
   const path = url.pathname.replace('/api/', '');
   const method = request.method;
 
-  // CORS 预检
   if (method === 'OPTIONS') {
     return new Response(null, {
       headers: {
@@ -502,25 +759,33 @@ async function handleApi(request, env, url) {
     });
   }
 
-  // 检查 D1 绑定
-  if (!env.DB) {
-    return json({ error: '数据库未绑定，请检查 Cloudflare D1 Binding 配置（变量名需为 DB）' }, 500);
-  }
+  if (!env.DB) return json({ error: '数据库未绑定，请检查 Cloudflare D1 Binding 配置（变量名需为 DB）' }, 500);
 
-  // 自动初始化数据库表
   await ensureDB(env);
 
-  // 路由分发
+  // 认证路由
   if (path === 'register' && method === 'POST') return await handleRegister(request, env);
   if (path === 'login' && method === 'POST') return await handleLogin(request, env);
   if (path === 'logout' && method === 'POST') return await handleLogout(request, env);
   if (path === 'me' && method === 'GET') return await handleMe(request, env);
-  if (path === 'search' && method === 'GET') return await handleSearch(request, env, url);
+
+  // 搜索路由（需要后端代理的）
+  if (path === 'search' && method === 'GET') return await handleSearchPhoto(request, env, url);
+  if (path === 'search/video' && method === 'GET') return await handleSearchVideo(request, env, url);
+  if (path === 'search/illustration' && method === 'GET') return await handleSearchIllustration(request, env, url);
+  if (path === 'search/gif' && method === 'GET') return await handleSearchGif(request, env, url);
+  if (path === 'search/news' && method === 'GET') return await handleSearchNews(request, env, url);
+  if (path === 'search/quotes' && method === 'GET') return await handleSearchQuotes(request, env, url);
+
+  // 历史与收藏
   if (path === 'history' && method === 'GET') return await handleGetHistory(request, env);
   if (path === 'history' && method === 'POST') return await handleSaveHistory(request, env);
   if (path === 'favorites' && method === 'GET') return await handleGetFavorites(request, env);
   if (path === 'favorites' && method === 'POST') return await handleAddFavorite(request, env);
   if (path === 'favorites' && method === 'DELETE') return await handleRemoveFavorite(request, env);
+
+  // AI 叙事生成
+  if (path === 'narrative/generate' && method === 'POST') return await handleGenerateNarrative(request, env);
 
   return json({ error: 'API 路由不存在' }, 404);
 }
@@ -531,11 +796,9 @@ export default {
   async fetch(request, env) {
     try {
       const url = new URL(request.url);
-
       if (url.pathname.startsWith('/api/')) {
         return await handleApi(request, env, url);
       }
-
       return env.ASSETS.fetch(request);
     } catch (error) {
       return new Response('Internal Server Error: ' + error.message, { status: 500 });
