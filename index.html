@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TIDE Material — 素材生成器</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwindcss.config = {
+      theme: {
+        extend: {
+          colors: {
+            dark: '#0a0a0a',
+            'dark-card': '#141414',
+            'dark-border': '#2a2a2a',
+            accent: '#e5e5e5',
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+    
+    * { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; }
+    
+    body {
+      background-color: #0a0a0a;
+      min-height: 100vh;
+    }
+
+    /* 自定义滚动条 */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: #0a0a0a; }
+    ::-webkit-scrollbar-thumb { background: #333; border-radius: 3px; }
+
+    /* 输入框发光效果 */
+    .input-glow:focus {
+      box-shadow: 0 0 0 2px rgba(255,255,255,0.1), 0 0 20px rgba(255,255,255,0.05);
+    }
+
+    /* 图片悬浮效果 */
+    .img-card {
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .img-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+    }
+    .img-card:hover .img-overlay {
+      opacity: 1;
+    }
+
+    /* 弹窗动画 */
+    .modal-backdrop {
+      transition: opacity 0.3s ease;
+    }
+    .modal-content {
+      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease;
+    }
+
+    /* 加载动画 */
+    .loader {
+      width: 40px;
+      height: 40px;
+      border: 3px solid #333;
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* 瀑布流 */
+    .masonry {
+      columns: 2;
+      column-gap: 16px;
+    }
+    @media (min-width: 768px) {
+      .masonry { columns: 3; }
+    }
+    @media (min-width: 1024px) {
+      .masonry { columns: 4; }
+    }
+    .masonry-item {
+      break-inside: avoid;
+      margin-bottom: 16px;
+    }
+
+    /* 标签按钮 */
+    .tag-btn {
+      transition: all 0.2s ease;
+    }
+    .tag-btn:hover {
+      background-color: rgba(255,255,255,0.15);
+    }
+  </style>
+</head>
+<body class="text-white">
+
+  <!-- 导航栏 -->
+  <nav class="fixed top-0 left-0 right-0 z-50 bg-dark/80 backdrop-blur-xl border-b border-dark-border">
+    <div class="max-w-7xl mx-auto px-6 h-14 flex items-center justify-between">
+      <div class="flex items-center gap-2">
+        <span class="text-lg font-bold tracking-wider">TIDE</span>
+        <span class="text-xs text-neutral-500 font-light tracking-widest uppercase">Material</span>
+      </div>
+      <div class="text-xs text-neutral-600">Powered by Pexels</div>
+    </div>
+  </nav>
+
+  <!-- 主内容区 -->
+  <main class="pt-14">
+
+    <!-- Hero 搜索区 -->
+    <section class="px-6 pt-20 pb-12">
+      <div class="max-w-2xl mx-auto text-center">
+        <h1 class="text-4xl md:text-5xl font-bold tracking-tight mb-4">
+          输入灵感，获取素材
+        </h1>
+        <p class="text-neutral-500 text-sm mb-10">
+          输入关键词或描述，为你从全球图库中搜寻最匹配的高质量图片
+        </p>
+
+        <!-- 搜索框 -->
+        <div class="relative max-w-xl mx-auto">
+          <input
+            id="searchInput"
+            type="text"
+            placeholder="例如：夏日街头穿搭、minimal architecture、咖啡店..."
+            class="w-full bg-dark-card border border-dark-border rounded-2xl px-6 py-4 pr-28 text-white text-sm placeholder-neutral-600 outline-none input-glow transition-all"
+            autocomplete="off"
+          />
+          <button
+            id="searchBtn"
+            onclick="searchImages()"
+            class="absolute right-2 top-1/2 -translate-y-1/2 bg-white text-black text-sm font-medium px-5 py-2.5 rounded-xl hover:bg-neutral-200 active:scale-95 transition-all"
+          >
+            搜索素材
+          </button>
+        </div>
+
+        <!-- 快捷标签 -->
+        <div class="flex flex-wrap justify-center gap-2 mt-6">
+          <button onclick="quickSearch('street fashion')" class="tag-btn text-xs text-neutral-400 border border-dark-border rounded-full px-4 py-1.5">🔥 街头穿搭</button>
+          <button onclick="quickSearch('minimal interior')" class="tag-btn text-xs text-neutral-400 border border-dark-border rounded-full px-4 py-1.5">🏠 极简家居</button>
+          <button onclick="quickSearch('coffee aesthetic')" class="tag-btn text-xs text-neutral-400 border border-dark-border rounded-full px-4 py-1.5">☕ 咖啡美学</button>
+          <button onclick="quickSearch('nature landscape')" class="tag-btn text-xs text-neutral-400 border border-dark-border rounded-full px-4 py-1.5">🌿 自然风光</button>
+          <button onclick="quickSearch('urban night')" class="tag-btn text-xs text-neutral-400 border border-dark-border rounded-full px-4 py-1.5">🌃 城市夜景</button>
+          <button onclick="quickSearch('food photography')" class="tag-btn text-xs text-neutral-400 border border-dark-border rounded-full px-4 py-1.5">🍜 美食摄影</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- 结果统计 -->
+    <div id="resultInfo" class="hidden max-w-7xl mx-auto px-6 mb-6">
+      <div class="flex items-center justify-between">
+        <p class="text-sm text-neutral-500">
+          搜索 "<span id="resultQuery" class="text-white"></span>" · 找到 <span id="resultCount" class="text-white"></span> 张图片
+        </p>
+        <button onclick="loadMore()" id="loadMoreBtn" class="hidden text-xs text-neutral-400 border border-dark-border rounded-full px-4 py-1.5 hover:bg-white/5 transition-all">
+          加载更多
+        </button>
+      </div>
+    </div>
+
+    <!-- 图片网格 -->
+    <section class="max-w-7xl mx-auto px-6 pb-20">
+      <!-- 加载状态 -->
+      <div id="loading" class="hidden flex flex-col items-center justify-center py-20">
+        <div class="loader mb-4"></div>
+        <p class="text-sm text-neutral-500">正在搜索素材...</p>
+      </div>
+
+      <!-- 空状态 -->
+      <div id="emptyState" class="flex flex-col items-center justify-center py-20">
+        <div class="text-6xl mb-4 opacity-30">📷</div>
+        <p class="text-neutral-600 text-sm">输入关键词开始搜索</p>
+      </div>
+
+      <!-- 图片瀑布流 -->
+      <div id="imageGrid" class="masonry"></div>
+    </section>
+
+  </main>
+
+  <!-- 图片预览弹窗 -->
+  <div id="modal" class="fixed inset-0 z-[100] hidden">
+    <div class="modal-backdrop absolute inset-0 bg-black/90 backdrop-blur-sm" onclick="closeModal()"></div>
+    <div class="modal-content relative z-10 flex flex-col items-center justify-center min-h-screen p-6">
+      <!-- 关闭按钮 -->
+      <button onclick="closeModal()" class="absolute top-6 right-6 text-white/60 hover:text-white text-2xl transition-colors">✕</button>
+      
+      <!-- 图片 -->
+      <img id="modalImg" src="" alt="" class="max-w-full max-h-[75vh] object-contain rounded-lg shadow-2xl" />
+      
+      <!-- 图片信息 -->
+      <div class="mt-6 flex items-center gap-4">
+        <div class="text-center">
+          <p id="modalPhotographer" class="text-sm text-neutral-400"></p>
+          <p id="modalSize" class="text-xs text-neutral-600 mt-1"></p>
+        </div>
+        <a id="modalDownload" href="" target="_blank" download
+           class="bg-white text-black text-sm font-medium px-6 py-2.5 rounded-xl hover:bg-neutral-200 active:scale-95 transition-all">
+          ⬇ 下载原图
+        </a>
+        <button onclick="copyImageUrl()" id="copyBtn"
+           class="border border-dark-border text-sm text-neutral-300 px-6 py-2.5 rounded-xl hover:bg-white/5 transition-all">
+          📋 复制链接
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 底部 -->
+  <footer class="border-t border-dark-border py-8 text-center">
+    <p class="text-xs text-neutral-600">TIDE Material · 图片来源 <a href="https://www.pexels.com" target="_blank" class="underline hover:text-neutral-400">Pexels</a> · 免费可商用</p>
+  </footer>
+
+  <script>
+    // ============ 配置 ============
+    const API_KEY = 'QzRQUCCS2KSutNKlsXUE81M0zkPm56V01Nh0DrTW4nZZQOY939KBxhct';
+    const PER_PAGE = 20;
+    
+    // ============ 状态 ============
+    let currentQuery = '';
+    let currentPage = 1;
+    let totalResults = 0;
+
+    // ============ 常用中文→英文关键词映射 ============
+    const keywordMap = {
+      '穿搭': 'fashion outfit',
+      '街头': 'street style',
+      '夏日': 'summer',
+      '冬日': 'winter',
+      '春天': 'spring',
+      '秋天': 'autumn fall',
+      '极简': 'minimal',
+      '家居': 'interior home',
+      '咖啡': 'coffee',
+      '美食': 'food',
+      '风景': 'landscape scenery',
+      '城市': 'urban city',
+      '夜景': 'night city lights',
+      '海边': 'beach ocean',
+      '森林': 'forest',
+      '建筑': 'architecture',
+      '人像': 'portrait',
+      '黑白': 'black and white',
+      '复古': 'vintage retro',
+      '科技': 'technology',
+      '潮牌': 'streetwear',
+      '运动': 'sport fitness',
+      '旅行': 'travel',
+      '花': 'flowers',
+      '猫': 'cat',
+      '狗': 'dog',
+      '日落': 'sunset',
+      '星空': 'starry sky',
+      '雨天': 'rainy day',
+      '书': 'books reading',
+      '音乐': 'music',
+      '艺术': 'art',
+      '设计': 'design',
+      '清凉': 'cool fresh',
+      '温暖': 'warm cozy',
+      '简约': 'simple clean',
+      '奢华': 'luxury',
+      '街拍': 'street photography',
+      'ins风': 'instagram aesthetic',
+      '氛围感': 'moody aesthetic',
+      '高级感': 'elegant premium',
+    };
+
+    // ============ 中文转英文关键词 ============
+    function translateQuery(input) {
+      let result = input.trim();
+      
+      // 尝试将中文关键词替换为英文
+      let translated = [];
+      let hasChineseMatch = false;
+      
+      for (const [cn, en] of Object.entries(keywordMap)) {
+        if (result.includes(cn)) {
+          translated.push(en);
+          hasChineseMatch = true;
+        }
+      }
+      
+      if (hasChineseMatch && translated.length > 0) {
+        return translated.join(' ');
+      }
+      
+      // 如果没有匹配到映射，直接返回原文（Pexels 也支持部分中文搜索）
+      return result;
+    }
+
+    // ============ 搜索图片 ============
+    async function searchImages(append = false) {
+      const input = document.getElementById('searchInput');
+      const query = input.value.trim();
+      
+      if (!query) return;
+
+      if (!append) {
+        currentQuery = query;
+        currentPage = 1;
+      }
+
+      const translatedQuery = translateQuery(currentQuery);
+      
+      // UI 状态
+      showLoading(true);
+      if (!append) {
+        document.getElementById('imageGrid').innerHTML = '';
+      }
+      document.getElementById('emptyState').classList.add('hidden');
+
+      try {
+        const url = `https://api.pexels.com/v1/search?query=${encodeURIComponent(translatedQuery)}&per_page=${PER_PAGE}&page=${currentPage}`;
+        
+        const response = await fetch(url, {
+          headers: { 'Authorization': API_KEY }
+        });
+
+        if (!response.ok) throw new Error('API 请求失败');
+
+        const data = await response.json();
+        totalResults = data.total_results;
+
+        // 更新结果信息
+        document.getElementById('resultInfo').classList.remove('hidden');
+        document.getElementById('resultQuery').textContent = currentQuery;
+        document.getElementById('resultCount').textContent = totalResults.toLocaleString();
+
+        // 显示/隐藏加载更多按钮
+        const loadMoreBtn = document.getElementById('loadMoreBtn');
+        if (currentPage * PER_PAGE < totalResults) {
+          loadMoreBtn.classList.remove('hidden');
+        } else {
+          loadMoreBtn.classList.add('hidden');
+        }
+
+        // 渲染图片
+        renderImages(data.photos, append);
+
+      } catch (error) {
+        console.error('搜索失败:', error);
+        if (!append) {
+          document.getElementById('imageGrid').innerHTML = `
+            <div class="col-span-full text-center py-20">
+              <div class="text-4xl mb-4">😵</div>
+              <p class="text-neutral-500 text-sm">搜索出错了，请稍后重试</p>
+            </div>
+          `;
+        }
+      } finally {
+        showLoading(false);
+      }
+    }
+
+    // ============ 渲染图片 ============
+    function renderImages(photos, append) {
+      const grid = document.getElementById('imageGrid');
+      
+      if (!append && photos.length === 0) {
+        grid.innerHTML = `
+          <div class="col-span-full text-center py-20">
+            <div class="text-4xl mb-4">🔍</div>
+            <p class="text-neutral-500 text-sm">没有找到相关图片，换个关键词试试</p>
+          </div>
+        `;
+        return;
+      }
+
+      const fragment = document.createDocumentFragment();
+
+      photos.forEach(photo => {
+        const item = document.createElement('div');
+        item.className = 'masonry-item';
+        
+        // 计算宽高比用于占位
+        const ratio = photo.height / photo.width;
+
+        item.innerHTML = `
+          <div class="img-card relative rounded-xl overflow-hidden cursor-pointer bg-dark-card border border-dark-border group"
+               onclick="openModal('${photo.src.large2x}', '${photo.photographer}', ${photo.width}, ${photo.height}, '${photo.src.original}')">
+            <img 
+              src="${photo.src.medium}" 
+              alt="${photo.alt || photo.photographer}" 
+              loading="lazy"
+              class="w-full block"
+              style="aspect-ratio: ${photo.width}/${photo.height}"
+            />
+            <div class="img-overlay absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-0 transition-opacity duration-300 flex flex-col justify-end p-4">
+              <p class="text-white text-sm font-medium">${photo.photographer}</p>
+              <p class="text-white/60 text-xs mt-1">${photo.width} × ${photo.height}</p>
+            </div>
+          </div>
+        `;
+
+        fragment.appendChild(item);
+      });
+
+      grid.appendChild(fragment);
+    }
+
+    // ============ 加载更多 ============
+    function loadMore() {
+      currentPage++;
+      searchImages(true);
+    }
+
+    // ============ 快捷搜索 ============
+    function quickSearch(query) {
+      document.getElementById('searchInput').value = query;
+      currentQuery = query;
+      searchImages();
+    }
+
+    // ============ 弹窗预览 ============
+    function openModal(imgUrl, photographer, width, height, originalUrl) {
+      const modal = document.getElementById('modal');
+      document.getElementById('modalImg').src = imgUrl;
+      document.getElementById('modalPhotographer').textContent = `📸 ${photographer}`;
+      document.getElementById('modalSize').textContent = `${width} × ${height}`;
+      document.getElementById('modalDownload').href = originalUrl;
+      
+      modal.classList.remove('hidden');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeModal() {
+      const modal = document.getElementById('modal');
+      modal.classList.add('hidden');
+      document.body.style.overflow = '';
+    }
+
+    // ESC 键关闭弹窗
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') closeModal();
+    });
+
+    // ============ 复制链接 ============
+    function copyImageUrl() {
+      const url = document.getElementById('modalDownload').href;
+      navigator.clipboard.writeText(url).then(() => {
+        const btn = document.getElementById('copyBtn');
+        btn.textContent = '✅ 已复制';
+        setTimeout(() => { btn.textContent = '📋 复制链接'; }, 2000);
+      });
+    }
+
+    // ============ UI 辅助 ============
+    function showLoading(show) {
+      document.getElementById('loading').classList.toggle('hidden', !show);
+    }
+
+    // 回车搜索
+    document.getElementById('searchInput').addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') searchImages();
+    });
+  </script>
+
+</body>
+</html>
