@@ -10,267 +10,447 @@
       theme: {
         extend: {
           colors: {
-            dark: '#0a0a0a',
-            'dark-card': '#141414',
-            'dark-border': '#2a2a2a',
-            accent: '#e5e5e5',
+            'apple-bg': '#000000',
+            'apple-card': '#1C1C1E',
+            'apple-card-hover': '#2C2C2E',
+            'apple-separator': '#38383A',
+            'apple-gray': '#48484A',
+            'apple-blue': '#0A84FF',
+            'apple-blue-hover': '#409CFF',
+            'apple-text-primary': '#FFFFFF',
+            'apple-text-secondary': '#98989D',
+            'apple-text-tertiary': '#636366',
+            'apple-fill': 'rgba(120, 120, 128, 0.24)',
+          },
+          fontFamily: {
+            sans: ['-apple-system', 'BlinkMacSystemFont', 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', 'Helvetica', 'Arial', 'sans-serif'],
+          },
+          borderRadius: {
+            'apple': '12px',
+            'apple-lg': '16px',
+            'apple-xl': '20px',
+            'apple-2xl': '24px',
           }
         }
       }
     }
   </script>
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
-    
-    * { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; }
-    
-    body { background-color: #0a0a0a; min-height: 100vh; }
-
-    ::-webkit-scrollbar { width: 6px; }
-    ::-webkit-scrollbar-track { background: #0a0a0a; }
-    ::-webkit-scrollbar-thumb { background: #333; border-radius: 3px; }
-
-    .input-glow:focus {
-      box-shadow: 0 0 0 2px rgba(255,255,255,0.1), 0 0 20px rgba(255,255,255,0.05);
+    * {
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
     }
 
-    .img-card { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
-    .img-card:hover { transform: translateY(-4px); box-shadow: 0 20px 40px rgba(0,0,0,0.4); }
+    body {
+      background-color: #000000;
+      min-height: 100vh;
+      font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    }
+
+    /* Apple-style scrollbar */
+    ::-webkit-scrollbar { width: 8px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.25); }
+
+    /* Apple glass material */
+    .glass {
+      background: rgba(28, 28, 30, 0.72);
+      backdrop-filter: saturate(180%) blur(20px);
+      -webkit-backdrop-filter: saturate(180%) blur(20px);
+    }
+
+    .glass-thick {
+      background: rgba(28, 28, 30, 0.85);
+      backdrop-filter: saturate(180%) blur(40px);
+      -webkit-backdrop-filter: saturate(180%) blur(40px);
+    }
+
+    /* Apple-style input focus */
+    .apple-input {
+      background: rgba(120, 120, 128, 0.16);
+      border: 1px solid rgba(120, 120, 128, 0.24);
+      border-radius: 12px;
+      padding: 13px 16px;
+      color: white;
+      font-size: 15px;
+      width: 100%;
+      outline: none;
+      transition: all 0.25s cubic-bezier(0.25, 0.1, 0.25, 1);
+      letter-spacing: -0.01em;
+    }
+    .apple-input:focus {
+      border-color: #0A84FF;
+      box-shadow: 0 0 0 3px rgba(10, 132, 255, 0.25);
+      background: rgba(120, 120, 128, 0.24);
+    }
+    .apple-input::placeholder { color: #636366; }
+
+    /* Apple-style primary button */
+    .apple-btn-primary {
+      background: #0A84FF;
+      color: white;
+      font-size: 15px;
+      font-weight: 600;
+      padding: 13px 24px;
+      border-radius: 12px;
+      width: 100%;
+      border: none;
+      cursor: pointer;
+      transition: all 0.25s cubic-bezier(0.25, 0.1, 0.25, 1);
+      letter-spacing: -0.01em;
+    }
+    .apple-btn-primary:hover { background: #409CFF; }
+    .apple-btn-primary:active { transform: scale(0.98); opacity: 0.9; }
+    .apple-btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    /* Apple-style secondary button */
+    .apple-btn-secondary {
+      background: rgba(120, 120, 128, 0.24);
+      color: #0A84FF;
+      font-size: 15px;
+      font-weight: 600;
+      padding: 13px 24px;
+      border-radius: 12px;
+      border: none;
+      cursor: pointer;
+      transition: all 0.25s cubic-bezier(0.25, 0.1, 0.25, 1);
+    }
+    .apple-btn-secondary:hover { background: rgba(120, 120, 128, 0.36); }
+    .apple-btn-secondary:active { transform: scale(0.98); }
+
+    /* Image card hover */
+    .img-card {
+      transition: all 0.35s cubic-bezier(0.25, 0.1, 0.25, 1);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+    .img-card:hover {
+      transform: scale(1.02);
+      box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+    }
     .img-card:hover .img-overlay { opacity: 1; }
 
-    .loader {
-      width: 40px; height: 40px;
-      border: 3px solid #333; border-top-color: #fff;
+    /* Masonry grid */
+    .masonry { columns: 2; column-gap: 12px; }
+    @media (min-width: 768px) { .masonry { columns: 3; column-gap: 16px; } }
+    @media (min-width: 1024px) { .masonry { columns: 4; column-gap: 16px; } }
+    .masonry-item { break-inside: avoid; margin-bottom: 12px; }
+    @media (min-width: 768px) { .masonry-item { margin-bottom: 16px; } }
+
+    /* Apple loading spinner */
+    .apple-spinner {
+      width: 32px;
+      height: 32px;
+      border: 3px solid rgba(120, 120, 128, 0.24);
+      border-top-color: #0A84FF;
       border-radius: 50%;
-      animation: spin 0.8s linear infinite;
+      animation: spin 0.8s cubic-bezier(0.5, 0, 0.5, 1) infinite;
     }
     @keyframes spin { to { transform: rotate(360deg); } }
 
-    .masonry { columns: 2; column-gap: 16px; }
-    @media (min-width: 768px) { .masonry { columns: 3; } }
-    @media (min-width: 1024px) { .masonry { columns: 4; } }
-    .masonry-item { break-inside: avoid; margin-bottom: 16px; }
-
-    .tag-btn { transition: all 0.2s ease; }
-    .tag-btn:hover { background-color: rgba(255,255,255,0.15); }
-
-    .fade-in { animation: fadeIn 0.4s ease; }
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-
-    .auth-input {
-      background: #141414;
-      border: 1px solid #2a2a2a;
-      border-radius: 12px;
-      padding: 12px 16px;
-      color: white;
-      font-size: 14px;
-      width: 100%;
-      outline: none;
-      transition: all 0.2s;
+    /* Fade in animation */
+    .fade-in {
+      animation: fadeIn 0.5s cubic-bezier(0.25, 0.1, 0.25, 1);
     }
-    .auth-input:focus {
-      border-color: #555;
-      box-shadow: 0 0 0 2px rgba(255,255,255,0.05);
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(12px) scale(0.98); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
     }
-    .auth-input::placeholder { color: #555; }
 
+    /* Scale in for modal */
+    .scale-in {
+      animation: scaleIn 0.35s cubic-bezier(0.25, 0.1, 0.25, 1);
+    }
+    @keyframes scaleIn {
+      from { opacity: 0; transform: scale(0.92); }
+      to { opacity: 1; transform: scale(1); }
+    }
+
+    /* Tag button */
+    .tag-btn {
+      transition: all 0.2s cubic-bezier(0.25, 0.1, 0.25, 1);
+      background: rgba(120, 120, 128, 0.12);
+      border: 1px solid rgba(120, 120, 128, 0.2);
+    }
+    .tag-btn:hover {
+      background: rgba(120, 120, 128, 0.24);
+      border-color: rgba(120, 120, 128, 0.36);
+    }
+    .tag-btn:active { transform: scale(0.96); }
+
+    /* History panel */
     .history-item {
-      transition: all 0.2s ease;
+      transition: all 0.2s cubic-bezier(0.25, 0.1, 0.25, 1);
+      border-radius: 10px;
     }
     .history-item:hover {
-      background-color: rgba(255,255,255,0.05);
+      background-color: rgba(120, 120, 128, 0.16);
+    }
+    .history-item:active {
+      background-color: rgba(120, 120, 128, 0.24);
+    }
+
+    /* Segmented control (Apple-style tab) */
+    .segmented-control {
+      background: rgba(120, 120, 128, 0.12);
+      border-radius: 9px;
+      padding: 2px;
+      display: flex;
+      position: relative;
+    }
+    .segmented-btn {
+      flex: 1;
+      padding: 8px 16px;
+      font-size: 13px;
+      font-weight: 600;
+      border-radius: 7px;
+      color: #98989D;
+      transition: all 0.25s cubic-bezier(0.25, 0.1, 0.25, 1);
+      text-align: center;
+      cursor: pointer;
+      border: none;
+      background: transparent;
+      letter-spacing: -0.01em;
+    }
+    .segmented-btn.active {
+      background: rgba(120, 120, 128, 0.36);
+      color: #FFFFFF;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+    }
+
+    /* Search box glow */
+    .search-glow:focus-within {
+      box-shadow: 0 0 0 3px rgba(10, 132, 255, 0.2), 0 8px 24px rgba(0,0,0,0.3);
+      border-color: rgba(10, 132, 255, 0.5);
+    }
+
+    /* Tooltip animation */
+    .tooltip-enter {
+      animation: tooltipFade 0.2s ease;
+    }
+    @keyframes tooltipFade {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Smooth overlay */
+    .modal-overlay {
+      animation: overlayFade 0.3s ease;
+    }
+    @keyframes overlayFade {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    /* Selection color */
+    ::selection {
+      background: rgba(10, 132, 255, 0.3);
     }
   </style>
 </head>
-<body class="text-white">
+<body class="text-white antialiased">
 
-  <!-- ==================== 登录/注册页面 ==================== -->
+  <!-- ==================== 登录/注册页面 (Apple ID 风格) ==================== -->
   <div id="authPage" class="min-h-screen flex items-center justify-center px-6">
-    <div class="w-full max-w-sm fade-in">
+    <div class="w-full max-w-[360px] fade-in">
       <!-- Logo -->
       <div class="text-center mb-10">
-        <h1 class="text-3xl font-bold tracking-wider mb-2">TIDE</h1>
-        <p class="text-xs text-neutral-500 tracking-widest uppercase">Material</p>
+        <div class="w-16 h-16 mx-auto mb-5 rounded-apple-xl bg-gradient-to-b from-[#1C1C1E] to-[#0a0a0a] border border-[#38383A] flex items-center justify-center shadow-lg shadow-black/50">
+          <span class="text-2xl font-bold tracking-wider bg-gradient-to-b from-white to-[#98989D] bg-clip-text text-transparent">T</span>
+        </div>
+        <h1 class="text-[28px] font-bold tracking-tight mb-1.5" style="letter-spacing: -0.02em;">TIDE Material</h1>
+        <p class="text-[13px] text-apple-text-tertiary">高质量素材搜索平台</p>
       </div>
 
-      <!-- 登录/注册切换 -->
-      <div class="flex bg-dark-card rounded-xl p-1 mb-8 border border-dark-border">
-        <button id="tabLogin" onclick="switchTab('login')" class="flex-1 py-2.5 text-sm font-medium rounded-lg transition-all bg-white text-black">登录</button>
-        <button id="tabRegister" onclick="switchTab('register')" class="flex-1 py-2.5 text-sm font-medium rounded-lg transition-all text-neutral-500">注册</button>
+      <!-- Apple-style 分段控制器 -->
+      <div class="segmented-control mb-7">
+        <button id="tabLogin" onclick="switchTab('login')" class="segmented-btn active">登录</button>
+        <button id="tabRegister" onclick="switchTab('register')" class="segmented-btn">注册</button>
       </div>
 
       <!-- 登录表单 -->
       <div id="loginForm">
-        <div class="space-y-4">
+        <div class="space-y-3">
           <div>
-            <label class="text-xs text-neutral-500 mb-1.5 block">用户名</label>
-            <input id="loginUsername" type="text" placeholder="输入用户名" class="auth-input" autocomplete="username" />
+            <input id="loginUsername" type="text" placeholder="用户名" class="apple-input" autocomplete="username" />
           </div>
           <div>
-            <label class="text-xs text-neutral-500 mb-1.5 block">密码</label>
-            <input id="loginPassword" type="password" placeholder="输入密码" class="auth-input" autocomplete="current-password" />
+            <input id="loginPassword" type="password" placeholder="密码" class="apple-input" autocomplete="current-password" />
           </div>
         </div>
-        <button onclick="login()" id="loginBtn" class="w-full mt-6 bg-white text-black text-sm font-medium py-3 rounded-xl hover:bg-neutral-200 active:scale-[0.98] transition-all">
+        <button onclick="login()" id="loginBtn" class="apple-btn-primary mt-5">
           登录
         </button>
-        <p id="loginError" class="text-red-400 text-xs text-center mt-4 hidden"></p>
+        <p id="loginError" class="text-[#FF453A] text-[13px] text-center mt-4 hidden"></p>
       </div>
 
       <!-- 注册表单 -->
       <div id="registerForm" class="hidden">
-        <div class="space-y-4">
+        <div class="space-y-3">
           <div>
-            <label class="text-xs text-neutral-500 mb-1.5 block">用户名</label>
-            <input id="regUsername" type="text" placeholder="3-20 个字符" class="auth-input" autocomplete="username" />
+            <input id="regUsername" type="text" placeholder="用户名（3-20 个字符）" class="apple-input" autocomplete="username" />
           </div>
           <div>
-            <label class="text-xs text-neutral-500 mb-1.5 block">密码</label>
-            <input id="regPassword" type="password" placeholder="至少 6 个字符" class="auth-input" autocomplete="new-password" />
+            <input id="regPassword" type="password" placeholder="密码（至少 6 个字符）" class="apple-input" autocomplete="new-password" />
           </div>
           <div>
-            <label class="text-xs text-neutral-500 mb-1.5 block">确认密码</label>
-            <input id="regPassword2" type="password" placeholder="再次输入密码" class="auth-input" autocomplete="new-password" />
+            <input id="regPassword2" type="password" placeholder="确认密码" class="apple-input" autocomplete="new-password" />
           </div>
         </div>
-        <button onclick="register()" id="regBtn" class="w-full mt-6 bg-white text-black text-sm font-medium py-3 rounded-xl hover:bg-neutral-200 active:scale-[0.98] transition-all">
-          注册
+        <button onclick="register()" id="regBtn" class="apple-btn-primary mt-5">
+          创建账户
         </button>
-        <p id="regError" class="text-red-400 text-xs text-center mt-4 hidden"></p>
+        <p id="regError" class="text-[#FF453A] text-[13px] text-center mt-4 hidden"></p>
       </div>
 
-      <p class="text-center text-neutral-700 text-xs mt-8">素材搜索 · 免费使用</p>
+      <p class="text-center text-apple-text-tertiary text-[12px] mt-10">免费使用 · 图片来源 Pexels</p>
     </div>
   </div>
 
   <!-- ==================== 主应用页面 ==================== -->
   <div id="appPage" class="hidden">
 
-    <!-- 导航栏 -->
-    <nav class="fixed top-0 left-0 right-0 z-50 bg-dark/80 backdrop-blur-xl border-b border-dark-border">
-      <div class="max-w-7xl mx-auto px-6 h-14 flex items-center justify-between">
-        <div class="flex items-center gap-2">
-          <span class="text-lg font-bold tracking-wider">TIDE</span>
-          <span class="text-xs text-neutral-500 font-light tracking-widest uppercase">Material</span>
+    <!-- Apple 风格导航栏 (磨砂玻璃) -->
+    <nav class="fixed top-0 left-0 right-0 z-50 glass border-b border-white/[0.08]">
+      <div class="max-w-7xl mx-auto px-6 h-12 flex items-center justify-between">
+        <div class="flex items-center gap-2.5">
+          <span class="text-[15px] font-semibold tracking-tight" style="letter-spacing: -0.01em;">TIDE</span>
+          <span class="text-[11px] text-apple-text-tertiary font-medium tracking-wide uppercase">Material</span>
         </div>
-        <div class="flex items-center gap-4">
-          <button onclick="toggleHistory()" class="text-xs text-neutral-400 hover:text-white transition-colors flex items-center gap-1.5">
-            🕐 <span class="hidden sm:inline">搜索历史</span>
+        <div class="flex items-center gap-1">
+          <button onclick="toggleHistory()" class="h-8 px-3 rounded-lg text-[13px] text-apple-text-secondary hover:text-white hover:bg-white/[0.06] transition-all duration-200 flex items-center gap-1.5">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            <span class="hidden sm:inline">历史</span>
           </button>
-          <div class="flex items-center gap-3">
-            <span id="navUsername" class="text-xs text-neutral-400"></span>
-            <button onclick="logout()" class="text-xs text-neutral-500 hover:text-red-400 transition-colors">退出</button>
-          </div>
+          <div class="w-px h-4 bg-white/[0.08] mx-1"></div>
+          <span id="navUsername" class="text-[13px] text-apple-text-secondary px-2"></span>
+          <button onclick="logout()" class="h-8 px-3 rounded-lg text-[13px] text-apple-text-tertiary hover:text-[#FF453A] hover:bg-white/[0.06] transition-all duration-200">退出</button>
         </div>
       </div>
     </nav>
 
     <!-- 主内容区 -->
-    <main class="pt-14">
+    <main class="pt-12">
 
       <!-- Hero 搜索区 -->
-      <section class="px-6 pt-20 pb-12">
+      <section class="px-6 pt-24 pb-16">
         <div class="max-w-2xl mx-auto text-center">
-          <h1 class="text-4xl md:text-5xl font-bold tracking-tight mb-4">
-            输入灵感，获取素材
+          <h1 class="text-[42px] md:text-[52px] font-bold tracking-tight leading-[1.08] mb-4" style="letter-spacing: -0.03em;">
+            输入灵感<span class="text-apple-text-tertiary">，</span><br/>获取素材<span class="text-apple-blue">。</span>
           </h1>
-          <p class="text-neutral-500 text-sm mb-10">
-            输入关键词或描述，为你从全球图库中搜寻最匹配的高质量图片
+          <p class="text-apple-text-secondary text-[15px] leading-relaxed mb-12 max-w-md mx-auto" style="letter-spacing: -0.01em;">
+            输入关键词或描述，从全球图库中搜寻最匹配的高质量图片
           </p>
 
-          <!-- 搜索框 -->
-          <div class="relative max-w-xl mx-auto">
-            <input
-              id="searchInput"
-              type="text"
-              placeholder="例如：夏日街头穿搭、minimal architecture、咖啡店..."
-              class="w-full bg-dark-card border border-dark-border rounded-2xl px-6 py-4 pr-28 text-white text-sm placeholder-neutral-600 outline-none input-glow transition-all"
-              autocomplete="off"
-            />
-            <button
-              id="searchBtn"
-              onclick="searchImages()"
-              class="absolute right-2 top-1/2 -translate-y-1/2 bg-white text-black text-sm font-medium px-5 py-2.5 rounded-xl hover:bg-neutral-200 active:scale-95 transition-all"
-            >
-              搜索素材
-            </button>
+          <!-- Apple Spotlight 风格搜索框 -->
+          <div class="relative max-w-xl mx-auto search-glow rounded-2xl border border-white/[0.1] bg-apple-card transition-all duration-300">
+            <div class="flex items-center">
+              <svg class="ml-5 text-apple-text-tertiary flex-shrink-0" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+              <input
+                id="searchInput"
+                type="text"
+                placeholder="搜索素材..."
+                class="flex-1 bg-transparent px-4 py-4 text-[15px] text-white placeholder-apple-text-tertiary outline-none"
+                style="letter-spacing: -0.01em;"
+                autocomplete="off"
+              />
+              <button
+                id="searchBtn"
+                onclick="searchImages()"
+                class="mr-2 bg-apple-blue hover:bg-apple-blue-hover text-white text-[13px] font-semibold px-5 py-2 rounded-xl active:scale-95 transition-all duration-200 flex-shrink-0"
+              >
+                搜索
+              </button>
+            </div>
           </div>
 
-          <!-- 快捷标签 -->
-          <div class="flex flex-wrap justify-center gap-2 mt-6">
-            <button onclick="quickSearch('street fashion')" class="tag-btn text-xs text-neutral-400 border border-dark-border rounded-full px-4 py-1.5">🔥 街头穿搭</button>
-            <button onclick="quickSearch('minimal interior')" class="tag-btn text-xs text-neutral-400 border border-dark-border rounded-full px-4 py-1.5">🏠 极简家居</button>
-            <button onclick="quickSearch('coffee aesthetic')" class="tag-btn text-xs text-neutral-400 border border-dark-border rounded-full px-4 py-1.5">☕ 咖啡美学</button>
-            <button onclick="quickSearch('nature landscape')" class="tag-btn text-xs text-neutral-400 border border-dark-border rounded-full px-4 py-1.5">🌿 自然风光</button>
-            <button onclick="quickSearch('urban night')" class="tag-btn text-xs text-neutral-400 border border-dark-border rounded-full px-4 py-1.5">🌃 城市夜景</button>
-            <button onclick="quickSearch('food photography')" class="tag-btn text-xs text-neutral-400 border border-dark-border rounded-full px-4 py-1.5">🍜 美食摄影</button>
+          <!-- 快捷标签 (Apple 风格胶囊按钮) -->
+          <div class="flex flex-wrap justify-center gap-2 mt-8">
+            <button onclick="quickSearch('street fashion')" class="tag-btn text-[13px] text-apple-text-secondary rounded-full px-4 py-2">街头穿搭</button>
+            <button onclick="quickSearch('minimal interior')" class="tag-btn text-[13px] text-apple-text-secondary rounded-full px-4 py-2">极简家居</button>
+            <button onclick="quickSearch('coffee aesthetic')" class="tag-btn text-[13px] text-apple-text-secondary rounded-full px-4 py-2">咖啡美学</button>
+            <button onclick="quickSearch('nature landscape')" class="tag-btn text-[13px] text-apple-text-secondary rounded-full px-4 py-2">自然风光</button>
+            <button onclick="quickSearch('urban night')" class="tag-btn text-[13px] text-apple-text-secondary rounded-full px-4 py-2">城市夜景</button>
+            <button onclick="quickSearch('food photography')" class="tag-btn text-[13px] text-apple-text-secondary rounded-full px-4 py-2">美食摄影</button>
           </div>
         </div>
       </section>
 
       <!-- 结果统计 -->
-      <div id="resultInfo" class="hidden max-w-7xl mx-auto px-6 mb-6">
+      <div id="resultInfo" class="hidden max-w-7xl mx-auto px-6 mb-5">
         <div class="flex items-center justify-between">
-          <p class="text-sm text-neutral-500">
-            搜索 "<span id="resultQuery" class="text-white"></span>" · 找到 <span id="resultCount" class="text-white"></span> 张图片
+          <p class="text-[13px] text-apple-text-tertiary">
+            搜索 "<span id="resultQuery" class="text-white font-medium"></span>" · <span id="resultCount" class="text-apple-text-secondary"></span> 张
           </p>
-          <button onclick="loadMore()" id="loadMoreBtn" class="hidden text-xs text-neutral-400 border border-dark-border rounded-full px-4 py-1.5 hover:bg-white/5 transition-all">
+          <button onclick="loadMore()" id="loadMoreBtn" class="hidden text-[13px] text-apple-blue font-medium hover:text-apple-blue-hover transition-colors duration-200">
             加载更多
           </button>
         </div>
       </div>
 
       <!-- 图片网格 -->
-      <section class="max-w-7xl mx-auto px-6 pb-20">
-        <div id="loading" class="hidden flex flex-col items-center justify-center py-20">
-          <div class="loader mb-4"></div>
-          <p class="text-sm text-neutral-500">正在搜索素材...</p>
+      <section class="max-w-7xl mx-auto px-6 pb-24">
+        <div id="loading" class="hidden flex flex-col items-center justify-center py-24">
+          <div class="apple-spinner mb-4"></div>
+          <p class="text-[13px] text-apple-text-tertiary">正在搜索...</p>
         </div>
-        <div id="emptyState" class="flex flex-col items-center justify-center py-20">
-          <div class="text-6xl mb-4 opacity-30">📷</div>
-          <p class="text-neutral-600 text-sm">输入关键词开始搜索</p>
+        <div id="emptyState" class="flex flex-col items-center justify-center py-24">
+          <svg class="mb-5 text-apple-text-tertiary opacity-30" width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+          <p class="text-apple-text-tertiary text-[15px]">输入关键词开始搜索</p>
         </div>
         <div id="imageGrid" class="masonry"></div>
       </section>
     </main>
 
-    <!-- 搜索历史侧边栏 -->
-    <div id="historyPanel" class="fixed top-14 right-0 bottom-0 w-80 bg-dark-card border-l border-dark-border z-40 transform translate-x-full transition-transform duration-300 overflow-y-auto">
-      <div class="p-6">
-        <div class="flex items-center justify-between mb-6">
-          <h3 class="text-sm font-semibold">🕐 搜索历史</h3>
-          <button onclick="toggleHistory()" class="text-neutral-500 hover:text-white text-lg transition-colors">✕</button>
+    <!-- 搜索历史侧边栏 (Apple 风格面板) -->
+    <div id="historyOverlay" class="fixed inset-0 bg-black/40 z-40 hidden" onclick="toggleHistory()"></div>
+    <div id="historyPanel" class="fixed top-0 right-0 bottom-0 w-80 glass-thick border-l border-white/[0.08] z-50 transform translate-x-full transition-transform duration-[350ms] cubic-bezier(0.25, 0.1, 0.25, 1) overflow-y-auto" style="transition-timing-function: cubic-bezier(0.25, 0.1, 0.25, 1);">
+      <div class="p-5 pt-4">
+        <div class="flex items-center justify-between mb-5 h-12">
+          <h3 class="text-[15px] font-semibold" style="letter-spacing: -0.01em;">搜索历史</h3>
+          <button onclick="toggleHistory()" class="w-8 h-8 rounded-full bg-white/[0.08] hover:bg-white/[0.12] flex items-center justify-center transition-colors duration-200">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
         </div>
         <div id="historyList">
-          <p class="text-neutral-600 text-xs">暂无搜索记录</p>
+          <p class="text-apple-text-tertiary text-[13px]">暂无搜索记录</p>
         </div>
       </div>
     </div>
 
-    <!-- 图片预览弹窗 -->
+    <!-- 图片预览弹窗 (Apple QuickLook 风格) -->
     <div id="modal" class="fixed inset-0 z-[100] hidden">
-      <div class="absolute inset-0 bg-black/90 backdrop-blur-sm" onclick="closeModal()"></div>
-      <div class="relative z-10 flex flex-col items-center justify-center min-h-screen p-6">
-        <button onclick="closeModal()" class="absolute top-6 right-6 text-white/60 hover:text-white text-2xl transition-colors">✕</button>
-        <img id="modalImg" src="" alt="" class="max-w-full max-h-[75vh] object-contain rounded-lg shadow-2xl" />
-        <div class="mt-6 flex items-center gap-4">
-          <div class="text-center">
-            <p id="modalPhotographer" class="text-sm text-neutral-400"></p>
-            <p id="modalSize" class="text-xs text-neutral-600 mt-1"></p>
+      <div class="absolute inset-0 bg-black/80 backdrop-blur-xl modal-overlay" onclick="closeModal()"></div>
+      <div class="relative z-10 flex flex-col items-center justify-center min-h-screen p-6 scale-in">
+        <!-- 顶部关闭按钮 -->
+        <button onclick="closeModal()" class="absolute top-5 right-5 w-9 h-9 rounded-full bg-white/[0.1] hover:bg-white/[0.2] flex items-center justify-center transition-all duration-200">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+        <!-- 图片 -->
+        <img id="modalImg" src="" alt="" class="max-w-full max-h-[70vh] object-contain rounded-apple-lg shadow-2xl shadow-black/60" />
+        <!-- 底部信息栏 -->
+        <div class="mt-6 glass rounded-apple-lg px-6 py-4 flex items-center gap-5 border border-white/[0.08]">
+          <div class="text-left">
+            <p id="modalPhotographer" class="text-[14px] text-white font-medium"></p>
+            <p id="modalSize" class="text-[12px] text-apple-text-tertiary mt-0.5"></p>
           </div>
-          <a id="modalDownload" href="" target="_blank" download class="bg-white text-black text-sm font-medium px-6 py-2.5 rounded-xl hover:bg-neutral-200 active:scale-95 transition-all">
-            ⬇ 下载原图
+          <div class="w-px h-8 bg-white/[0.1]"></div>
+          <a id="modalDownload" href="" target="_blank" download class="apple-btn-primary !w-auto !py-2.5 !px-5 !text-[13px] !rounded-[10px] flex items-center gap-1.5">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            下载
           </a>
-          <button onclick="copyImageUrl()" id="copyBtn" class="border border-dark-border text-sm text-neutral-300 px-6 py-2.5 rounded-xl hover:bg-white/5 transition-all">
-            📋 复制链接
+          <button onclick="copyImageUrl()" id="copyBtn" class="apple-btn-secondary !w-auto !py-2.5 !px-5 !text-[13px] !rounded-[10px] flex items-center gap-1.5">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+            复制
           </button>
         </div>
       </div>
     </div>
 
     <!-- 底部 -->
-    <footer class="border-t border-dark-border py-8 text-center">
-      <p class="text-xs text-neutral-600">TIDE Material · 图片来源 <a href="https://www.pexels.com" target="_blank" class="underline hover:text-neutral-400">Pexels</a> · 免费可商用</p>
+    <footer class="border-t border-white/[0.06] py-8 text-center">
+      <p class="text-[12px] text-apple-text-tertiary">TIDE Material · 图片来源 <a href="https://www.pexels.com" target="_blank" class="text-apple-blue hover:text-apple-blue-hover transition-colors duration-200">Pexels</a> · 免费可商用</p>
     </footer>
   </div>
 
@@ -290,7 +470,6 @@
     // ============ 初始化 ============
     async function init() {
       if (authToken) {
-        // 验证 token 是否有效
         try {
           const res = await fetch('/api/me', {
             headers: { 'Authorization': 'Bearer ' + authToken }
@@ -302,7 +481,6 @@
             return;
           }
         } catch (e) {}
-        // token 无效，清除
         localStorage.removeItem('tide_token');
         localStorage.removeItem('tide_username');
         authToken = null;
@@ -318,10 +496,10 @@
     function showApp() {
       document.getElementById('authPage').classList.add('hidden');
       document.getElementById('appPage').classList.remove('hidden');
-      document.getElementById('navUsername').textContent = '👤 ' + currentUsername;
+      document.getElementById('navUsername').textContent = currentUsername;
     }
 
-    // ============ 登录/注册切换 ============
+    // ============ 登录/注册切换 (分段控制器) ============
     function switchTab(tab) {
       const tabLogin = document.getElementById('tabLogin');
       const tabRegister = document.getElementById('tabRegister');
@@ -329,17 +507,16 @@
       const registerForm = document.getElementById('registerForm');
 
       if (tab === 'login') {
-        tabLogin.className = 'flex-1 py-2.5 text-sm font-medium rounded-lg transition-all bg-white text-black';
-        tabRegister.className = 'flex-1 py-2.5 text-sm font-medium rounded-lg transition-all text-neutral-500';
+        tabLogin.classList.add('active');
+        tabRegister.classList.remove('active');
         loginForm.classList.remove('hidden');
         registerForm.classList.add('hidden');
       } else {
-        tabRegister.className = 'flex-1 py-2.5 text-sm font-medium rounded-lg transition-all bg-white text-black';
-        tabLogin.className = 'flex-1 py-2.5 text-sm font-medium rounded-lg transition-all text-neutral-500';
+        tabRegister.classList.add('active');
+        tabLogin.classList.remove('active');
         registerForm.classList.remove('hidden');
         loginForm.classList.add('hidden');
       }
-      // 清除错误信息
       document.getElementById('loginError').classList.add('hidden');
       document.getElementById('regError').classList.add('hidden');
     }
@@ -366,7 +543,7 @@
         return;
       }
 
-      btn.textContent = '注册中...';
+      btn.textContent = '创建中...';
       btn.disabled = true;
 
       try {
@@ -384,7 +561,6 @@
           throw new Error(data.error || '注册失败');
         }
 
-        // 保存 token
         authToken = data.token;
         currentUsername = data.username;
         localStorage.setItem('tide_token', authToken);
@@ -394,7 +570,7 @@
         errorEl.textContent = error.message;
         errorEl.classList.remove('hidden');
       } finally {
-        btn.textContent = '注册';
+        btn.textContent = '创建账户';
         btn.disabled = false;
       }
     }
@@ -461,7 +637,6 @@
       localStorage.removeItem('tide_username');
       showAuth();
 
-      // 重置表单
       document.getElementById('loginUsername').value = '';
       document.getElementById('loginPassword').value = '';
       document.getElementById('regUsername').value = '';
@@ -533,7 +708,6 @@
 
         renderImages(data.photos, append);
 
-        // 保存搜索历史（后台执行，不阻塞）
         if (!append && authToken) {
           fetch('/api/history', {
             method: 'POST',
@@ -549,9 +723,9 @@
         console.error('搜索失败:', error);
         if (!append) {
           document.getElementById('imageGrid').innerHTML = `
-            <div class="col-span-full text-center py-20">
-              <div class="text-4xl mb-4">😵</div>
-              <p class="text-neutral-500 text-sm">搜索出错了，请稍后重试</p>
+            <div class="col-span-full text-center py-24">
+              <svg class="mx-auto mb-4 text-apple-text-tertiary opacity-30" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+              <p class="text-apple-text-tertiary text-[15px]">搜索出错了，请稍后重试</p>
             </div>`;
         }
       } finally {
@@ -564,25 +738,26 @@
       const grid = document.getElementById('imageGrid');
       if (!append && photos.length === 0) {
         grid.innerHTML = `
-          <div class="col-span-full text-center py-20">
-            <div class="text-4xl mb-4">🔍</div>
-            <p class="text-neutral-500 text-sm">没有找到相关图片，换个关键词试试</p>
+          <div class="col-span-full text-center py-24">
+            <svg class="mx-auto mb-4 text-apple-text-tertiary opacity-30" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <p class="text-apple-text-tertiary text-[15px]">没有找到相关图片，换个关键词试试</p>
           </div>`;
         return;
       }
 
       const fragment = document.createDocumentFragment();
-      photos.forEach(photo => {
+      photos.forEach((photo, index) => {
         const item = document.createElement('div');
         item.className = 'masonry-item';
+        item.style.animation = `fadeIn 0.4s cubic-bezier(0.25, 0.1, 0.25, 1) ${index * 0.04}s both`;
         item.innerHTML = `
-          <div class="img-card relative rounded-xl overflow-hidden cursor-pointer bg-dark-card border border-dark-border group"
+          <div class="img-card relative cursor-pointer bg-apple-card group"
                onclick="openModal('${photo.src.large2x}', '${photo.photographer}', ${photo.width}, ${photo.height}, '${photo.src.original}')">
             <img src="${photo.src.medium}" alt="${photo.alt || photo.photographer}" loading="lazy" class="w-full block"
                  style="aspect-ratio: ${photo.width}/${photo.height}" />
-            <div class="img-overlay absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-0 transition-opacity duration-300 flex flex-col justify-end p-4">
-              <p class="text-white text-sm font-medium">${photo.photographer}</p>
-              <p class="text-white/60 text-xs mt-1">${photo.width} × ${photo.height}</p>
+            <div class="img-overlay absolute inset-0 bg-gradient-to-t from-black/60 via-black/0 to-black/0 opacity-0 transition-opacity duration-300 flex flex-col justify-end p-4">
+              <p class="text-white text-[13px] font-medium">${photo.photographer}</p>
+              <p class="text-white/50 text-[11px] mt-0.5">${photo.width} × ${photo.height}</p>
             </div>
           </div>`;
         fragment.appendChild(item);
@@ -599,21 +774,24 @@
     }
 
     // ============ 搜索历史 ============
-    async function toggleHistory() {
+    function toggleHistory() {
       const panel = document.getElementById('historyPanel');
+      const overlay = document.getElementById('historyOverlay');
       historyOpen = !historyOpen;
 
       if (historyOpen) {
         panel.style.transform = 'translateX(0)';
+        overlay.classList.remove('hidden');
         loadHistory();
       } else {
         panel.style.transform = 'translateX(100%)';
+        overlay.classList.add('hidden');
       }
     }
 
     async function loadHistory() {
       const list = document.getElementById('historyList');
-      list.innerHTML = '<p class="text-neutral-600 text-xs">加载中...</p>';
+      list.innerHTML = '<div class="flex justify-center py-8"><div class="apple-spinner"></div></div>';
 
       try {
         const res = await fetch('/api/history', {
@@ -622,7 +800,7 @@
         const data = await res.json();
 
         if (!data.history || data.history.length === 0) {
-          list.innerHTML = '<p class="text-neutral-600 text-xs">暂无搜索记录</p>';
+          list.innerHTML = '<p class="text-apple-text-tertiary text-[13px] text-center py-8">暂无搜索记录</p>';
           return;
         }
 
@@ -631,24 +809,24 @@
             month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'
           });
           return `
-            <div class="history-item flex items-center justify-between py-3 px-3 rounded-lg cursor-pointer -mx-3"
+            <div class="history-item flex items-center justify-between py-3 px-3 cursor-pointer -mx-1"
                  onclick="quickSearch('${item.query.replace(/'/g, "\\'")}')">
-              <div>
-                <p class="text-sm text-white">${item.query}</p>
-                <p class="text-xs text-neutral-600 mt-0.5">${time}</p>
+              <div class="min-w-0">
+                <p class="text-[14px] text-white truncate" style="letter-spacing: -0.01em;">${item.query}</p>
+                <p class="text-[11px] text-apple-text-tertiary mt-0.5">${time}</p>
               </div>
-              <span class="text-neutral-600 text-xs">→</span>
+              <svg class="flex-shrink-0 ml-2 text-apple-text-tertiary" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
             </div>`;
         }).join('');
       } catch (e) {
-        list.innerHTML = '<p class="text-neutral-600 text-xs">加载失败</p>';
+        list.innerHTML = '<p class="text-apple-text-tertiary text-[13px] text-center py-8">加载失败</p>';
       }
     }
 
     // ============ 弹窗预览 ============
     function openModal(imgUrl, photographer, width, height, originalUrl) {
       document.getElementById('modalImg').src = imgUrl;
-      document.getElementById('modalPhotographer').textContent = '📸 ' + photographer;
+      document.getElementById('modalPhotographer').textContent = photographer;
       document.getElementById('modalSize').textContent = width + ' × ' + height;
       document.getElementById('modalDownload').href = originalUrl;
       document.getElementById('modal').classList.remove('hidden');
@@ -661,15 +839,22 @@
     }
 
     document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape') closeModal();
+      if (e.key === 'Escape') {
+        if (!document.getElementById('modal').classList.contains('hidden')) {
+          closeModal();
+        } else if (historyOpen) {
+          toggleHistory();
+        }
+      }
     });
 
     function copyImageUrl() {
       const url = document.getElementById('modalDownload').href;
       navigator.clipboard.writeText(url).then(() => {
         const btn = document.getElementById('copyBtn');
-        btn.textContent = '✅ 已复制';
-        setTimeout(() => { btn.textContent = '📋 复制链接'; }, 2000);
+        const originalHTML = btn.innerHTML;
+        btn.innerHTML = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> 已复制`;
+        setTimeout(() => { btn.innerHTML = originalHTML; }, 2000);
       });
     }
 
@@ -680,12 +865,10 @@
     // 回车键支持
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Enter') {
-        // 登录表单
         if (!document.getElementById('authPage').classList.contains('hidden')) {
           if (!document.getElementById('loginForm').classList.contains('hidden')) login();
           else register();
         }
-        // 搜索框
         if (document.activeElement === document.getElementById('searchInput')) searchImages();
       }
     });
