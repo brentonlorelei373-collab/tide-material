@@ -24,283 +24,478 @@
     
     * { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; }
     
-    body {
-      background-color: #0a0a0a;
-      min-height: 100vh;
-    }
+    body { background-color: #0a0a0a; min-height: 100vh; }
 
-    /* 自定义滚动条 */
     ::-webkit-scrollbar { width: 6px; }
     ::-webkit-scrollbar-track { background: #0a0a0a; }
     ::-webkit-scrollbar-thumb { background: #333; border-radius: 3px; }
 
-    /* 输入框发光效果 */
     .input-glow:focus {
       box-shadow: 0 0 0 2px rgba(255,255,255,0.1), 0 0 20px rgba(255,255,255,0.05);
     }
 
-    /* 图片悬浮效果 */
-    .img-card {
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-    .img-card:hover {
-      transform: translateY(-4px);
-      box-shadow: 0 20px 40px rgba(0,0,0,0.4);
-    }
-    .img-card:hover .img-overlay {
-      opacity: 1;
-    }
+    .img-card { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+    .img-card:hover { transform: translateY(-4px); box-shadow: 0 20px 40px rgba(0,0,0,0.4); }
+    .img-card:hover .img-overlay { opacity: 1; }
 
-    /* 弹窗动画 */
-    .modal-backdrop {
-      transition: opacity 0.3s ease;
-    }
-    .modal-content {
-      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease;
-    }
-
-    /* 加载动画 */
     .loader {
-      width: 40px;
-      height: 40px;
-      border: 3px solid #333;
-      border-top-color: #fff;
+      width: 40px; height: 40px;
+      border: 3px solid #333; border-top-color: #fff;
       border-radius: 50%;
       animation: spin 0.8s linear infinite;
     }
-    @keyframes spin {
-      to { transform: rotate(360deg); }
-    }
+    @keyframes spin { to { transform: rotate(360deg); } }
 
-    /* 瀑布流 */
-    .masonry {
-      columns: 2;
-      column-gap: 16px;
-    }
-    @media (min-width: 768px) {
-      .masonry { columns: 3; }
-    }
-    @media (min-width: 1024px) {
-      .masonry { columns: 4; }
-    }
-    .masonry-item {
-      break-inside: avoid;
-      margin-bottom: 16px;
-    }
+    .masonry { columns: 2; column-gap: 16px; }
+    @media (min-width: 768px) { .masonry { columns: 3; } }
+    @media (min-width: 1024px) { .masonry { columns: 4; } }
+    .masonry-item { break-inside: avoid; margin-bottom: 16px; }
 
-    /* 标签按钮 */
-    .tag-btn {
+    .tag-btn { transition: all 0.2s ease; }
+    .tag-btn:hover { background-color: rgba(255,255,255,0.15); }
+
+    .fade-in { animation: fadeIn 0.4s ease; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+    .auth-input {
+      background: #141414;
+      border: 1px solid #2a2a2a;
+      border-radius: 12px;
+      padding: 12px 16px;
+      color: white;
+      font-size: 14px;
+      width: 100%;
+      outline: none;
+      transition: all 0.2s;
+    }
+    .auth-input:focus {
+      border-color: #555;
+      box-shadow: 0 0 0 2px rgba(255,255,255,0.05);
+    }
+    .auth-input::placeholder { color: #555; }
+
+    .history-item {
       transition: all 0.2s ease;
     }
-    .tag-btn:hover {
-      background-color: rgba(255,255,255,0.15);
+    .history-item:hover {
+      background-color: rgba(255,255,255,0.05);
     }
   </style>
 </head>
 <body class="text-white">
 
-  <!-- 导航栏 -->
-  <nav class="fixed top-0 left-0 right-0 z-50 bg-dark/80 backdrop-blur-xl border-b border-dark-border">
-    <div class="max-w-7xl mx-auto px-6 h-14 flex items-center justify-between">
-      <div class="flex items-center gap-2">
-        <span class="text-lg font-bold tracking-wider">TIDE</span>
-        <span class="text-xs text-neutral-500 font-light tracking-widest uppercase">Material</span>
+  <!-- ==================== 登录/注册页面 ==================== -->
+  <div id="authPage" class="min-h-screen flex items-center justify-center px-6">
+    <div class="w-full max-w-sm fade-in">
+      <!-- Logo -->
+      <div class="text-center mb-10">
+        <h1 class="text-3xl font-bold tracking-wider mb-2">TIDE</h1>
+        <p class="text-xs text-neutral-500 tracking-widest uppercase">Material</p>
       </div>
-      <div class="text-xs text-neutral-600">Powered by Pexels</div>
-    </div>
-  </nav>
 
-  <!-- 主内容区 -->
-  <main class="pt-14">
-
-    <!-- Hero 搜索区 -->
-    <section class="px-6 pt-20 pb-12">
-      <div class="max-w-2xl mx-auto text-center">
-        <h1 class="text-4xl md:text-5xl font-bold tracking-tight mb-4">
-          输入灵感，获取素材
-        </h1>
-        <p class="text-neutral-500 text-sm mb-10">
-          输入关键词或描述，为你从全球图库中搜寻最匹配的高质量图片
-        </p>
-
-        <!-- 搜索框 -->
-        <div class="relative max-w-xl mx-auto">
-          <input
-            id="searchInput"
-            type="text"
-            placeholder="例如：夏日街头穿搭、minimal architecture、咖啡店..."
-            class="w-full bg-dark-card border border-dark-border rounded-2xl px-6 py-4 pr-28 text-white text-sm placeholder-neutral-600 outline-none input-glow transition-all"
-            autocomplete="off"
-          />
-          <button
-            id="searchBtn"
-            onclick="searchImages()"
-            class="absolute right-2 top-1/2 -translate-y-1/2 bg-white text-black text-sm font-medium px-5 py-2.5 rounded-xl hover:bg-neutral-200 active:scale-95 transition-all"
-          >
-            搜索素材
-          </button>
-        </div>
-
-        <!-- 快捷标签 -->
-        <div class="flex flex-wrap justify-center gap-2 mt-6">
-          <button onclick="quickSearch('street fashion')" class="tag-btn text-xs text-neutral-400 border border-dark-border rounded-full px-4 py-1.5">🔥 街头穿搭</button>
-          <button onclick="quickSearch('minimal interior')" class="tag-btn text-xs text-neutral-400 border border-dark-border rounded-full px-4 py-1.5">🏠 极简家居</button>
-          <button onclick="quickSearch('coffee aesthetic')" class="tag-btn text-xs text-neutral-400 border border-dark-border rounded-full px-4 py-1.5">☕ 咖啡美学</button>
-          <button onclick="quickSearch('nature landscape')" class="tag-btn text-xs text-neutral-400 border border-dark-border rounded-full px-4 py-1.5">🌿 自然风光</button>
-          <button onclick="quickSearch('urban night')" class="tag-btn text-xs text-neutral-400 border border-dark-border rounded-full px-4 py-1.5">🌃 城市夜景</button>
-          <button onclick="quickSearch('food photography')" class="tag-btn text-xs text-neutral-400 border border-dark-border rounded-full px-4 py-1.5">🍜 美食摄影</button>
-        </div>
+      <!-- 登录/注册切换 -->
+      <div class="flex bg-dark-card rounded-xl p-1 mb-8 border border-dark-border">
+        <button id="tabLogin" onclick="switchTab('login')" class="flex-1 py-2.5 text-sm font-medium rounded-lg transition-all bg-white text-black">登录</button>
+        <button id="tabRegister" onclick="switchTab('register')" class="flex-1 py-2.5 text-sm font-medium rounded-lg transition-all text-neutral-500">注册</button>
       </div>
-    </section>
 
-    <!-- 结果统计 -->
-    <div id="resultInfo" class="hidden max-w-7xl mx-auto px-6 mb-6">
-      <div class="flex items-center justify-between">
-        <p class="text-sm text-neutral-500">
-          搜索 "<span id="resultQuery" class="text-white"></span>" · 找到 <span id="resultCount" class="text-white"></span> 张图片
-        </p>
-        <button onclick="loadMore()" id="loadMoreBtn" class="hidden text-xs text-neutral-400 border border-dark-border rounded-full px-4 py-1.5 hover:bg-white/5 transition-all">
-          加载更多
+      <!-- 登录表单 -->
+      <div id="loginForm">
+        <div class="space-y-4">
+          <div>
+            <label class="text-xs text-neutral-500 mb-1.5 block">用户名</label>
+            <input id="loginUsername" type="text" placeholder="输入用户名" class="auth-input" autocomplete="username" />
+          </div>
+          <div>
+            <label class="text-xs text-neutral-500 mb-1.5 block">密码</label>
+            <input id="loginPassword" type="password" placeholder="输入密码" class="auth-input" autocomplete="current-password" />
+          </div>
+        </div>
+        <button onclick="login()" id="loginBtn" class="w-full mt-6 bg-white text-black text-sm font-medium py-3 rounded-xl hover:bg-neutral-200 active:scale-[0.98] transition-all">
+          登录
         </button>
-      </div>
-    </div>
-
-    <!-- 图片网格 -->
-    <section class="max-w-7xl mx-auto px-6 pb-20">
-      <!-- 加载状态 -->
-      <div id="loading" class="hidden flex flex-col items-center justify-center py-20">
-        <div class="loader mb-4"></div>
-        <p class="text-sm text-neutral-500">正在搜索素材...</p>
+        <p id="loginError" class="text-red-400 text-xs text-center mt-4 hidden"></p>
       </div>
 
-      <!-- 空状态 -->
-      <div id="emptyState" class="flex flex-col items-center justify-center py-20">
-        <div class="text-6xl mb-4 opacity-30">📷</div>
-        <p class="text-neutral-600 text-sm">输入关键词开始搜索</p>
-      </div>
-
-      <!-- 图片瀑布流 -->
-      <div id="imageGrid" class="masonry"></div>
-    </section>
-
-  </main>
-
-  <!-- 图片预览弹窗 -->
-  <div id="modal" class="fixed inset-0 z-[100] hidden">
-    <div class="modal-backdrop absolute inset-0 bg-black/90 backdrop-blur-sm" onclick="closeModal()"></div>
-    <div class="modal-content relative z-10 flex flex-col items-center justify-center min-h-screen p-6">
-      <!-- 关闭按钮 -->
-      <button onclick="closeModal()" class="absolute top-6 right-6 text-white/60 hover:text-white text-2xl transition-colors">✕</button>
-      
-      <!-- 图片 -->
-      <img id="modalImg" src="" alt="" class="max-w-full max-h-[75vh] object-contain rounded-lg shadow-2xl" />
-      
-      <!-- 图片信息 -->
-      <div class="mt-6 flex items-center gap-4">
-        <div class="text-center">
-          <p id="modalPhotographer" class="text-sm text-neutral-400"></p>
-          <p id="modalSize" class="text-xs text-neutral-600 mt-1"></p>
+      <!-- 注册表单 -->
+      <div id="registerForm" class="hidden">
+        <div class="space-y-4">
+          <div>
+            <label class="text-xs text-neutral-500 mb-1.5 block">用户名</label>
+            <input id="regUsername" type="text" placeholder="3-20 个字符" class="auth-input" autocomplete="username" />
+          </div>
+          <div>
+            <label class="text-xs text-neutral-500 mb-1.5 block">密码</label>
+            <input id="regPassword" type="password" placeholder="至少 6 个字符" class="auth-input" autocomplete="new-password" />
+          </div>
+          <div>
+            <label class="text-xs text-neutral-500 mb-1.5 block">确认密码</label>
+            <input id="regPassword2" type="password" placeholder="再次输入密码" class="auth-input" autocomplete="new-password" />
+          </div>
         </div>
-        <a id="modalDownload" href="" target="_blank" download
-           class="bg-white text-black text-sm font-medium px-6 py-2.5 rounded-xl hover:bg-neutral-200 active:scale-95 transition-all">
-          ⬇ 下载原图
-        </a>
-        <button onclick="copyImageUrl()" id="copyBtn"
-           class="border border-dark-border text-sm text-neutral-300 px-6 py-2.5 rounded-xl hover:bg-white/5 transition-all">
-          📋 复制链接
+        <button onclick="register()" id="regBtn" class="w-full mt-6 bg-white text-black text-sm font-medium py-3 rounded-xl hover:bg-neutral-200 active:scale-[0.98] transition-all">
+          注册
         </button>
+        <p id="regError" class="text-red-400 text-xs text-center mt-4 hidden"></p>
       </div>
+
+      <p class="text-center text-neutral-700 text-xs mt-8">素材搜索 · 免费使用</p>
     </div>
   </div>
 
-  <!-- 底部 -->
-  <footer class="border-t border-dark-border py-8 text-center">
-    <p class="text-xs text-neutral-600">TIDE Material · 图片来源 <a href="https://www.pexels.com" target="_blank" class="underline hover:text-neutral-400">Pexels</a> · 免费可商用</p>
-  </footer>
+  <!-- ==================== 主应用页面 ==================== -->
+  <div id="appPage" class="hidden">
+
+    <!-- 导航栏 -->
+    <nav class="fixed top-0 left-0 right-0 z-50 bg-dark/80 backdrop-blur-xl border-b border-dark-border">
+      <div class="max-w-7xl mx-auto px-6 h-14 flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <span class="text-lg font-bold tracking-wider">TIDE</span>
+          <span class="text-xs text-neutral-500 font-light tracking-widest uppercase">Material</span>
+        </div>
+        <div class="flex items-center gap-4">
+          <button onclick="toggleHistory()" class="text-xs text-neutral-400 hover:text-white transition-colors flex items-center gap-1.5">
+            🕐 <span class="hidden sm:inline">搜索历史</span>
+          </button>
+          <div class="flex items-center gap-3">
+            <span id="navUsername" class="text-xs text-neutral-400"></span>
+            <button onclick="logout()" class="text-xs text-neutral-500 hover:text-red-400 transition-colors">退出</button>
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    <!-- 主内容区 -->
+    <main class="pt-14">
+
+      <!-- Hero 搜索区 -->
+      <section class="px-6 pt-20 pb-12">
+        <div class="max-w-2xl mx-auto text-center">
+          <h1 class="text-4xl md:text-5xl font-bold tracking-tight mb-4">
+            输入灵感，获取素材
+          </h1>
+          <p class="text-neutral-500 text-sm mb-10">
+            输入关键词或描述，为你从全球图库中搜寻最匹配的高质量图片
+          </p>
+
+          <!-- 搜索框 -->
+          <div class="relative max-w-xl mx-auto">
+            <input
+              id="searchInput"
+              type="text"
+              placeholder="例如：夏日街头穿搭、minimal architecture、咖啡店..."
+              class="w-full bg-dark-card border border-dark-border rounded-2xl px-6 py-4 pr-28 text-white text-sm placeholder-neutral-600 outline-none input-glow transition-all"
+              autocomplete="off"
+            />
+            <button
+              id="searchBtn"
+              onclick="searchImages()"
+              class="absolute right-2 top-1/2 -translate-y-1/2 bg-white text-black text-sm font-medium px-5 py-2.5 rounded-xl hover:bg-neutral-200 active:scale-95 transition-all"
+            >
+              搜索素材
+            </button>
+          </div>
+
+          <!-- 快捷标签 -->
+          <div class="flex flex-wrap justify-center gap-2 mt-6">
+            <button onclick="quickSearch('street fashion')" class="tag-btn text-xs text-neutral-400 border border-dark-border rounded-full px-4 py-1.5">🔥 街头穿搭</button>
+            <button onclick="quickSearch('minimal interior')" class="tag-btn text-xs text-neutral-400 border border-dark-border rounded-full px-4 py-1.5">🏠 极简家居</button>
+            <button onclick="quickSearch('coffee aesthetic')" class="tag-btn text-xs text-neutral-400 border border-dark-border rounded-full px-4 py-1.5">☕ 咖啡美学</button>
+            <button onclick="quickSearch('nature landscape')" class="tag-btn text-xs text-neutral-400 border border-dark-border rounded-full px-4 py-1.5">🌿 自然风光</button>
+            <button onclick="quickSearch('urban night')" class="tag-btn text-xs text-neutral-400 border border-dark-border rounded-full px-4 py-1.5">🌃 城市夜景</button>
+            <button onclick="quickSearch('food photography')" class="tag-btn text-xs text-neutral-400 border border-dark-border rounded-full px-4 py-1.5">🍜 美食摄影</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- 结果统计 -->
+      <div id="resultInfo" class="hidden max-w-7xl mx-auto px-6 mb-6">
+        <div class="flex items-center justify-between">
+          <p class="text-sm text-neutral-500">
+            搜索 "<span id="resultQuery" class="text-white"></span>" · 找到 <span id="resultCount" class="text-white"></span> 张图片
+          </p>
+          <button onclick="loadMore()" id="loadMoreBtn" class="hidden text-xs text-neutral-400 border border-dark-border rounded-full px-4 py-1.5 hover:bg-white/5 transition-all">
+            加载更多
+          </button>
+        </div>
+      </div>
+
+      <!-- 图片网格 -->
+      <section class="max-w-7xl mx-auto px-6 pb-20">
+        <div id="loading" class="hidden flex flex-col items-center justify-center py-20">
+          <div class="loader mb-4"></div>
+          <p class="text-sm text-neutral-500">正在搜索素材...</p>
+        </div>
+        <div id="emptyState" class="flex flex-col items-center justify-center py-20">
+          <div class="text-6xl mb-4 opacity-30">📷</div>
+          <p class="text-neutral-600 text-sm">输入关键词开始搜索</p>
+        </div>
+        <div id="imageGrid" class="masonry"></div>
+      </section>
+    </main>
+
+    <!-- 搜索历史侧边栏 -->
+    <div id="historyPanel" class="fixed top-14 right-0 bottom-0 w-80 bg-dark-card border-l border-dark-border z-40 transform translate-x-full transition-transform duration-300 overflow-y-auto">
+      <div class="p-6">
+        <div class="flex items-center justify-between mb-6">
+          <h3 class="text-sm font-semibold">🕐 搜索历史</h3>
+          <button onclick="toggleHistory()" class="text-neutral-500 hover:text-white text-lg transition-colors">✕</button>
+        </div>
+        <div id="historyList">
+          <p class="text-neutral-600 text-xs">暂无搜索记录</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 图片预览弹窗 -->
+    <div id="modal" class="fixed inset-0 z-[100] hidden">
+      <div class="absolute inset-0 bg-black/90 backdrop-blur-sm" onclick="closeModal()"></div>
+      <div class="relative z-10 flex flex-col items-center justify-center min-h-screen p-6">
+        <button onclick="closeModal()" class="absolute top-6 right-6 text-white/60 hover:text-white text-2xl transition-colors">✕</button>
+        <img id="modalImg" src="" alt="" class="max-w-full max-h-[75vh] object-contain rounded-lg shadow-2xl" />
+        <div class="mt-6 flex items-center gap-4">
+          <div class="text-center">
+            <p id="modalPhotographer" class="text-sm text-neutral-400"></p>
+            <p id="modalSize" class="text-xs text-neutral-600 mt-1"></p>
+          </div>
+          <a id="modalDownload" href="" target="_blank" download class="bg-white text-black text-sm font-medium px-6 py-2.5 rounded-xl hover:bg-neutral-200 active:scale-95 transition-all">
+            ⬇ 下载原图
+          </a>
+          <button onclick="copyImageUrl()" id="copyBtn" class="border border-dark-border text-sm text-neutral-300 px-6 py-2.5 rounded-xl hover:bg-white/5 transition-all">
+            📋 复制链接
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 底部 -->
+    <footer class="border-t border-dark-border py-8 text-center">
+      <p class="text-xs text-neutral-600">TIDE Material · 图片来源 <a href="https://www.pexels.com" target="_blank" class="underline hover:text-neutral-400">Pexels</a> · 免费可商用</p>
+    </footer>
+  </div>
 
   <script>
     // ============ 配置 ============
-    const API_KEY = 'QzRQUCCS2KSutNKlsXUE81M0zkPm56V01Nh0DrTW4nZZQOY939KBxhct';
+    const PEXELS_API_KEY = 'QzRQUCCS2KSutNKlsXUE81M0zkPm56V01Nh0DrTW4nZZQOY939KBxhct';
     const PER_PAGE = 20;
-    
+
     // ============ 状态 ============
     let currentQuery = '';
     let currentPage = 1;
     let totalResults = 0;
+    let authToken = localStorage.getItem('tide_token');
+    let currentUsername = localStorage.getItem('tide_username');
+    let historyOpen = false;
 
-    // ============ 常用中文→英文关键词映射 ============
+    // ============ 初始化 ============
+    async function init() {
+      if (authToken) {
+        // 验证 token 是否有效
+        try {
+          const res = await fetch('/api/me', {
+            headers: { 'Authorization': 'Bearer ' + authToken }
+          });
+          if (res.ok) {
+            const data = await res.json();
+            currentUsername = data.username;
+            showApp();
+            return;
+          }
+        } catch (e) {}
+        // token 无效，清除
+        localStorage.removeItem('tide_token');
+        localStorage.removeItem('tide_username');
+        authToken = null;
+      }
+      showAuth();
+    }
+
+    function showAuth() {
+      document.getElementById('authPage').classList.remove('hidden');
+      document.getElementById('appPage').classList.add('hidden');
+    }
+
+    function showApp() {
+      document.getElementById('authPage').classList.add('hidden');
+      document.getElementById('appPage').classList.remove('hidden');
+      document.getElementById('navUsername').textContent = '👤 ' + currentUsername;
+    }
+
+    // ============ 登录/注册切换 ============
+    function switchTab(tab) {
+      const tabLogin = document.getElementById('tabLogin');
+      const tabRegister = document.getElementById('tabRegister');
+      const loginForm = document.getElementById('loginForm');
+      const registerForm = document.getElementById('registerForm');
+
+      if (tab === 'login') {
+        tabLogin.className = 'flex-1 py-2.5 text-sm font-medium rounded-lg transition-all bg-white text-black';
+        tabRegister.className = 'flex-1 py-2.5 text-sm font-medium rounded-lg transition-all text-neutral-500';
+        loginForm.classList.remove('hidden');
+        registerForm.classList.add('hidden');
+      } else {
+        tabRegister.className = 'flex-1 py-2.5 text-sm font-medium rounded-lg transition-all bg-white text-black';
+        tabLogin.className = 'flex-1 py-2.5 text-sm font-medium rounded-lg transition-all text-neutral-500';
+        registerForm.classList.remove('hidden');
+        loginForm.classList.add('hidden');
+      }
+      // 清除错误信息
+      document.getElementById('loginError').classList.add('hidden');
+      document.getElementById('regError').classList.add('hidden');
+    }
+
+    // ============ 注册 ============
+    async function register() {
+      const username = document.getElementById('regUsername').value.trim();
+      const password = document.getElementById('regPassword').value;
+      const password2 = document.getElementById('regPassword2').value;
+      const errorEl = document.getElementById('regError');
+      const btn = document.getElementById('regBtn');
+
+      errorEl.classList.add('hidden');
+
+      if (!username || !password) {
+        errorEl.textContent = '请填写用户名和密码';
+        errorEl.classList.remove('hidden');
+        return;
+      }
+
+      if (password !== password2) {
+        errorEl.textContent = '两次密码输入不一致';
+        errorEl.classList.remove('hidden');
+        return;
+      }
+
+      btn.textContent = '注册中...';
+      btn.disabled = true;
+
+      try {
+        const res = await fetch('/api/register', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username, password })
+        });
+
+        const data = await res.json();
+
+        if (!res.ok) {
+          throw new Error(data.error || '注册失败');
+        }
+
+        // 保存 token
+        authToken = data.token;
+        currentUsername = data.username;
+        localStorage.setItem('tide_token', authToken);
+        localStorage.setItem('tide_username', currentUsername);
+        showApp();
+      } catch (error) {
+        errorEl.textContent = error.message;
+        errorEl.classList.remove('hidden');
+      } finally {
+        btn.textContent = '注册';
+        btn.disabled = false;
+      }
+    }
+
+    // ============ 登录 ============
+    async function login() {
+      const username = document.getElementById('loginUsername').value.trim();
+      const password = document.getElementById('loginPassword').value;
+      const errorEl = document.getElementById('loginError');
+      const btn = document.getElementById('loginBtn');
+
+      errorEl.classList.add('hidden');
+
+      if (!username || !password) {
+        errorEl.textContent = '请填写用户名和密码';
+        errorEl.classList.remove('hidden');
+        return;
+      }
+
+      btn.textContent = '登录中...';
+      btn.disabled = true;
+
+      try {
+        const res = await fetch('/api/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username, password })
+        });
+
+        const data = await res.json();
+
+        if (!res.ok) {
+          throw new Error(data.error || '登录失败');
+        }
+
+        authToken = data.token;
+        currentUsername = data.username;
+        localStorage.setItem('tide_token', authToken);
+        localStorage.setItem('tide_username', currentUsername);
+        showApp();
+      } catch (error) {
+        errorEl.textContent = error.message;
+        errorEl.classList.remove('hidden');
+      } finally {
+        btn.textContent = '登录';
+        btn.disabled = false;
+      }
+    }
+
+    // ============ 登出 ============
+    async function logout() {
+      try {
+        await fetch('/api/logout', {
+          method: 'POST',
+          headers: { 'Authorization': 'Bearer ' + authToken }
+        });
+      } catch (e) {}
+
+      authToken = null;
+      currentUsername = null;
+      localStorage.removeItem('tide_token');
+      localStorage.removeItem('tide_username');
+      showAuth();
+
+      // 重置表单
+      document.getElementById('loginUsername').value = '';
+      document.getElementById('loginPassword').value = '';
+      document.getElementById('regUsername').value = '';
+      document.getElementById('regPassword').value = '';
+      document.getElementById('regPassword2').value = '';
+    }
+
+    // ============ 中文→英文关键词映射 ============
     const keywordMap = {
-      '穿搭': 'fashion outfit',
-      '街头': 'street style',
-      '夏日': 'summer',
-      '冬日': 'winter',
-      '春天': 'spring',
-      '秋天': 'autumn fall',
-      '极简': 'minimal',
-      '家居': 'interior home',
-      '咖啡': 'coffee',
-      '美食': 'food',
-      '风景': 'landscape scenery',
-      '城市': 'urban city',
-      '夜景': 'night city lights',
-      '海边': 'beach ocean',
-      '森林': 'forest',
-      '建筑': 'architecture',
-      '人像': 'portrait',
-      '黑白': 'black and white',
-      '复古': 'vintage retro',
-      '科技': 'technology',
-      '潮牌': 'streetwear',
-      '运动': 'sport fitness',
-      '旅行': 'travel',
-      '花': 'flowers',
-      '猫': 'cat',
-      '狗': 'dog',
-      '日落': 'sunset',
-      '星空': 'starry sky',
-      '雨天': 'rainy day',
-      '书': 'books reading',
-      '音乐': 'music',
-      '艺术': 'art',
-      '设计': 'design',
-      '清凉': 'cool fresh',
-      '温暖': 'warm cozy',
-      '简约': 'simple clean',
-      '奢华': 'luxury',
-      '街拍': 'street photography',
-      'ins风': 'instagram aesthetic',
-      '氛围感': 'moody aesthetic',
-      '高级感': 'elegant premium',
+      '穿搭': 'fashion outfit', '街头': 'street style', '夏日': 'summer',
+      '冬日': 'winter', '春天': 'spring', '秋天': 'autumn fall',
+      '极简': 'minimal', '家居': 'interior home', '咖啡': 'coffee',
+      '美食': 'food', '风景': 'landscape scenery', '城市': 'urban city',
+      '夜景': 'night city lights', '海边': 'beach ocean', '森林': 'forest',
+      '建筑': 'architecture', '人像': 'portrait', '黑白': 'black and white',
+      '复古': 'vintage retro', '科技': 'technology', '潮牌': 'streetwear',
+      '运动': 'sport fitness', '旅行': 'travel', '花': 'flowers',
+      '猫': 'cat', '狗': 'dog', '日落': 'sunset', '星空': 'starry sky',
+      '雨天': 'rainy day', '书': 'books reading', '音乐': 'music',
+      '艺术': 'art', '设计': 'design', '清凉': 'cool fresh',
+      '温暖': 'warm cozy', '简约': 'simple clean', '奢华': 'luxury',
+      '街拍': 'street photography', 'ins风': 'instagram aesthetic',
+      '氛围感': 'moody aesthetic', '高级感': 'elegant premium',
     };
 
-    // ============ 中文转英文关键词 ============
     function translateQuery(input) {
       let result = input.trim();
-      
-      // 尝试将中文关键词替换为英文
       let translated = [];
-      let hasChineseMatch = false;
-      
       for (const [cn, en] of Object.entries(keywordMap)) {
-        if (result.includes(cn)) {
-          translated.push(en);
-          hasChineseMatch = true;
-        }
+        if (result.includes(cn)) translated.push(en);
       }
-      
-      if (hasChineseMatch && translated.length > 0) {
-        return translated.join(' ');
-      }
-      
-      // 如果没有匹配到映射，直接返回原文（Pexels 也支持部分中文搜索）
-      return result;
+      return translated.length > 0 ? translated.join(' ') : result;
     }
 
     // ============ 搜索图片 ============
     async function searchImages(append = false) {
       const input = document.getElementById('searchInput');
       const query = input.value.trim();
-      
       if (!query) return;
 
       if (!append) {
@@ -309,32 +504,22 @@
       }
 
       const translatedQuery = translateQuery(currentQuery);
-      
-      // UI 状态
       showLoading(true);
-      if (!append) {
-        document.getElementById('imageGrid').innerHTML = '';
-      }
+      if (!append) document.getElementById('imageGrid').innerHTML = '';
       document.getElementById('emptyState').classList.add('hidden');
 
       try {
         const url = `https://api.pexels.com/v1/search?query=${encodeURIComponent(translatedQuery)}&per_page=${PER_PAGE}&page=${currentPage}`;
-        
-        const response = await fetch(url, {
-          headers: { 'Authorization': API_KEY }
-        });
-
+        const response = await fetch(url, { headers: { 'Authorization': PEXELS_API_KEY } });
         if (!response.ok) throw new Error('API 请求失败');
 
         const data = await response.json();
         totalResults = data.total_results;
 
-        // 更新结果信息
         document.getElementById('resultInfo').classList.remove('hidden');
         document.getElementById('resultQuery').textContent = currentQuery;
         document.getElementById('resultCount').textContent = totalResults.toLocaleString();
 
-        // 显示/隐藏加载更多按钮
         const loadMoreBtn = document.getElementById('loadMoreBtn');
         if (currentPage * PER_PAGE < totalResults) {
           loadMoreBtn.classList.remove('hidden');
@@ -342,8 +527,19 @@
           loadMoreBtn.classList.add('hidden');
         }
 
-        // 渲染图片
         renderImages(data.photos, append);
+
+        // 保存搜索历史（后台执行，不阻塞）
+        if (!append && authToken) {
+          fetch('/api/history', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': 'Bearer ' + authToken
+            },
+            body: JSON.stringify({ query: currentQuery })
+          }).catch(() => {});
+        }
 
       } catch (error) {
         console.error('搜索失败:', error);
@@ -352,8 +548,7 @@
             <div class="col-span-full text-center py-20">
               <div class="text-4xl mb-4">😵</div>
               <p class="text-neutral-500 text-sm">搜索出错了，请稍后重试</p>
-            </div>
-          `;
+            </div>`;
         }
       } finally {
         showLoading(false);
@@ -363,86 +558,108 @@
     // ============ 渲染图片 ============
     function renderImages(photos, append) {
       const grid = document.getElementById('imageGrid');
-      
       if (!append && photos.length === 0) {
         grid.innerHTML = `
           <div class="col-span-full text-center py-20">
             <div class="text-4xl mb-4">🔍</div>
             <p class="text-neutral-500 text-sm">没有找到相关图片，换个关键词试试</p>
-          </div>
-        `;
+          </div>`;
         return;
       }
 
       const fragment = document.createDocumentFragment();
-
       photos.forEach(photo => {
         const item = document.createElement('div');
         item.className = 'masonry-item';
-        
-        // 计算宽高比用于占位
-        const ratio = photo.height / photo.width;
-
         item.innerHTML = `
           <div class="img-card relative rounded-xl overflow-hidden cursor-pointer bg-dark-card border border-dark-border group"
                onclick="openModal('${photo.src.large2x}', '${photo.photographer}', ${photo.width}, ${photo.height}, '${photo.src.original}')">
-            <img 
-              src="${photo.src.medium}" 
-              alt="${photo.alt || photo.photographer}" 
-              loading="lazy"
-              class="w-full block"
-              style="aspect-ratio: ${photo.width}/${photo.height}"
-            />
+            <img src="${photo.src.medium}" alt="${photo.alt || photo.photographer}" loading="lazy" class="w-full block"
+                 style="aspect-ratio: ${photo.width}/${photo.height}" />
             <div class="img-overlay absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-0 transition-opacity duration-300 flex flex-col justify-end p-4">
               <p class="text-white text-sm font-medium">${photo.photographer}</p>
               <p class="text-white/60 text-xs mt-1">${photo.width} × ${photo.height}</p>
             </div>
-          </div>
-        `;
-
+          </div>`;
         fragment.appendChild(item);
       });
-
       grid.appendChild(fragment);
     }
 
-    // ============ 加载更多 ============
-    function loadMore() {
-      currentPage++;
-      searchImages(true);
-    }
+    function loadMore() { currentPage++; searchImages(true); }
 
-    // ============ 快捷搜索 ============
     function quickSearch(query) {
       document.getElementById('searchInput').value = query;
       currentQuery = query;
       searchImages();
     }
 
+    // ============ 搜索历史 ============
+    async function toggleHistory() {
+      const panel = document.getElementById('historyPanel');
+      historyOpen = !historyOpen;
+
+      if (historyOpen) {
+        panel.style.transform = 'translateX(0)';
+        loadHistory();
+      } else {
+        panel.style.transform = 'translateX(100%)';
+      }
+    }
+
+    async function loadHistory() {
+      const list = document.getElementById('historyList');
+      list.innerHTML = '<p class="text-neutral-600 text-xs">加载中...</p>';
+
+      try {
+        const res = await fetch('/api/history', {
+          headers: { 'Authorization': 'Bearer ' + authToken }
+        });
+        const data = await res.json();
+
+        if (!data.history || data.history.length === 0) {
+          list.innerHTML = '<p class="text-neutral-600 text-xs">暂无搜索记录</p>';
+          return;
+        }
+
+        list.innerHTML = data.history.map(item => {
+          const time = new Date(item.created_at).toLocaleString('zh-CN', {
+            month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'
+          });
+          return `
+            <div class="history-item flex items-center justify-between py-3 px-3 rounded-lg cursor-pointer -mx-3"
+                 onclick="quickSearch('${item.query.replace(/'/g, "\\'")}')">
+              <div>
+                <p class="text-sm text-white">${item.query}</p>
+                <p class="text-xs text-neutral-600 mt-0.5">${time}</p>
+              </div>
+              <span class="text-neutral-600 text-xs">→</span>
+            </div>`;
+        }).join('');
+      } catch (e) {
+        list.innerHTML = '<p class="text-neutral-600 text-xs">加载失败</p>';
+      }
+    }
+
     // ============ 弹窗预览 ============
     function openModal(imgUrl, photographer, width, height, originalUrl) {
-      const modal = document.getElementById('modal');
       document.getElementById('modalImg').src = imgUrl;
-      document.getElementById('modalPhotographer').textContent = `📸 ${photographer}`;
-      document.getElementById('modalSize').textContent = `${width} × ${height}`;
+      document.getElementById('modalPhotographer').textContent = '📸 ' + photographer;
+      document.getElementById('modalSize').textContent = width + ' × ' + height;
       document.getElementById('modalDownload').href = originalUrl;
-      
-      modal.classList.remove('hidden');
+      document.getElementById('modal').classList.remove('hidden');
       document.body.style.overflow = 'hidden';
     }
 
     function closeModal() {
-      const modal = document.getElementById('modal');
-      modal.classList.add('hidden');
+      document.getElementById('modal').classList.add('hidden');
       document.body.style.overflow = '';
     }
 
-    // ESC 键关闭弹窗
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape') closeModal();
     });
 
-    // ============ 复制链接 ============
     function copyImageUrl() {
       const url = document.getElementById('modalDownload').href;
       navigator.clipboard.writeText(url).then(() => {
@@ -452,15 +669,25 @@
       });
     }
 
-    // ============ UI 辅助 ============
     function showLoading(show) {
       document.getElementById('loading').classList.toggle('hidden', !show);
     }
 
-    // 回车搜索
-    document.getElementById('searchInput').addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') searchImages();
+    // 回车键支持
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        // 登录表单
+        if (!document.getElementById('authPage').classList.contains('hidden')) {
+          if (!document.getElementById('loginForm').classList.contains('hidden')) login();
+          else register();
+        }
+        // 搜索框
+        if (document.activeElement === document.getElementById('searchInput')) searchImages();
+      }
     });
+
+    // ============ 启动 ============
+    init();
   </script>
 
 </body>
