@@ -1,5 +1,5 @@
 // ============ TIDE Material API ============
-// Cloudflare Pages Functions + D1 Database
+// Cloudflare Pages _worker.js — 处理 API 路由 + 静态资源
 
 // ============ 工具函数 ============
 
@@ -138,100 +138,129 @@ async function handleLogin(request, env) {
 // ============ 登出 ============
 
 async function handleLogout(request, env) {
-  const token = request.headers.get('Authorization')?.replace('Bearer ', '');
-  if (token) {
-    await env.DB.prepare('DELETE FROM sessions WHERE token = ?').bind(token).run();
+  try {
+    const token = request.headers.get('Authorization')?.replace('Bearer ', '');
+    if (token) {
+      await env.DB.prepare('DELETE FROM sessions WHERE token = ?').bind(token).run();
+    }
+    return jsonResponse({ success: true });
+  } catch (error) {
+    return jsonResponse({ error: '登出失败' }, 500);
   }
-  return jsonResponse({ success: true });
 }
 
 // ============ 获取当前用户 ============
 
 async function handleMe(request, env) {
-  const user = await getUser(request, env);
-  if (!user) {
-    return jsonResponse({ error: '未登录' }, 401);
+  try {
+    const user = await getUser(request, env);
+    if (!user) {
+      return jsonResponse({ error: '未登录' }, 401);
+    }
+    return jsonResponse({ username: user.username, created_at: user.created_at });
+  } catch (error) {
+    return jsonResponse({ error: '获取用户信息失败' }, 500);
   }
-  return jsonResponse({ username: user.username, created_at: user.created_at });
 }
 
 // ============ 获取搜索历史 ============
 
 async function handleGetHistory(request, env) {
-  const user = await getUser(request, env);
-  if (!user) {
-    return jsonResponse({ error: '未登录' }, 401);
+  try {
+    const user = await getUser(request, env);
+    if (!user) {
+      return jsonResponse({ error: '未登录' }, 401);
+    }
+
+    const { results } = await env.DB.prepare(
+      'SELECT id, query, created_at FROM search_history WHERE user_id = ? ORDER BY created_at DESC LIMIT 50'
+    ).bind(user.id).all();
+
+    return jsonResponse({ history: results });
+  } catch (error) {
+    return jsonResponse({ error: '获取历史失败' }, 500);
   }
-
-  const { results } = await env.DB.prepare(
-    'SELECT id, query, created_at FROM search_history WHERE user_id = ? ORDER BY created_at DESC LIMIT 50'
-  ).bind(user.id).all();
-
-  return jsonResponse({ history: results });
 }
 
 // ============ 保存搜索历史 ============
 
 async function handleSaveHistory(request, env) {
-  const user = await getUser(request, env);
-  if (!user) {
-    return jsonResponse({ error: '未登录' }, 401);
-  }
-
-  const { query } = await request.json();
-  if (!query) {
-    return jsonResponse({ error: '搜索词不能为空' }, 400);
-  }
-
-  // 避免重复保存相同的搜索词（最近一条如果相同就跳过）
-  const last = await env.DB.prepare(
-    'SELECT query FROM search_history WHERE user_id = ? ORDER BY created_at DESC LIMIT 1'
-  ).bind(user.id).first();
-
-  if (!last || last.query !== query) {
-    await env.DB.prepare(
-      'INSERT INTO search_history (user_id, query) VALUES (?, ?)'
-    ).bind(user.id, query).run();
-  }
-
-  return jsonResponse({ success: true });
-}
-
-// ============ 主路由 ============
-
-export async function onRequest(context) {
   try {
-    const { request, env } = context;
-    const url = new URL(request.url);
-    const path = url.pathname.replace('/api/', '');
-    const method = request.method;
-
-    // CORS 预检
-    if (method === 'OPTIONS') {
-      return new Response(null, {
-        headers: {
-          'Access-Control-Allow-Origin': '*',
-          'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
-          'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-        }
-      });
+    const user = await getUser(request, env);
+    if (!user) {
+      return jsonResponse({ error: '未登录' }, 401);
     }
 
-    // 检查 D1 数据库绑定是否存在
-    if (!env.DB) {
-      return jsonResponse({ error: '数据库未绑定，请在 Cloudflare Pages 设置中绑定 D1 数据库（变量名: DB）' }, 500);
+    const { query } = await request.json();
+    if (!query) {
+      return jsonResponse({ error: '搜索词不能为空' }, 400);
     }
 
-    // 路由分发
-    if (path === 'register' && method === 'POST') return await handleRegister(request, env);
-    if (path === 'login' && method === 'POST') return await handleLogin(request, env);
-    if (path === 'logout' && method === 'POST') return await handleLogout(request, env);
-    if (path === 'me' && method === 'GET') return await handleMe(request, env);
-    if (path === 'history' && method === 'GET') return await handleGetHistory(request, env);
-    if (path === 'history' && method === 'POST') return await handleSaveHistory(request, env);
+    const last = await env.DB.prepare(
+      'SELECT query FROM search_history WHERE user_id = ? ORDER BY created_at DESC LIMIT 1'
+    ).bind(user.id).first();
 
-    return jsonResponse({ error: 'Not Found' }, 404);
+    if (!last || last.query !== query) {
+      await env.DB.prepare(
+        'INSERT INTO search_history (user_id, query) VALUES (?, ?)'
+      ).bind(user.id, query).run();
+    }
+
+    return jsonResponse({ success: true });
   } catch (error) {
-    return jsonResponse({ error: '服务器错误: ' + error.message }, 500);
+    return jsonResponse({ error: '保存历史失败' }, 500);
   }
 }
+
+// ============ API 路由处理 ============
+
+async function handleApi(request, env, url) {
+  const path = url.pathname.replace('/api/', '');
+  const method = request.method;
+
+  // CORS 预检
+  if (method === 'OPTIONS') {
+    return new Response(null, {
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+        'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+      }
+    });
+  }
+
+  // 检查 D1 绑定
+  if (!env.DB) {
+    return jsonResponse({ error: '数据库未绑定，请检查 Cloudflare D1 Binding 配置（变量名需为 DB）' }, 500);
+  }
+
+  // 路由分发
+  if (path === 'register' && method === 'POST') return await handleRegister(request, env);
+  if (path === 'login' && method === 'POST') return await handleLogin(request, env);
+  if (path === 'logout' && method === 'POST') return await handleLogout(request, env);
+  if (path === 'me' && method === 'GET') return await handleMe(request, env);
+  if (path === 'history' && method === 'GET') return await handleGetHistory(request, env);
+  if (path === 'history' && method === 'POST') return await handleSaveHistory(request, env);
+
+  return jsonResponse({ error: 'API 路由不存在' }, 404);
+}
+
+// ============ 主入口 ============
+
+export default {
+  async fetch(request, env) {
+    try {
+      const url = new URL(request.url);
+
+      // API 路由
+      if (url.pathname.startsWith('/api/')) {
+        return await handleApi(request, env, url);
+      }
+
+      // 静态资源（交给 Pages 处理）
+      return env.ASSETS.fetch(request);
+    } catch (error) {
+      return new Response('Internal Server Error: ' + error.message, { status: 500 });
+    }
+  }
+};
