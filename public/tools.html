@@ -356,8 +356,8 @@
 
         <!-- 模式 A：YouTube URL -->
         <div id="input-url" class="tool-card mb-4">
-          <p class="text-[13px] font-semibold text-apple-text-primary mb-1" style="letter-spacing: -0.01em;">视频链接</p>
-          <p class="text-[12px] text-apple-text-secondary mb-3" style="letter-spacing: -0.01em;">由 <a href="https://cobalt.tools" target="_blank" class="text-apple-blue hover:underline">Cobalt</a> 免费解析下载，无需部署后端，支持 YouTube · BiliBili · Twitter 等</p>
+          <p class="text-[13px] font-semibold text-apple-text-primary mb-1" style="letter-spacing: -0.01em;">YouTube 视频链接</p>
+          <p class="text-[12px] text-apple-text-secondary mb-3" style="letter-spacing: -0.01em;">yt-dlp 下载音频 · Groq Whisper 转录 · 需要填写 Groq API Key</p>
           <input id="videoUrl" type="url" placeholder="https://www.youtube.com/watch?v=..."
             class="tool-input text-[14px]" />
         </div>
@@ -502,6 +502,9 @@
   <div id="toast" class="toast"></div>
 
   <script>
+    // ============ 后端地址 ============
+    const BACKEND = 'https://web-production-47b90.up.railway.app';
+
     // ============ 状态 ============
     let currentTab = 'transcribe';
     let transcribeMode = 'url'; // 'url' | 'file'
@@ -587,65 +590,89 @@
       document.getElementById('dropZone').classList.remove('hidden');
     }
 
+    // ============ SSE POST 辅助（fetch 流式读取） ============
+    async function ssePost(url, body, onEvent) {
+      const resp = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      });
+      if (!resp.ok) throw new Error('HTTP ' + resp.status);
+      const reader = resp.body.getReader();
+      const decoder = new TextDecoder();
+      let buf = '';
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        buf += decoder.decode(value, { stream: true });
+        const lines = buf.split('\n');
+        buf = lines.pop();
+        for (const line of lines) {
+          if (line.startsWith('data: ')) {
+            try { onEvent(JSON.parse(line.slice(6))); } catch {}
+          }
+        }
+      }
+    }
+
     // ============ 转录 ============
     async function doTranscribe() {
       const apiKey = getApiKey();
       if (!apiKey) { showToast('⚠️ 请先填写 Groq API Key'); return; }
 
       const btn = document.getElementById('transcribeBtn');
-      let resp, data;
 
       if (transcribeMode === 'url') {
-        // ── 模式 A：YouTube URL（Cobalt 下载） ──
+        // ── 模式 A：YouTube URL → Railway yt-dlp + Groq Whisper ──
         const url = document.getElementById('videoUrl').value.trim();
         if (!url) { showToast('⚠️ 请输入视频链接'); return; }
 
-        setLoading(btn, '下载音频中…');
+        setLoading(btn, '准备中…');
         try {
-          resp = await fetch('/api/tool/transcribe', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ url, api_key: apiKey }),
+          await ssePost(`${BACKEND}/transcribe`, { url, api_key: apiKey }, (data) => {
+            if (data.status === 'downloading') setLoading(btn, '⬇ 下载音频中…');
+            else if (data.status === 'transcribing') setLoading(btn, '🤖 AI 转录中…');
+            else if (data.status === 'done') {
+              document.getElementById('transcribeOutput').textContent = data.transcript;
+              document.getElementById('transcribeResult').classList.remove('hidden');
+              showToast('✅ 转录完成：' + (data.title || ''));
+              document.getElementById('transcribeResult').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            } else if (data.status === 'error') {
+              showToast('❌ ' + data.message);
+            }
           });
-          data = await resp.json();
         } catch (e) {
           showToast('❌ 请求失败：' + e.message);
-          resetBtn(btn, '🎙️ 开始转录');
-          return;
         }
+        resetBtn(btn, '🎙️ 开始转录');
 
       } else {
-        // ── 模式 B：上传音频文件 ──
+        // ── 模式 B：上传音频 → 直接调 Groq API ──
         if (!selectedFile) { showToast('⚠️ 请先选择音频文件'); return; }
-
         setLoading(btn, '转录中…');
         try {
           const form = new FormData();
-          form.append('audio', selectedFile, selectedFile.name);
-          form.append('api_key', apiKey);
-          resp = await fetch('/api/tool/transcribe', { method: 'POST', body: form });
-          data = await resp.json();
+          form.append('file', selectedFile, selectedFile.name);
+          form.append('model', 'whisper-large-v3');
+          const resp = await fetch('https://api.groq.com/openai/v1/audio/transcriptions', {
+            method: 'POST',
+            headers: { 'Authorization': 'Bearer ' + apiKey },
+            body: form,
+          });
+          const data = await resp.json();
+          if (!resp.ok) throw new Error(data.error?.message || '转录失败');
+          document.getElementById('transcribeOutput').textContent = data.text;
+          document.getElementById('transcribeResult').classList.remove('hidden');
+          showToast('✅ 转录完成');
+          document.getElementById('transcribeResult').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
         } catch (e) {
-          showToast('❌ 请求失败：' + e.message);
-          resetBtn(btn, '🎙️ 开始转录');
-          return;
+          showToast('❌ ' + e.message);
         }
+        resetBtn(btn, '🎙️ 开始转录');
       }
-
-      resetBtn(btn, '🎙️ 开始转录');
-
-      if (!resp.ok || data.error) {
-        showToast('❌ ' + (data.error || '转录失败'));
-        return;
-      }
-
-      document.getElementById('transcribeOutput').textContent = data.transcript;
-      document.getElementById('transcribeResult').classList.remove('hidden');
-      showToast('✅ 转录完成');
-      document.getElementById('transcribeResult').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     }
 
-    // ============ 翻译 ============
+    // ============ 翻译（SSE 流式） ============
     function setLang(lang) {
       targetLang = lang;
       document.getElementById('lang-zh').classList.toggle('active', lang === 'zh');
@@ -661,35 +688,35 @@
       const btn = document.getElementById('translateBtn');
       setLoading(btn, '翻译中…');
 
+      const outEl = document.getElementById('translateOutput');
+      const resultEl = document.getElementById('translateResult');
+      outEl.textContent = '';
+      resultEl.classList.remove('hidden');
+
       try {
-        const resp = await fetch('/api/tool/translate', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ text, target: targetLang, api_key: apiKey })
+        await ssePost(`${BACKEND}/translate`, { text, target: targetLang, api_key: apiKey }, (data) => {
+          if (data.status === 'chunk') {
+            outEl.textContent += data.text;
+          } else if (data.status === 'already') {
+            showToast('ℹ️ ' + data.message);
+            resultEl.classList.add('hidden');
+          } else if (data.status === 'done') {
+            showToast('✅ 翻译完成');
+            resultEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+          } else if (data.status === 'error') {
+            showToast('❌ ' + data.message);
+            resultEl.classList.add('hidden');
+          }
         });
-        const data = await resp.json();
-
-        if (!resp.ok || data.error) {
-          showToast('❌ ' + (data.error || '翻译失败'));
-          return;
-        }
-        if (data.already) {
-          showToast('ℹ️ ' + data.message);
-          return;
-        }
-
-        document.getElementById('translateOutput').textContent = data.result;
-        document.getElementById('translateResult').classList.remove('hidden');
-        showToast('✅ 翻译完成');
-        document.getElementById('translateResult').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
       } catch (e) {
         showToast('❌ 请求失败：' + e.message);
+        resultEl.classList.add('hidden');
       } finally {
         resetBtn(btn, '🌐 开始翻译');
       }
     }
 
-    // ============ 格式化 ============
+    // ============ 格式化（SSE 流式） ============
     async function doFormat() {
       const apiKey = getApiKey();
       if (!apiKey) { showToast('⚠️ 请先填写 Groq API Key'); return; }
@@ -699,25 +726,26 @@
       const btn = document.getElementById('formatBtn');
       setLoading(btn, 'AI 整理中…');
 
+      const outEl = document.getElementById('formatOutput');
+      const resultEl = document.getElementById('formatResult');
+      outEl.textContent = '';
+      resultEl.classList.remove('hidden');
+
       try {
-        const resp = await fetch('/api/tool/format', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ transcript: text, api_key: apiKey })
+        await ssePost(`${BACKEND}/format`, { transcript: text, api_key: apiKey }, (data) => {
+          if (data.status === 'chunk') {
+            outEl.textContent += data.text;
+          } else if (data.status === 'done') {
+            showToast('✅ 整理完成');
+            resultEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+          } else if (data.status === 'error') {
+            showToast('❌ ' + data.message);
+            resultEl.classList.add('hidden');
+          }
         });
-        const data = await resp.json();
-
-        if (!resp.ok || data.error) {
-          showToast('❌ ' + (data.error || '格式化失败'));
-          return;
-        }
-
-        document.getElementById('formatOutput').textContent = data.result;
-        document.getElementById('formatResult').classList.remove('hidden');
-        showToast('✅ 整理完成');
-        document.getElementById('formatResult').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
       } catch (e) {
         showToast('❌ 请求失败：' + e.message);
+        resultEl.classList.add('hidden');
       } finally {
         resetBtn(btn, '✏️ AI 整理格式');
       }
@@ -730,11 +758,11 @@
       setLoading(btn, '获取中…');
 
       try {
-        const resp = await fetch('/api/tool/trends?geo=' + geo);
+        const resp = await fetch(`${BACKEND}/api/trends/realtime?geo=${geo}`);
         const data = await resp.json();
 
-        if (!resp.ok || data.error) {
-          showToast('❌ ' + (data.error || '获取失败'));
+        if (!resp.ok || data.status === 'error') {
+          showToast('❌ ' + (data.message || '获取失败'));
           return;
         }
 
