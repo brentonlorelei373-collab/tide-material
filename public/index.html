@@ -336,7 +336,9 @@
       transform-origin: bottom right;
       transition: transform 0.35s cubic-bezier(0.25, 0.1, 0.25, 1), opacity 0.35s cubic-bezier(0.25, 0.1, 0.25, 1);
     }
-    .pixel-studio.hidden { transform: scale(0.92); opacity: 0; pointer-events: none; }
+    .pixel-studio.studio-hide {
+      transform: scale(0.92); opacity: 0; pointer-events: none;
+    }
 
     .pixel-canvas-wrap {
       background: #1a1a1e; border-radius: 14px; overflow: hidden;
@@ -419,8 +421,6 @@
     .px-toggle-btn.active .px-switch { background: #af52de; }
     .px-toggle-btn.active .px-switch::after { transform: translateX(14px); }
 
-    /* 创作台主开关控制面板可见性 */
-    body:not(.studio-on) .pixel-studio { display: none !important; }
     /* 像素块化子开关控制 FAB 和 + 按钮 */
     body:not(.px-mode) .pixel-fab { display: none !important; }
     body:not(.px-mode) .add-studio-btn { display: none !important; }
@@ -733,7 +733,7 @@
     </button>
 
     <!-- 创作台面板 -->
-    <div class="pixel-studio hidden" id="pixelStudio">
+    <div class="pixel-studio studio-hide" id="pixelStudio">
       <!-- 头部 -->
       <div class="flex items-center justify-between p-4 pb-3">
         <div>
@@ -1715,25 +1715,39 @@
     let studioPanelOpen = false;
     let pxFeatureOn = false;
 
+    function openStudioPanel() {
+      studioPanelOpen = true;
+      document.getElementById('pxToggleBtn').classList.add('active');
+      document.getElementById('pixelStudio').classList.remove('studio-hide');
+    }
+
+    function closeStudioPanel() {
+      studioPanelOpen = false;
+      document.getElementById('pxToggleBtn').classList.remove('active');
+      document.getElementById('pixelStudio').classList.add('studio-hide');
+      // 关闭面板时停止播放
+      if (pxStudio.isPlaying) studioTogglePlay();
+      // 重置像素块化子功能
+      if (pxFeatureOn) {
+        pxFeatureOn = false;
+        document.body.classList.remove('px-mode');
+        document.getElementById('pxFeatureSwitch').classList.remove('on');
+        document.getElementById('pxContentArea').classList.add('collapsed');
+      }
+    }
+
     function togglePxMode() {
-      // 导航栏开关：打开/关闭创作台面板
-      studioPanelOpen = !studioPanelOpen;
-      document.body.classList.toggle('studio-on', studioPanelOpen);
-      document.getElementById('pxToggleBtn').classList.toggle('active', studioPanelOpen);
-      document.getElementById('pixelStudio').classList.toggle('hidden', !studioPanelOpen);
-      // 关闭面板时，停止播放
-      if (!studioPanelOpen && pxStudio.isPlaying) {
-        studioTogglePlay();
+      // 导航栏开关：切换创作台面板
+      if (studioPanelOpen) {
+        closeStudioPanel();
+      } else {
+        openStudioPanel();
       }
     }
 
     function toggleStudioPanel() {
-      // 面板内的关闭按钮
-      studioPanelOpen = false;
-      document.body.classList.remove('studio-on');
-      document.getElementById('pxToggleBtn').classList.remove('active');
-      document.getElementById('pixelStudio').classList.add('hidden');
-      if (pxStudio.isPlaying) studioTogglePlay();
+      // 面板内 × 按钮
+      closeStudioPanel();
     }
 
     function togglePxFeature() {
@@ -1758,17 +1772,9 @@
     let pxAnim = { lastTime: 0, trans: false, from: null, to: null, tStart: 0, tDur: 0, order: null };
 
     function togglePixelStudio() {
-      // FAB 点击：确保面板打开且滚动到像素区
-      if (!studioPanelOpen) {
-        studioPanelOpen = true;
-        document.body.classList.add('studio-on');
-        document.getElementById('pxToggleBtn').classList.add('active');
-        document.getElementById('pixelStudio').classList.remove('hidden');
-      }
-      // 确保像素块化功能已开启
-      if (!pxFeatureOn) {
-        togglePxFeature();
-      }
+      // FAB 点击：确保面板打开且像素块化开启
+      if (!studioPanelOpen) openStudioPanel();
+      if (!pxFeatureOn) togglePxFeature();
     }
 
     function addToStudio(imgUrl) {
