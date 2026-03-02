@@ -780,110 +780,176 @@ async function handleGenerateImage(request, env) {
   }
 }
 
-// ============ Tool: 通过 Cobalt API 下载 YouTube 音频 ============
+// ============ Tool: 直接获取 YouTube 字幕/转录 ============
 
-async function fetchYoutubeAudioBuffer(videoUrl) {
-  // Step 1: 调用 Cobalt API 获取音频直链
-  const cobaltResp = await fetch('https://api.cobalt.tools/', {
-    method: 'POST',
-    headers: {
-      'Accept': 'application/json',
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      url: videoUrl,
-      downloadMode: 'audio',
-      audioFormat: 'mp3',
-      audioBitrate: '64',
-    }),
-  });
+function extractVideoId(url) {
+  const patterns = [
+    /[?&]v=([a-zA-Z0-9_-]{11})/,
+    /youtu\.be\/([a-zA-Z0-9_-]{11})/,
+    /youtube\.com\/embed\/([a-zA-Z0-9_-]{11})/,
+    /youtube\.com\/shorts\/([a-zA-Z0-9_-]{11})/,
+  ];
+  for (const p of patterns) {
+    const m = url.match(p);
+    if (m) return m[1];
+  }
+  return null;
+}
 
-  if (!cobaltResp.ok) {
-    const err = await cobaltResp.json().catch(() => ({}));
-    throw new Error(err.error?.code || `Cobalt 请求失败 (HTTP ${cobaltResp.status})`);
+async function fetchYoutubeTranscript(videoUrl) {
+  const videoId = extractVideoId(videoUrl);
+  if (!videoId) throw new Error('无效的 YouTube 链接，请确认格式正确');
+
+  const UA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36';
+
+  // Step 1: 获取字幕列表
+  const listUrl = `https://www.youtube.com/api/timedtext?type=list&v=${videoId}`;
+  const listResp = await fetch(listUrl, { headers: { 'User-Agent': UA } });
+
+  if (!listResp.ok) throw new Error('无法获取字幕信息，请检查视频链接');
+
+  const listXml = await listResp.text();
+
+  // 解析可用字幕轨道（包括自动生成字幕 kind="asr"）
+  const tracks = [];
+  const re = /<track[^>]+id="(\d+)"[^>]+name="([^"]*)"[^>]+lang_code="([^"]+)"[^>]*(?:kind="([^"]*)")?/g;
+  let m;
+  while ((m = re.exec(listXml)) !== null) {
+    tracks.push({ id: m[1], name: m[2], lang: m[3], kind: m[4] || '' });
   }
 
-  const cobaltData = await cobaltResp.json();
-
-  // status 可能是 "tunnel" / "redirect" / "stream"
-  if (cobaltData.status === 'error') {
-    throw new Error(cobaltData.error?.code || '无法解析该视频链接');
+  // 也尝试不带 kind 属性的格式
+  const re2 = /<track[^>]+lang_code="([^"]+)"/g;
+  const seen = new Set(tracks.map(t => t.lang));
+  while ((m = re2.exec(listXml)) !== null) {
+    if (!seen.has(m[1])) {
+      tracks.push({ lang: m[1], kind: '' });
+      seen.add(m[1]);
+    }
   }
 
-  const audioUrl = cobaltData.url;
-  if (!audioUrl) throw new Error('Cobalt 未返回音频地址，请稍后重试');
-
-  // Step 2: 下载音频数据
-  const audioResp = await fetch(audioUrl, {
-    headers: { 'User-Agent': 'Mozilla/5.0' },
-  });
-  if (!audioResp.ok) throw new Error(`音频下载失败 (HTTP ${audioResp.status})`);
-
-  const audioBuffer = await audioResp.arrayBuffer();
-  if (audioBuffer.byteLength > 25 * 1024 * 1024) {
-    throw new Error('音频文件超过 25 MB（Groq 上限），请尝试较短的视频');
+  if (tracks.length === 0) {
+    throw new Error('该视频暂无字幕/转录文本，请切换到「上传音频」模式');
   }
 
-  return audioBuffer;
+  // 优先选择中文，其次英文，再选第一个
+  const preferred = ['zh-Hans', 'zh-Hant', 'zh', 'zh-CN', 'zh-TW', 'en'];
+  let selected = null;
+  for (const lang of preferred) {
+    selected = tracks.find(t => t.lang === lang);
+    if (selected) break;
+  }
+  if (!selected) selected = tracks[0];
+
+  // Step 2: 获取字幕内容（JSON3 格式）
+  let transcriptUrl = `https://www.youtube.com/api/timedtext?v=${videoId}&lang=${selected.lang}&fmt=json3`;
+  if (selected.kind === 'asr') transcriptUrl += '&kind=asr';
+
+  const transResp = await fetch(transcriptUrl, { headers: { 'User-Agent': UA } });
+  if (!transResp.ok) throw new Error('字幕文件获取失败，请稍后重试');
+
+  const transData = await transResp.json();
+
+  if (!transData.events || transData.events.length === 0) {
+    throw new Error('字幕内容为空，请切换到「上传音频」模式');
+  }
+
+  // Step 3: 拼成纯文本
+  const text = transData.events
+    .filter(e => e.segs)
+    .map(e => e.segs.map(s => (s.utf8 || '').replace(/\n/g, ' ')).join(''))
+    .filter(t => t.trim())
+    .join(' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+
+  if (!text) throw new Error('字幕内容为空，请切换到「上传音频」模式');
+
+  return text;
 }
 
 // ============ Tool: 音频转录（Groq Whisper） ============
+
+const RAILWAY_BACKEND = 'https://web-production-47b90.up.railway.app';
 
 async function handleToolTranscribe(request) {
   try {
     const contentType = request.headers.get('Content-Type') || '';
 
-    let apiKey = '';
-    let audioBlob = null;
-    let fileName = 'audio.mp3';
-
     if (contentType.includes('multipart/form-data')) {
-      // 模式 A：上传音频文件
+      // 模式 A：上传音频文件 → 直接调 Groq
       const formData = await request.formData();
-      apiKey = (formData.get('api_key') || '').trim();
+      const apiKey = (formData.get('api_key') || '').trim();
       const audioFile = formData.get('audio');
       if (!audioFile) return json({ error: '请选择音频文件' }, 400);
-      audioBlob = audioFile;
-      fileName = audioFile.name || 'audio.mp3';
+      if (!apiKey) return json({ error: '请输入 Groq API Key' }, 400);
+
+      const groqForm = new FormData();
+      groqForm.append('file', audioFile, audioFile.name || 'audio.mp3');
+      groqForm.append('model', 'whisper-large-v3');
+
+      const groqResp = await fetch('https://api.groq.com/openai/v1/audio/transcriptions', {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${apiKey}` },
+        body: groqForm,
+      });
+
+      if (!groqResp.ok) {
+        const err = await groqResp.json().catch(() => ({}));
+        if (groqResp.status === 401) return json({ error: 'Groq API Key 无效，请检查后重试' }, 401);
+        if (groqResp.status === 413) return json({ error: '文件过大，Groq 最大支持 25 MB' }, 413);
+        return json({ error: err.error?.message || `转录失败 (HTTP ${groqResp.status})` }, groqResp.status);
+      }
+
+      const data = await groqResp.json();
+      return json({ success: true, transcript: data.text });
 
     } else {
-      // 模式 B：传入 YouTube URL（由 Cobalt 下载）
+      // 模式 B：YouTube URL → 代理到 Railway（yt-dlp + Groq Whisper）
       const body = await request.json();
-      apiKey = (body.api_key || '').trim();
+      const apiKey = (body.api_key || '').trim();
       const videoUrl = (body.url || '').trim();
-      if (!videoUrl) return json({ error: '请提供视频链接或上传音频文件' }, 400);
+      if (!videoUrl) return json({ error: '请提供视频链接' }, 400);
+      if (!apiKey) return json({ error: '请输入 Groq API Key' }, 400);
 
-      try {
-        const audioBuffer = await fetchYoutubeAudioBuffer(videoUrl);
-        audioBlob = new Blob([audioBuffer], { type: 'audio/mpeg' });
-        fileName = 'audio.mp3';
-      } catch (e) {
-        return json({ error: '视频下载失败：' + e.message }, 502);
+      // 调用 Railway SSE 端点，收集事件直到 done/error
+      const railwayResp = await fetch(`${RAILWAY_BACKEND}/transcribe`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ url: videoUrl, api_key: apiKey }),
+      });
+
+      if (!railwayResp.ok) {
+        return json({ error: `后端服务异常 (HTTP ${railwayResp.status})` }, 502);
       }
+
+      // 读取 SSE 流，提取最终结果
+      const reader = railwayResp.body.getReader();
+      const decoder = new TextDecoder();
+      let buf = '';
+      let transcript = null;
+      let errorMsg = null;
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        buf += decoder.decode(value, { stream: true });
+        const lines = buf.split('\n');
+        buf = lines.pop();
+        for (const line of lines) {
+          if (!line.startsWith('data: ')) continue;
+          try {
+            const evt = JSON.parse(line.slice(6));
+            if (evt.status === 'done') transcript = evt.transcript;
+            if (evt.status === 'error') errorMsg = evt.message;
+          } catch {}
+        }
+      }
+
+      if (errorMsg) return json({ error: errorMsg }, 502);
+      if (!transcript) return json({ error: '转录失败，未收到结果' }, 502);
+      return json({ success: true, transcript });
     }
-
-    if (!apiKey) return json({ error: '请输入 Groq API Key' }, 400);
-
-    // 调用 Groq Whisper
-    const groqForm = new FormData();
-    groqForm.append('file', audioBlob, fileName);
-    groqForm.append('model', 'whisper-large-v3');
-
-    const groqResp = await fetch('https://api.groq.com/openai/v1/audio/transcriptions', {
-      method: 'POST',
-      headers: { 'Authorization': `Bearer ${apiKey}` },
-      body: groqForm,
-    });
-
-    if (!groqResp.ok) {
-      const err = await groqResp.json().catch(() => ({}));
-      if (groqResp.status === 401) return json({ error: 'Groq API Key 无效，请检查后重试' }, 401);
-      if (groqResp.status === 413) return json({ error: '文件过大，Groq 最大支持 25 MB' }, 413);
-      return json({ error: err.error?.message || `转录失败 (HTTP ${groqResp.status})` }, groqResp.status);
-    }
-
-    const data = await groqResp.json();
-    return json({ success: true, transcript: data.text });
   } catch (error) {
     return json({ error: '转录失败: ' + error.message }, 500);
   }
