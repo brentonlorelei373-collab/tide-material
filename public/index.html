@@ -3,27 +3,33 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>TIDE Material — 素材生成器</title>
+  <title>TIDE Material — 超级素材搜索</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwindcss.config = {
       theme: {
         extend: {
           colors: {
-            'apple-bg': '#000000',
-            'apple-card': '#1C1C1E',
-            'apple-card-hover': '#2C2C2E',
-            'apple-separator': '#38383A',
-            'apple-gray': '#48484A',
-            'apple-blue': '#0A84FF',
-            'apple-blue-hover': '#409CFF',
-            'apple-red': '#FF453A',
-            'apple-green': '#30D158',
-            'apple-orange': '#FF9F0A',
-            'apple-text-primary': '#FFFFFF',
-            'apple-text-secondary': '#98989D',
-            'apple-text-tertiary': '#636366',
-            'apple-fill': 'rgba(120, 120, 128, 0.24)',
+            'apple-bg': '#ffffff',
+            'apple-bg-secondary': '#f5f5f7',
+            'apple-bg-tertiary': '#fbfbfd',
+            'apple-card': '#ffffff',
+            'apple-card-hover': '#f5f5f7',
+            'apple-separator': '#d2d2d7',
+            'apple-gray': '#86868b',
+            'apple-blue': '#0071e3',
+            'apple-blue-hover': '#0077ed',
+            'apple-blue-light': '#e8f0fe',
+            'apple-red': '#ff3b30',
+            'apple-green': '#34c759',
+            'apple-orange': '#ff9500',
+            'apple-purple': '#af52de',
+            'apple-pink': '#ff2d55',
+            'apple-teal': '#5ac8fa',
+            'apple-text-primary': '#1d1d1f',
+            'apple-text-secondary': '#6e6e73',
+            'apple-text-tertiary': '#86868b',
+            'apple-fill': 'rgba(0, 0, 0, 0.04)',
           },
           fontFamily: {
             sans: ['-apple-system', 'BlinkMacSystemFont', 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', 'Helvetica', 'Arial', 'sans-serif'],
@@ -34,53 +40,101 @@
   </script>
   <style>
     * { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
-    body { background-color: #000000; min-height: 100vh; font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', Helvetica, Arial, sans-serif; }
+    body { background-color: #ffffff; min-height: 100vh; font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', Helvetica, Arial, sans-serif; color: #1d1d1f; }
 
     ::-webkit-scrollbar { width: 8px; }
     ::-webkit-scrollbar-track { background: transparent; }
-    ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 4px; }
-    ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.25); }
+    ::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.15); border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: rgba(0,0,0,0.25); }
 
-    .glass { background: rgba(28, 28, 30, 0.72); backdrop-filter: saturate(180%) blur(20px); -webkit-backdrop-filter: saturate(180%) blur(20px); }
-    .glass-thick { background: rgba(28, 28, 30, 0.88); backdrop-filter: saturate(180%) blur(40px); -webkit-backdrop-filter: saturate(180%) blur(40px); }
+    /* Apple 官网风格毛玻璃导航 */
+    .glass-nav {
+      background: rgba(255, 255, 255, 0.72);
+      backdrop-filter: saturate(180%) blur(20px);
+      -webkit-backdrop-filter: saturate(180%) blur(20px);
+    }
 
     .apple-input {
-      background: rgba(120, 120, 128, 0.16); border: 1px solid rgba(120, 120, 128, 0.24);
-      border-radius: 12px; padding: 13px 16px; color: white; font-size: 15px;
-      width: 100%; outline: none; transition: all 0.25s cubic-bezier(0.25, 0.1, 0.25, 1); letter-spacing: -0.01em;
+      background: #ffffff;
+      border: 1px solid #d2d2d7;
+      border-radius: 12px;
+      padding: 13px 16px;
+      color: #1d1d1f;
+      font-size: 17px;
+      width: 100%;
+      outline: none;
+      transition: all 0.25s cubic-bezier(0.25, 0.1, 0.25, 1);
+      letter-spacing: -0.022em;
     }
-    .apple-input:focus { border-color: #0A84FF; box-shadow: 0 0 0 3px rgba(10, 132, 255, 0.25); background: rgba(120, 120, 128, 0.24); }
-    .apple-input::placeholder { color: #636366; }
+    .apple-input:focus {
+      border-color: #0071e3;
+      box-shadow: 0 0 0 4px rgba(0, 113, 227, 0.15);
+    }
+    .apple-input::placeholder { color: #86868b; }
 
     .apple-btn-primary {
-      background: #0A84FF; color: white; font-size: 15px; font-weight: 600;
-      padding: 13px 24px; border-radius: 12px; width: 100%; border: none; cursor: pointer;
-      transition: all 0.25s cubic-bezier(0.25, 0.1, 0.25, 1); letter-spacing: -0.01em;
+      background: #0071e3;
+      color: white;
+      font-size: 17px;
+      font-weight: 400;
+      padding: 12px 24px;
+      border-radius: 980px;
+      width: 100%;
+      border: none;
+      cursor: pointer;
+      transition: all 0.25s cubic-bezier(0.25, 0.1, 0.25, 1);
+      letter-spacing: -0.022em;
     }
-    .apple-btn-primary:hover { background: #409CFF; }
+    .apple-btn-primary:hover { background: #0077ed; }
     .apple-btn-primary:active { transform: scale(0.98); opacity: 0.9; }
-    .apple-btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+    .apple-btn-primary:disabled { opacity: 0.42; cursor: not-allowed; }
 
     .apple-btn-secondary {
-      background: rgba(120, 120, 128, 0.24); color: #0A84FF; font-size: 15px; font-weight: 600;
-      padding: 13px 24px; border-radius: 12px; border: none; cursor: pointer;
+      background: transparent;
+      color: #0071e3;
+      font-size: 17px;
+      font-weight: 400;
+      padding: 12px 24px;
+      border-radius: 980px;
+      border: 1px solid #0071e3;
+      cursor: pointer;
       transition: all 0.25s cubic-bezier(0.25, 0.1, 0.25, 1);
     }
-    .apple-btn-secondary:hover { background: rgba(120, 120, 128, 0.36); }
+    .apple-btn-secondary:hover { background: #0071e3; color: white; }
     .apple-btn-secondary:active { transform: scale(0.98); }
 
-    .img-card { transition: all 0.35s cubic-bezier(0.25, 0.1, 0.25, 1); border-radius: 12px; overflow: hidden; }
-    .img-card:hover { transform: scale(1.02); box-shadow: 0 8px 32px rgba(0,0,0,0.5); }
+    /* Apple 风格文字链接 */
+    .apple-link {
+      color: #0071e3;
+      text-decoration: none;
+      cursor: pointer;
+      transition: color 0.2s;
+    }
+    .apple-link:hover { color: #0077ed; text-decoration: underline; }
+
+    .img-card {
+      transition: all 0.35s cubic-bezier(0.25, 0.1, 0.25, 1);
+      border-radius: 16px;
+      overflow: hidden;
+      background: #f5f5f7;
+    }
+    .img-card:hover { transform: scale(1.02); box-shadow: 0 12px 40px rgba(0,0,0,0.12); }
     .img-card:hover .img-overlay { opacity: 1; }
     .img-card:hover .fav-btn { opacity: 1; }
 
-    .masonry { columns: 2; column-gap: 12px; }
-    @media (min-width: 768px) { .masonry { columns: 3; column-gap: 16px; } }
-    @media (min-width: 1024px) { .masonry { columns: 4; column-gap: 16px; } }
-    .masonry-item { break-inside: avoid; margin-bottom: 12px; }
-    @media (min-width: 768px) { .masonry-item { margin-bottom: 16px; } }
+    .masonry { columns: 2; column-gap: 16px; }
+    @media (min-width: 768px) { .masonry { columns: 3; column-gap: 20px; } }
+    @media (min-width: 1024px) { .masonry { columns: 4; column-gap: 20px; } }
+    .masonry-item { break-inside: avoid; margin-bottom: 16px; }
+    @media (min-width: 768px) { .masonry-item { margin-bottom: 20px; } }
 
-    .apple-spinner { width: 32px; height: 32px; border: 3px solid rgba(120,120,128,0.24); border-top-color: #0A84FF; border-radius: 50%; animation: spin 0.8s cubic-bezier(0.5,0,0.5,1) infinite; }
+    .apple-spinner {
+      width: 32px; height: 32px;
+      border: 3px solid rgba(0,0,0,0.08);
+      border-top-color: #0071e3;
+      border-radius: 50%;
+      animation: spin 0.8s cubic-bezier(0.5,0,0.5,1) infinite;
+    }
     @keyframes spin { to { transform: rotate(360deg); } }
 
     .fade-in { animation: fadeIn 0.5s cubic-bezier(0.25, 0.1, 0.25, 1); }
@@ -89,137 +143,279 @@
     .scale-in { animation: scaleIn 0.35s cubic-bezier(0.25, 0.1, 0.25, 1); }
     @keyframes scaleIn { from { opacity: 0; transform: scale(0.92); } to { opacity: 1; transform: scale(1); } }
 
-    .tag-btn { transition: all 0.2s cubic-bezier(0.25, 0.1, 0.25, 1); background: rgba(120, 120, 128, 0.12); border: 1px solid rgba(120, 120, 128, 0.2); }
-    .tag-btn:hover { background: rgba(120, 120, 128, 0.24); border-color: rgba(120, 120, 128, 0.36); }
+    .tag-btn {
+      transition: all 0.2s cubic-bezier(0.25, 0.1, 0.25, 1);
+      background: #f5f5f7;
+      border: none;
+      color: #1d1d1f;
+    }
+    .tag-btn:hover { background: #e8e8ed; }
     .tag-btn:active { transform: scale(0.96); }
 
-    .history-item { transition: all 0.2s cubic-bezier(0.25, 0.1, 0.25, 1); border-radius: 10px; }
-    .history-item:hover { background-color: rgba(120, 120, 128, 0.16); }
-    .history-item:active { background-color: rgba(120, 120, 128, 0.24); }
+    .history-item { transition: all 0.2s cubic-bezier(0.25, 0.1, 0.25, 1); border-radius: 12px; }
+    .history-item:hover { background-color: #f5f5f7; }
 
-    .segmented-control { background: rgba(120, 120, 128, 0.12); border-radius: 9px; padding: 2px; display: flex; }
-    .segmented-btn { flex: 1; padding: 8px 16px; font-size: 13px; font-weight: 600; border-radius: 7px; color: #98989D; transition: all 0.25s cubic-bezier(0.25, 0.1, 0.25, 1); text-align: center; cursor: pointer; border: none; background: transparent; letter-spacing: -0.01em; }
-    .segmented-btn.active { background: rgba(120, 120, 128, 0.36); color: #FFFFFF; box-shadow: 0 1px 4px rgba(0,0,0,0.2); }
+    .segmented-control {
+      background: #f5f5f7;
+      border-radius: 9px;
+      padding: 2px;
+      display: flex;
+    }
+    .segmented-btn {
+      flex: 1; padding: 8px 16px; font-size: 13px; font-weight: 600;
+      border-radius: 7px; color: #86868b;
+      transition: all 0.25s cubic-bezier(0.25, 0.1, 0.25, 1);
+      text-align: center; cursor: pointer; border: none; background: transparent;
+      letter-spacing: -0.01em;
+    }
+    .segmented-btn.active {
+      background: #ffffff;
+      color: #1d1d1f;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.08), 0 0 1px rgba(0,0,0,0.04);
+    }
 
-    .search-glow:focus-within { box-shadow: 0 0 0 3px rgba(10, 132, 255, 0.2), 0 8px 24px rgba(0,0,0,0.3); border-color: rgba(10, 132, 255, 0.5); }
+    .search-glow:focus-within {
+      box-shadow: 0 0 0 4px rgba(0, 113, 227, 0.12), 0 4px 16px rgba(0,0,0,0.06);
+      border-color: #0071e3;
+    }
 
     /* 收藏按钮 */
     .fav-btn {
       position: absolute; top: 10px; right: 10px; z-index: 10;
       width: 36px; height: 36px; border-radius: 50%;
-      background: rgba(0,0,0,0.5); backdrop-filter: blur(10px);
+      background: rgba(255,255,255,0.85); backdrop-filter: blur(10px);
       display: flex; align-items: center; justify-content: center;
       opacity: 0; transition: all 0.2s ease; cursor: pointer; border: none;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
     }
-    .fav-btn:hover { background: rgba(0,0,0,0.7); transform: scale(1.1); }
+    .fav-btn:hover { background: rgba(255,255,255,0.95); transform: scale(1.1); }
     .fav-btn:active { transform: scale(0.9); }
     .fav-btn.is-fav { opacity: 1; }
     .fav-btn svg { width: 18px; height: 18px; transition: all 0.2s ease; }
 
     /* 收藏夹缩略图网格 */
-    .fav-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
-    .fav-thumb {
-      border-radius: 8px; overflow: hidden; cursor: pointer;
-      transition: all 0.2s ease; aspect-ratio: 1; position: relative;
-    }
+    .fav-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+    .fav-thumb { border-radius: 12px; overflow: hidden; cursor: pointer; transition: all 0.2s ease; aspect-ratio: 1; position: relative; }
     .fav-thumb:hover { transform: scale(1.03); }
     .fav-thumb img { width: 100%; height: 100%; object-fit: cover; }
     .fav-thumb .fav-remove {
-      position: absolute; top: 4px; right: 4px; width: 22px; height: 22px;
-      border-radius: 50%; background: rgba(0,0,0,0.6); display: flex;
+      position: absolute; top: 6px; right: 6px; width: 24px; height: 24px;
+      border-radius: 50%; background: rgba(0,0,0,0.5); display: flex;
       align-items: center; justify-content: center; opacity: 0;
       transition: opacity 0.2s; cursor: pointer; border: none;
     }
     .fav-thumb:hover .fav-remove { opacity: 1; }
 
-    /* 频率限制提示条 */
-    .rate-bar { height: 3px; border-radius: 2px; background: rgba(120,120,128,0.2); overflow: hidden; }
+    .rate-bar { height: 3px; border-radius: 2px; background: #e8e8ed; overflow: hidden; }
     .rate-bar-fill { height: 100%; border-radius: 2px; transition: width 0.5s ease, background 0.5s ease; }
 
     .modal-overlay { animation: overlayFade 0.3s ease; }
     @keyframes overlayFade { from { opacity: 0; } to { opacity: 1; } }
 
-    ::selection { background: rgba(10, 132, 255, 0.3); }
+    ::selection { background: rgba(0, 113, 227, 0.2); }
+
+    /* 类型选择器 pill — Apple 风格 */
+    .type-pill {
+      padding: 8px 18px; font-size: 14px; font-weight: 400; border-radius: 980px;
+      color: #6e6e73; background: #f5f5f7; border: none;
+      cursor: pointer; transition: all 0.25s cubic-bezier(0.25, 0.1, 0.25, 1);
+      display: inline-flex; align-items: center; gap: 6px; white-space: nowrap;
+      letter-spacing: -0.016em;
+    }
+    .type-pill:hover { background: #e8e8ed; color: #1d1d1f; }
+    .type-pill.active { color: #ffffff; }
+    .type-pill .pill-icon { font-size: 14px; line-height: 1; }
+
+    /* 文字卡片 — Apple 风格 */
+    .text-card {
+      background: #ffffff;
+      border: 1px solid #d2d2d7;
+      border-radius: 18px;
+      padding: 24px;
+      transition: all 0.3s cubic-bezier(0.25, 0.1, 0.25, 1);
+    }
+    .text-card:hover {
+      border-color: #0071e3;
+      transform: translateY(-2px);
+      box-shadow: 0 8px 30px rgba(0,0,0,0.08);
+    }
+
+    /* 视频卡片播放按钮 */
+    .video-play-btn {
+      position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+      width: 52px; height: 52px; border-radius: 50%;
+      background: rgba(255,255,255,0.9); backdrop-filter: blur(10px);
+      display: flex; align-items: center; justify-content: center;
+      opacity: 0; transition: all 0.3s ease;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+    }
+    .img-card:hover .video-play-btn { opacity: 1; }
+
+    .video-duration {
+      position: absolute; bottom: 10px; right: 10px;
+      background: rgba(0,0,0,0.6); backdrop-filter: blur(4px);
+      padding: 3px 10px; border-radius: 8px;
+      font-size: 12px; font-weight: 600; color: white;
+    }
+
+    .gif-badge {
+      position: absolute; top: 10px; left: 10px;
+      background: rgba(175, 82, 222, 0.9); backdrop-filter: blur(4px);
+      padding: 3px 10px; border-radius: 8px;
+      font-size: 11px; font-weight: 700; color: white; letter-spacing: 0.05em;
+    }
+
+    /* 分类 pill 颜色 */
+    .type-pill.active[data-type="photo"] { background: #0071e3; }
+    .type-pill.active[data-type="video"] { background: #ff2d55; }
+    .type-pill.active[data-type="gif"] { background: #af52de; }
+    .type-pill.active[data-type="illustration"] { background: #ff9500; }
+    .type-pill.active[data-type="news"] { background: #34c759; }
+    .type-pill.active[data-type="books"] { background: #ff6482; }
+    .type-pill.active[data-type="wiki"] { background: #5ac8fa; }
+    .type-pill.active[data-type="quotes"] { background: #ac8e68; }
+
+    /* 横向滚动 pill 容器 */
+    .pill-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; -ms-overflow-style: none; }
+    .pill-scroll::-webkit-scrollbar { display: none; }
+
+    /* Apple 官网 hero 背景渐变 */
+    .hero-section {
+      background: linear-gradient(180deg, #fbfbfd 0%, #ffffff 100%);
+    }
+
+    /* Apple 风格的侧边面板 */
+    .panel-glass {
+      background: rgba(255, 255, 255, 0.92);
+      backdrop-filter: saturate(180%) blur(40px);
+      -webkit-backdrop-filter: saturate(180%) blur(40px);
+    }
+
+    /* Apple 风格 footer */
+    .apple-footer {
+      background: #f5f5f7;
+    }
+
+    /* 弹窗底部工具栏 */
+    .modal-toolbar {
+      background: rgba(255, 255, 255, 0.88);
+      backdrop-filter: saturate(180%) blur(20px);
+      -webkit-backdrop-filter: saturate(180%) blur(20px);
+    }
   </style>
 </head>
-<body class="text-white antialiased">
+<body class="antialiased">
 
   <!-- ==================== 登录/注册页面 ==================== -->
-  <div id="authPage" class="min-h-screen flex items-center justify-center px-6">
-    <div class="w-full max-w-[360px] fade-in">
-      <div class="text-center mb-10">
-        <div class="w-16 h-16 mx-auto mb-5 rounded-[20px] bg-gradient-to-b from-[#1C1C1E] to-[#0a0a0a] border border-[#38383A] flex items-center justify-center shadow-lg shadow-black/50">
-          <span class="text-2xl font-bold tracking-wider bg-gradient-to-b from-white to-[#98989D] bg-clip-text text-transparent">T</span>
+  <div id="authPage" class="min-h-screen flex flex-col">
+    <!-- 登录页顶部导航 -->
+    <nav class="w-full border-b border-[#d2d2d7]/60">
+      <div class="max-w-[980px] mx-auto px-6 h-12 flex items-center">
+        <div class="flex items-center gap-2">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+            <rect width="24" height="24" rx="6" fill="#1d1d1f"/>
+            <text x="12" y="17" text-anchor="middle" fill="white" font-size="14" font-weight="700" font-family="-apple-system, sans-serif">T</text>
+          </svg>
         </div>
-        <h1 class="text-[28px] font-bold tracking-tight mb-1.5" style="letter-spacing: -0.02em;">TIDE Material</h1>
-        <p class="text-[13px] text-apple-text-tertiary">高质量素材搜索平台</p>
       </div>
+    </nav>
 
-      <div class="segmented-control mb-7">
-        <button id="tabLogin" onclick="switchTab('login')" class="segmented-btn active">登录</button>
-        <button id="tabRegister" onclick="switchTab('register')" class="segmented-btn">注册</button>
-      </div>
-
-      <div id="loginForm">
-        <div class="space-y-3">
-          <input id="loginUsername" type="text" placeholder="用户名" class="apple-input" autocomplete="username" />
-          <input id="loginPassword" type="password" placeholder="密码" class="apple-input" autocomplete="current-password" />
+    <div class="flex-1 flex items-center justify-center px-6 py-16">
+      <div class="w-full max-w-[340px] fade-in">
+        <div class="text-center mb-10">
+          <div class="w-20 h-20 mx-auto mb-5 rounded-[22px] bg-gradient-to-b from-[#1d1d1f] to-[#424245] flex items-center justify-center shadow-lg">
+            <span class="text-3xl font-bold tracking-wider text-white">T</span>
+          </div>
+          <h1 class="text-[32px] font-semibold tracking-tight text-apple-text-primary" style="letter-spacing: -0.03em;">TIDE Material</h1>
+          <p class="text-[14px] text-apple-text-tertiary mt-1">登录你的账户以继续使用</p>
         </div>
-        <button onclick="login()" id="loginBtn" class="apple-btn-primary mt-5">登录</button>
-        <p id="loginError" class="text-apple-red text-[13px] text-center mt-4 hidden"></p>
-      </div>
 
-      <div id="registerForm" class="hidden">
-        <div class="space-y-3">
-          <input id="regUsername" type="text" placeholder="用户名（3-20 个字符）" class="apple-input" autocomplete="username" />
-          <input id="regPassword" type="password" placeholder="密码（至少 6 个字符）" class="apple-input" autocomplete="new-password" />
-          <input id="regPassword2" type="password" placeholder="确认密码" class="apple-input" autocomplete="new-password" />
+        <div class="segmented-control mb-8">
+          <button id="tabLogin" onclick="switchTab('login')" class="segmented-btn active">登录</button>
+          <button id="tabRegister" onclick="switchTab('register')" class="segmented-btn">注册</button>
         </div>
-        <button onclick="register()" id="regBtn" class="apple-btn-primary mt-5">创建账户</button>
-        <p id="regError" class="text-apple-red text-[13px] text-center mt-4 hidden"></p>
-      </div>
 
-      <p class="text-center text-apple-text-tertiary text-[12px] mt-10">免费使用 · 图片来源 Pexels</p>
+        <div id="loginForm">
+          <div class="space-y-4">
+            <div>
+              <label class="block text-[12px] font-medium text-apple-text-secondary mb-1.5 ml-1">用户名</label>
+              <input id="loginUsername" type="text" placeholder="请输入用户名" class="apple-input" autocomplete="username" />
+            </div>
+            <div>
+              <label class="block text-[12px] font-medium text-apple-text-secondary mb-1.5 ml-1">密码</label>
+              <input id="loginPassword" type="password" placeholder="请输入密码" class="apple-input" autocomplete="current-password" />
+            </div>
+          </div>
+          <button onclick="login()" id="loginBtn" class="apple-btn-primary mt-6">登录</button>
+          <p id="loginError" class="text-apple-red text-[13px] text-center mt-4 hidden"></p>
+        </div>
+
+        <div id="registerForm" class="hidden">
+          <div class="space-y-4">
+            <div>
+              <label class="block text-[12px] font-medium text-apple-text-secondary mb-1.5 ml-1">用户名</label>
+              <input id="regUsername" type="text" placeholder="3-20 个字符" class="apple-input" autocomplete="username" />
+            </div>
+            <div>
+              <label class="block text-[12px] font-medium text-apple-text-secondary mb-1.5 ml-1">密码</label>
+              <input id="regPassword" type="password" placeholder="至少 6 个字符" class="apple-input" autocomplete="new-password" />
+            </div>
+            <div>
+              <label class="block text-[12px] font-medium text-apple-text-secondary mb-1.5 ml-1">确认密码</label>
+              <input id="regPassword2" type="password" placeholder="再次输入密码" class="apple-input" autocomplete="new-password" />
+            </div>
+          </div>
+          <button onclick="register()" id="regBtn" class="apple-btn-primary mt-6">创建账户</button>
+          <p id="regError" class="text-apple-red text-[13px] text-center mt-4 hidden"></p>
+        </div>
+
+        <div class="mt-10 pt-6 border-t border-[#d2d2d7]/60">
+          <p class="text-center text-apple-text-tertiary text-[12px] leading-5">
+            免费使用 · 搜索图片、视频、GIF、插画<br/>新闻、图书、百科与名言
+          </p>
+        </div>
+      </div>
     </div>
   </div>
 
   <!-- ==================== 主应用页面 ==================== -->
   <div id="appPage" class="hidden">
 
-    <!-- 导航栏 -->
-    <nav class="fixed top-0 left-0 right-0 z-50 glass border-b border-white/[0.08]">
-      <div class="max-w-7xl mx-auto px-6 h-12 flex items-center justify-between">
-        <div class="flex items-center gap-2.5">
-          <span class="text-[15px] font-semibold tracking-tight" style="letter-spacing: -0.01em;">TIDE</span>
-          <span class="text-[11px] text-apple-text-tertiary font-medium tracking-wide uppercase">Material</span>
+    <!-- Apple 风格导航栏 -->
+    <nav class="fixed top-0 left-0 right-0 z-50 glass-nav border-b border-[#d2d2d7]/50">
+      <div class="max-w-[980px] mx-auto px-6 h-11 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+            <rect width="24" height="24" rx="5" fill="#1d1d1f"/>
+            <text x="12" y="17" text-anchor="middle" fill="white" font-size="13" font-weight="700" font-family="-apple-system, sans-serif">T</text>
+          </svg>
+          <span class="text-[12px] font-normal text-apple-text-primary tracking-tight" style="letter-spacing: -0.01em;">TIDE Material</span>
         </div>
-        <div class="flex items-center gap-1">
-          <!-- 收藏按钮 -->
-          <button onclick="openPanel('favorites')" class="h-8 px-3 rounded-lg text-[13px] text-apple-text-secondary hover:text-apple-red hover:bg-white/[0.06] transition-all duration-200 flex items-center gap-1.5">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+        <div class="flex items-center gap-0.5">
+          <button onclick="openPanel('favorites')" class="h-8 px-3 rounded-full text-[12px] text-apple-text-secondary hover:text-apple-red hover:bg-black/[0.04] transition-all duration-200 flex items-center gap-1.5">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
             <span class="hidden sm:inline">收藏</span>
           </button>
-          <!-- 历史按钮 -->
-          <button onclick="openPanel('history')" class="h-8 px-3 rounded-lg text-[13px] text-apple-text-secondary hover:text-white hover:bg-white/[0.06] transition-all duration-200 flex items-center gap-1.5">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          <button onclick="openPanel('history')" class="h-8 px-3 rounded-full text-[12px] text-apple-text-secondary hover:text-apple-text-primary hover:bg-black/[0.04] transition-all duration-200 flex items-center gap-1.5">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
             <span class="hidden sm:inline">历史</span>
           </button>
-          <div class="w-px h-4 bg-white/[0.08] mx-1"></div>
-          <span id="navUsername" class="text-[13px] text-apple-text-secondary px-2"></span>
-          <button onclick="logout()" class="h-8 px-3 rounded-lg text-[13px] text-apple-text-tertiary hover:text-apple-red hover:bg-white/[0.06] transition-all duration-200">退出</button>
+          <div class="w-px h-4 bg-[#d2d2d7] mx-2"></div>
+          <span id="navUsername" class="text-[12px] text-apple-text-secondary px-1"></span>
+          <button onclick="logout()" class="h-8 px-3 rounded-full text-[12px] text-apple-text-tertiary hover:text-apple-red hover:bg-black/[0.04] transition-all duration-200">退出</button>
         </div>
       </div>
     </nav>
 
-    <main class="pt-12">
-      <!-- Hero 搜索区 -->
-      <section class="px-6 pt-24 pb-16">
-        <div class="max-w-2xl mx-auto text-center">
-          <h1 class="text-[42px] md:text-[52px] font-bold tracking-tight leading-[1.08] mb-4" style="letter-spacing: -0.03em;">
-            输入灵感<span class="text-apple-text-tertiary">，</span><br/>获取素材<span class="text-apple-blue">。</span>
+    <main class="pt-11">
+      <!-- Hero 搜索区 — Apple 风格 -->
+      <section class="hero-section px-6 pt-20 pb-14">
+        <div class="max-w-[680px] mx-auto text-center">
+          <h1 class="text-[48px] md:text-[56px] font-semibold tracking-tight leading-[1.07] mb-4 text-apple-text-primary" style="letter-spacing: -0.035em;">
+            搜索你的灵感。
           </h1>
-          <p class="text-apple-text-secondary text-[15px] leading-relaxed mb-4 max-w-md mx-auto" style="letter-spacing: -0.01em;">
-            输入关键词或描述，从全球图库中搜寻最匹配的高质量图片
+          <p class="text-[21px] text-apple-text-secondary leading-relaxed mb-3 max-w-lg mx-auto font-normal" style="letter-spacing: 0.011em;">
+            图片、视频、GIF、插画、新闻<br/>图书、百科与名言 — 一站式创作素材平台。
           </p>
 
           <!-- 频率限制指示器 -->
@@ -233,106 +429,128 @@
             </div>
           </div>
 
-          <!-- 搜索框 -->
-          <div class="relative max-w-xl mx-auto search-glow rounded-2xl border border-white/[0.1] bg-apple-card transition-all duration-300">
+          <!-- 搜索框 — Apple 风格 -->
+          <div class="relative max-w-[580px] mx-auto search-glow rounded-2xl border border-[#d2d2d7] bg-white transition-all duration-300 shadow-sm">
             <div class="flex items-center">
               <svg class="ml-5 text-apple-text-tertiary flex-shrink-0" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-              <input id="searchInput" type="text" placeholder="搜索素材..." class="flex-1 bg-transparent px-4 py-4 text-[15px] text-white placeholder-apple-text-tertiary outline-none" style="letter-spacing: -0.01em;" autocomplete="off" />
-              <button id="searchBtn" onclick="searchImages()" class="mr-2 bg-apple-blue hover:bg-apple-blue-hover text-white text-[13px] font-semibold px-5 py-2 rounded-xl active:scale-95 transition-all duration-200 flex-shrink-0">搜索</button>
+              <input id="searchInput" type="text" placeholder="搜索素材..." class="flex-1 bg-transparent px-4 py-[14px] text-[17px] text-apple-text-primary placeholder-apple-text-tertiary outline-none" style="letter-spacing: -0.022em;" autocomplete="off" />
+              <button id="searchBtn" onclick="doSearch()" class="mr-2 bg-apple-blue hover:bg-apple-blue-hover text-white text-[14px] font-normal px-5 py-[7px] rounded-full active:scale-95 transition-all duration-200 flex-shrink-0">搜索</button>
+            </div>
+          </div>
+
+          <!-- 类型选择器 -->
+          <div class="pill-scroll mt-7">
+            <div id="typePills" class="flex justify-center gap-2 min-w-max px-4">
+              <button class="type-pill active" data-type="photo" onclick="setSearchType('photo')">
+                <span class="pill-icon">📷</span> 图片
+              </button>
+              <button class="type-pill" data-type="video" onclick="setSearchType('video')">
+                <span class="pill-icon">🎬</span> 视频
+              </button>
+              <button class="type-pill" data-type="gif" onclick="setSearchType('gif')">
+                <span class="pill-icon">✨</span> GIF
+              </button>
+              <button class="type-pill" data-type="illustration" onclick="setSearchType('illustration')">
+                <span class="pill-icon">🎨</span> 插画
+              </button>
+              <button class="type-pill" data-type="news" onclick="setSearchType('news')">
+                <span class="pill-icon">📰</span> 新闻
+              </button>
+              <button class="type-pill" data-type="books" onclick="setSearchType('books')">
+                <span class="pill-icon">📚</span> 图书
+              </button>
+              <button class="type-pill" data-type="wiki" onclick="setSearchType('wiki')">
+                <span class="pill-icon">🌐</span> 百科
+              </button>
+              <button class="type-pill" data-type="quotes" onclick="setSearchType('quotes')">
+                <span class="pill-icon">💬</span> 名言
+              </button>
             </div>
           </div>
 
           <!-- 快捷标签 -->
-          <div class="flex flex-wrap justify-center gap-2 mt-8">
-            <button onclick="quickSearch('street fashion')" class="tag-btn text-[13px] text-apple-text-secondary rounded-full px-4 py-2">街头穿搭</button>
-            <button onclick="quickSearch('minimal interior')" class="tag-btn text-[13px] text-apple-text-secondary rounded-full px-4 py-2">极简家居</button>
-            <button onclick="quickSearch('coffee aesthetic')" class="tag-btn text-[13px] text-apple-text-secondary rounded-full px-4 py-2">咖啡美学</button>
-            <button onclick="quickSearch('nature landscape')" class="tag-btn text-[13px] text-apple-text-secondary rounded-full px-4 py-2">自然风光</button>
-            <button onclick="quickSearch('urban night')" class="tag-btn text-[13px] text-apple-text-secondary rounded-full px-4 py-2">城市夜景</button>
-            <button onclick="quickSearch('food photography')" class="tag-btn text-[13px] text-apple-text-secondary rounded-full px-4 py-2">美食摄影</button>
-          </div>
+          <div id="quickTags" class="flex flex-wrap justify-center gap-2 mt-6"></div>
         </div>
       </section>
 
+      <!-- 分隔线 -->
+      <div class="border-t border-[#d2d2d7]/40"></div>
+
       <!-- 结果统计 -->
-      <div id="resultInfo" class="hidden max-w-7xl mx-auto px-6 mb-5">
+      <div id="resultInfo" class="hidden max-w-[980px] mx-auto px-6 mt-6 mb-4">
         <div class="flex items-center justify-between">
-          <p class="text-[13px] text-apple-text-tertiary">
-            搜索 "<span id="resultQuery" class="text-white font-medium"></span>" · <span id="resultCount" class="text-apple-text-secondary"></span> 张
+          <p class="text-[14px] text-apple-text-secondary">
+            搜索 "<span id="resultQuery" class="text-apple-text-primary font-medium"></span>" · <span id="resultCount" class="text-apple-text-tertiary"></span>
           </p>
-          <button onclick="loadMore()" id="loadMoreBtn" class="hidden text-[13px] text-apple-blue font-medium hover:text-apple-blue-hover transition-colors duration-200">加载更多</button>
+          <button onclick="loadMore()" id="loadMoreBtn" class="hidden text-[14px] text-apple-blue font-normal hover:text-apple-blue-hover transition-colors duration-200">加载更多 →</button>
         </div>
       </div>
 
-      <!-- 图片网格 -->
-      <section class="max-w-7xl mx-auto px-6 pb-24">
-        <div id="loading" class="hidden flex flex-col items-center justify-center py-24">
+      <!-- 内容网格 -->
+      <section class="max-w-[980px] mx-auto px-6 pb-24">
+        <div id="loading" class="hidden flex flex-col items-center justify-center py-28">
           <div class="apple-spinner mb-4"></div>
-          <p class="text-[13px] text-apple-text-tertiary">正在搜索...</p>
+          <p class="text-[14px] text-apple-text-tertiary">正在搜索...</p>
         </div>
-        <div id="emptyState" class="flex flex-col items-center justify-center py-24">
-          <svg class="mb-5 text-apple-text-tertiary opacity-30" width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
-          <p class="text-apple-text-tertiary text-[15px]">输入关键词开始搜索</p>
+        <div id="emptyState" class="flex flex-col items-center justify-center py-28">
+          <svg class="mb-5 text-apple-text-tertiary opacity-20" width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <p class="text-apple-text-tertiary text-[17px] font-normal">输入关键词开始搜索</p>
         </div>
+        <!-- 图片/视频/GIF/插画瀑布流 -->
         <div id="imageGrid" class="masonry"></div>
+        <!-- 文字类卡片列表 -->
+        <div id="textGrid" class="hidden space-y-4 max-w-3xl mx-auto"></div>
       </section>
     </main>
 
-    <!-- 右侧面板 (历史 + 收藏 双标签) -->
-    <div id="panelOverlay" class="fixed inset-0 bg-black/40 z-40 hidden" onclick="closePanel()"></div>
-    <div id="sidePanel" class="fixed top-0 right-0 bottom-0 w-80 glass-thick border-l border-white/[0.08] z-50 transform translate-x-full overflow-y-auto" style="transition: transform 0.35s cubic-bezier(0.25, 0.1, 0.25, 1);">
+    <!-- 右侧面板 -->
+    <div id="panelOverlay" class="fixed inset-0 bg-black/20 z-40 hidden" onclick="closePanel()"></div>
+    <div id="sidePanel" class="fixed top-0 right-0 bottom-0 w-80 panel-glass border-l border-[#d2d2d7]/60 z-50 transform translate-x-full overflow-y-auto shadow-2xl" style="transition: transform 0.35s cubic-bezier(0.25, 0.1, 0.25, 1);">
       <div class="p-5 pt-4">
-        <!-- 面板头部 -->
-        <div class="flex items-center justify-between mb-4 h-12">
+        <div class="flex items-center justify-between mb-5 h-12">
           <div class="segmented-control flex-1 mr-3">
             <button onclick="switchPanelTab('history')" id="panelTabHistory" class="segmented-btn active text-[12px] !py-1.5">历史</button>
             <button onclick="switchPanelTab('favorites')" id="panelTabFav" class="segmented-btn text-[12px] !py-1.5">收藏</button>
           </div>
-          <button onclick="closePanel()" class="w-8 h-8 rounded-full bg-white/[0.08] hover:bg-white/[0.12] flex items-center justify-center transition-colors duration-200 flex-shrink-0">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          <button onclick="closePanel()" class="w-8 h-8 rounded-full bg-black/[0.05] hover:bg-black/[0.1] flex items-center justify-center transition-colors duration-200 flex-shrink-0">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#1d1d1f" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
           </button>
         </div>
-
-        <!-- 历史列表 -->
         <div id="historyContent">
-          <div id="historyList">
-            <p class="text-apple-text-tertiary text-[13px] text-center py-8">暂无搜索记录</p>
-          </div>
+          <div id="historyList"><p class="text-apple-text-tertiary text-[13px] text-center py-8">暂无搜索记录</p></div>
         </div>
-
-        <!-- 收藏列表 -->
         <div id="favoritesContent" class="hidden">
-          <div id="favoritesList">
-            <p class="text-apple-text-tertiary text-[13px] text-center py-8">暂无收藏</p>
-          </div>
+          <div id="favoritesList"><p class="text-apple-text-tertiary text-[13px] text-center py-8">暂无收藏</p></div>
         </div>
       </div>
     </div>
 
-    <!-- 图片预览弹窗 -->
+    <!-- 图片/视频预览弹窗 -->
     <div id="modal" class="fixed inset-0 z-[100] hidden">
-      <div class="absolute inset-0 bg-black/80 backdrop-blur-xl modal-overlay" onclick="closeModal()"></div>
+      <div class="absolute inset-0 bg-black/60 backdrop-blur-xl modal-overlay" onclick="closeModal()"></div>
       <div class="relative z-10 flex flex-col items-center justify-center min-h-screen p-6 scale-in">
-        <button onclick="closeModal()" class="absolute top-5 right-5 w-9 h-9 rounded-full bg-white/[0.1] hover:bg-white/[0.2] flex items-center justify-center transition-all duration-200">
+        <button onclick="closeModal()" class="absolute top-5 right-5 w-9 h-9 rounded-full bg-white/[0.15] hover:bg-white/[0.25] flex items-center justify-center transition-all duration-200">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
         </button>
-        <img id="modalImg" src="" alt="" class="max-w-full max-h-[70vh] object-contain rounded-2xl shadow-2xl shadow-black/60" />
-        <div class="mt-6 glass rounded-2xl px-6 py-4 flex items-center gap-4 border border-white/[0.08]">
+        <!-- 图片预览 -->
+        <img id="modalImg" src="" alt="" class="max-w-full max-h-[70vh] object-contain rounded-2xl shadow-2xl" />
+        <!-- 视频预览 -->
+        <video id="modalVideo" controls class="hidden max-w-full max-h-[70vh] rounded-2xl shadow-2xl"></video>
+        <div class="mt-6 modal-toolbar rounded-2xl px-6 py-4 flex items-center gap-4 border border-white/[0.15] flex-wrap justify-center">
           <div class="text-left">
             <p id="modalPhotographer" class="text-[14px] text-white font-medium"></p>
-            <p id="modalSize" class="text-[12px] text-apple-text-tertiary mt-0.5"></p>
+            <p id="modalSize" class="text-[12px] text-white/60 mt-0.5"></p>
           </div>
-          <div class="w-px h-8 bg-white/[0.1]"></div>
-          <!-- 收藏按钮 -->
-          <button onclick="toggleFavFromModal()" id="modalFavBtn" class="h-10 px-4 rounded-xl flex items-center gap-1.5 text-[13px] font-semibold transition-all duration-200" style="background: rgba(120,120,128,0.24); color: #FF453A;">
+          <div class="w-px h-8 bg-white/[0.15]"></div>
+          <button onclick="toggleFavFromModal()" id="modalFavBtn" class="h-10 px-4 rounded-full flex items-center gap-1.5 text-[13px] font-medium transition-all duration-200" style="background: rgba(255,255,255,0.15); color: #FF3B30;">
             <svg id="modalFavIcon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
             <span id="modalFavText">收藏</span>
           </button>
-          <a id="modalDownload" href="" target="_blank" download class="h-10 px-4 rounded-xl bg-apple-blue hover:bg-apple-blue-hover text-white text-[13px] font-semibold flex items-center gap-1.5 transition-all duration-200">
+          <a id="modalDownload" href="" target="_blank" download class="h-10 px-5 rounded-full bg-apple-blue hover:bg-apple-blue-hover text-white text-[13px] font-medium flex items-center gap-1.5 transition-all duration-200">
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
             下载
           </a>
-          <button onclick="copyImageUrl()" id="copyBtn" class="h-10 px-4 rounded-xl flex items-center gap-1.5 text-[13px] font-semibold transition-all duration-200" style="background: rgba(120,120,128,0.24); color: #0A84FF;">
+          <button onclick="copyUrl()" id="copyBtn" class="h-10 px-4 rounded-full flex items-center gap-1.5 text-[13px] font-medium transition-all duration-200" style="background: rgba(255,255,255,0.15); color: #0071e3;">
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
             复制
           </button>
@@ -340,8 +558,24 @@
       </div>
     </div>
 
-    <footer class="border-t border-white/[0.06] py-8 text-center">
-      <p class="text-[12px] text-apple-text-tertiary">TIDE Material · 图片来源 <a href="https://www.pexels.com" target="_blank" class="text-apple-blue hover:text-apple-blue-hover transition-colors duration-200">Pexels</a> · 免费可商用 · 每小时 <span id="footerLimit">30</span> 次搜索</p>
+    <!-- Apple 风格 footer -->
+    <footer class="apple-footer">
+      <div class="border-t border-[#d2d2d7]/60"></div>
+      <div class="max-w-[980px] mx-auto px-6 py-5">
+        <div class="flex flex-col sm:flex-row items-center justify-between gap-3">
+          <p class="text-[12px] text-apple-text-tertiary">
+            Copyright © 2026 TIDE Material. 保留所有权利。
+          </p>
+          <p class="text-[12px] text-apple-text-tertiary">
+            图片/视频
+            <a href="https://www.pexels.com" target="_blank" class="apple-link text-[12px]">Pexels</a> ·
+            插画 <a href="https://pixabay.com" target="_blank" class="apple-link text-[12px]">Pixabay</a> ·
+            GIF <a href="https://giphy.com" target="_blank" class="apple-link text-[12px]">GIPHY</a> ·
+            百科 <a href="https://wikipedia.org" target="_blank" class="apple-link text-[12px]">Wikipedia</a> ·
+            图书 <a href="https://openlibrary.org" target="_blank" class="apple-link text-[12px]">Open Library</a>
+          </p>
+        </div>
+      </div>
     </footer>
   </div>
 
@@ -350,6 +584,7 @@
     const PER_PAGE = 20;
 
     // ============ 状态 ============
+    let searchType = 'photo'; // photo | video | gif | illustration | news | books | wiki | quotes
     let currentQuery = '';
     let currentPage = 1;
     let totalResults = 0;
@@ -357,158 +592,75 @@
     let currentUsername = localStorage.getItem('tide_username');
     let panelOpen = false;
     let panelTab = 'history';
-    let favoriteIds = new Set();      // 已收藏的 photo_id
-    let favoritesData = [];           // 收藏完整数据
-    let currentModalPhoto = null;     // 当前弹窗中的图片信息
-    let rateRemaining = 30;
-    let rateLimit = 30;
+    let favoriteIds = new Set();
+    let favoritesData = [];
+    let currentModalPhoto = null;
+    let rateRemaining = 50;
+    let rateLimit = 50;
 
-    // ============ 超大中文→英文关键词映射（200+） ============
+    // ============ 每种类型的快捷标签 ============
+    const quickTagsMap = {
+      photo: [
+        { label: '街头穿搭', q: 'street fashion' }, { label: '极简家居', q: 'minimal interior' },
+        { label: '咖啡美学', q: 'coffee aesthetic' }, { label: '自然风光', q: 'nature landscape' },
+        { label: '城市夜景', q: 'urban night' }, { label: '美食摄影', q: 'food photography' },
+      ],
+      video: [
+        { label: '旅行 Vlog', q: 'travel vlog' }, { label: '城市延时', q: 'city timelapse' },
+        { label: '海浪', q: 'ocean waves' }, { label: '无人机航拍', q: 'drone aerial' },
+        { label: '日落', q: 'sunset cinematic' }, { label: '美食制作', q: 'cooking food' },
+      ],
+      gif: [
+        { label: '搞笑', q: 'funny' }, { label: '猫咪', q: 'cat' },
+        { label: '鼓掌', q: 'clapping' }, { label: '开心', q: 'happy dance' },
+        { label: '惊讶', q: 'surprised' }, { label: '爱心', q: 'love heart' },
+      ],
+      illustration: [
+        { label: '扁平风', q: 'flat design' }, { label: '手绘', q: 'hand drawn' },
+        { label: '科技', q: 'technology' }, { label: '自然', q: 'nature' },
+        { label: '商务', q: 'business' }, { label: '节日', q: 'holiday celebration' },
+      ],
+      news: [
+        { label: '科技', q: 'technology AI' }, { label: '商业', q: 'business economy' },
+        { label: '文化', q: 'culture art' }, { label: '体育', q: 'sports' },
+        { label: '健康', q: 'health' }, { label: '环境', q: 'climate environment' },
+      ],
+      books: [
+        { label: '科幻小说', q: 'science fiction' }, { label: '悬疑推理', q: 'mystery detective' },
+        { label: '心理学', q: 'psychology' }, { label: '历史', q: 'history' },
+        { label: '哲学', q: 'philosophy' }, { label: '奇幻', q: 'fantasy' },
+      ],
+      wiki: [
+        { label: '量子力学', q: '量子力学' }, { label: '人工智能', q: '人工智能' },
+        { label: '文艺复兴', q: '文艺复兴' }, { label: '黑洞', q: '黑洞' },
+        { label: '莎士比亚', q: '莎士比亚' }, { label: '赛博朋克', q: 'Cyberpunk' },
+      ],
+      quotes: [
+        { label: '励志', q: 'inspirational' }, { label: '爱情', q: 'love' },
+        { label: '智慧', q: 'wisdom' }, { label: '人生', q: 'life' },
+        { label: '成功', q: 'success' }, { label: '幸福', q: 'happiness' },
+      ],
+    };
+
+    // ============ 中文→英文关键词映射 ============
     const keywordMap = {
-      // 🔥 热门/风格
       '穿搭': 'fashion outfit', '街头': 'street style', '潮流': 'trendy fashion',
-      '潮牌': 'streetwear', 'ins风': 'instagram aesthetic', '氛围感': 'moody aesthetic',
-      '高级感': 'elegant premium', '简约': 'simple clean minimal', '极简': 'minimal',
-      '复古': 'vintage retro', '赛博朋克': 'cyberpunk', '蒸汽波': 'vaporwave',
-      '波西米亚': 'bohemian', '日系': 'japanese style', '韩系': 'korean style',
-      '法式': 'french style', '工业风': 'industrial style', '北欧': 'scandinavian',
-      '中国风': 'chinese style', '古风': 'ancient chinese', '水墨': 'ink painting',
-      '朋克': 'punk', '嘻哈': 'hip hop', '学院风': 'preppy academic',
-      '暗黑': 'dark aesthetic', '小清新': 'fresh aesthetic', '治愈系': 'healing aesthetic',
-      '少女': 'girly', '甜酷': 'sweet cool', '盐系': 'salt style minimal',
-
-      // 🌿 自然/风景
-      '风景': 'landscape scenery', '自然': 'nature', '山': 'mountain',
-      '海': 'sea ocean', '海边': 'beach ocean', '湖': 'lake',
-      '河': 'river', '瀑布': 'waterfall', '森林': 'forest',
-      '丛林': 'jungle', '草原': 'grassland prairie', '沙漠': 'desert',
-      '雪山': 'snow mountain', '冰川': 'glacier', '火山': 'volcano',
-      '日出': 'sunrise', '日落': 'sunset', '朝霞': 'dawn clouds',
-      '晚霞': 'evening glow', '星空': 'starry sky', '银河': 'milky way',
-      '极光': 'aurora northern lights', '彩虹': 'rainbow', '闪电': 'lightning',
-      '云': 'clouds sky', '雾': 'fog mist', '雨': 'rain',
-      '雪': 'snow winter', '樱花': 'cherry blossom', '枫叶': 'maple autumn',
-      '荷花': 'lotus flower', '向日葵': 'sunflower', '薰衣草': 'lavender',
-      '田野': 'field countryside', '梯田': 'rice terrace', '花海': 'flower field',
-      '溪流': 'creek stream', '珊瑚': 'coral reef', '水下': 'underwater',
-
-      // 🏙️ 城市/建筑
-      '城市': 'urban city', '夜景': 'night city lights', '天际线': 'skyline',
-      '摩天大楼': 'skyscraper', '建筑': 'architecture', '街道': 'street',
-      '胡同': 'alley', '小巷': 'narrow street', '桥': 'bridge',
-      '教堂': 'church cathedral', '寺庙': 'temple', '城堡': 'castle',
-      '宫殿': 'palace', '废墟': 'ruins', '灯塔': 'lighthouse',
-      '摩天轮': 'ferris wheel', '地铁': 'subway metro', '火车站': 'train station',
-      '机场': 'airport', '码头': 'dock harbor', '市场': 'market bazaar',
-      '商场': 'shopping mall', '图书馆': 'library', '博物馆': 'museum',
-      '咖啡馆': 'cafe coffee shop', '餐厅': 'restaurant', '酒吧': 'bar pub',
-
-      // 🏠 家居/室内
-      '家居': 'interior home', '客厅': 'living room', '卧室': 'bedroom',
-      '厨房': 'kitchen', '浴室': 'bathroom', '书房': 'study room',
-      '阳台': 'balcony', '花园': 'garden', '庭院': 'courtyard',
-      '装修': 'interior design', '家具': 'furniture', '灯具': 'lighting lamp',
-      '窗': 'window', '门': 'door', '楼梯': 'staircase',
-
-      // 🍜 美食/饮品
-      '美食': 'food delicious', '咖啡': 'coffee', '茶': 'tea',
-      '甜品': 'dessert', '蛋糕': 'cake', '面包': 'bread bakery',
-      '披萨': 'pizza', '寿司': 'sushi', '拉面': 'ramen noodles',
-      '火锅': 'hot pot', '烧烤': 'barbecue grill', '沙拉': 'salad',
-      '水果': 'fruits', '冰淇淋': 'ice cream', '鸡尾酒': 'cocktail',
-      '红酒': 'red wine', '啤酒': 'beer', '奶茶': 'bubble tea',
-      '早餐': 'breakfast', '晚餐': 'dinner', '下午茶': 'afternoon tea',
-      '料理': 'cuisine cooking', '烘焙': 'baking',
-
-      // 👤 人物/人像
-      '人像': 'portrait', '肖像': 'portrait face', '模特': 'model',
-      '情侣': 'couple love', '家庭': 'family', '儿童': 'children kids',
-      '婴儿': 'baby', '老人': 'elderly senior', '女孩': 'girl',
-      '男孩': 'boy', '闺蜜': 'best friends girls', '兄弟': 'brothers',
-      '婚礼': 'wedding', '毕业': 'graduation', '派对': 'party',
-      '舞蹈': 'dance dancing', '瑜伽': 'yoga', '冥想': 'meditation',
-
-      // 🐾 动物
-      '猫': 'cat kitten', '狗': 'dog puppy', '鸟': 'bird',
-      '鱼': 'fish', '蝴蝶': 'butterfly', '马': 'horse',
-      '兔子': 'rabbit bunny', '熊猫': 'panda', '老虎': 'tiger',
-      '狮子': 'lion', '鹿': 'deer', '鹰': 'eagle hawk',
-      '海豚': 'dolphin', '鲸鱼': 'whale', '企鹅': 'penguin',
-      '狐狸': 'fox', '松鼠': 'squirrel', '仓鼠': 'hamster',
-      '宠物': 'pet', '野生动物': 'wildlife',
-
-      // 🎨 艺术/创意
-      '艺术': 'art artwork', '绘画': 'painting', '插画': 'illustration',
-      '雕塑': 'sculpture', '涂鸦': 'graffiti street art', '素描': 'sketch drawing',
-      '水彩': 'watercolor', '油画': 'oil painting', '抽象': 'abstract art',
-      '几何': 'geometric pattern', '纹理': 'texture pattern', '色彩': 'colorful',
-      '黑白': 'black and white monochrome', '光影': 'light shadow',
-      '剪影': 'silhouette', '倒影': 'reflection', '长曝光': 'long exposure',
-      '微距': 'macro photography', '航拍': 'aerial drone',
-
-      // 💼 工作/科技
-      '办公': 'office workspace', '电脑': 'computer laptop', '手机': 'smartphone mobile',
-      '科技': 'technology', '编程': 'coding programming', '会议': 'meeting conference',
-      '创业': 'startup business', '团队': 'team collaboration', '书桌': 'desk workspace',
-      '笔记本': 'notebook', '咖啡办公': 'coffee work', '远程办公': 'remote work',
-      '人工智能': 'artificial intelligence AI', '机器人': 'robot',
-      '数据': 'data analytics', '网络': 'internet network', '芯片': 'chip semiconductor',
-
-      // 🏃 运动/健身
-      '运动': 'sport fitness', '跑步': 'running jogging', '游泳': 'swimming',
-      '篮球': 'basketball', '足球': 'soccer football', '网球': 'tennis',
-      '滑板': 'skateboard', '冲浪': 'surfing', '攀岩': 'rock climbing',
-      '登山': 'hiking mountain', '骑行': 'cycling bike', '滑雪': 'skiing',
-      '健身': 'gym workout', '拳击': 'boxing',
-
-      // ✈️ 旅行
-      '旅行': 'travel journey', '背包客': 'backpacker travel', '露营': 'camping',
-      '公路旅行': 'road trip', '行李': 'luggage travel', '地图': 'map',
-      '护照': 'passport', '飞机': 'airplane flight', '火车': 'train',
-      '船': 'boat ship', '热气球': 'hot air balloon', '帐篷': 'tent camping',
-
-      // 📚 文化/生活
-      '书': 'books reading', '音乐': 'music', '电影': 'film cinema',
-      '吉他': 'guitar', '钢琴': 'piano', '耳机': 'headphones',
-      '相机': 'camera photography', '杂志': 'magazine', '报纸': 'newspaper',
-      '花': 'flowers floral', '蜡烛': 'candle', '香水': 'perfume',
-      '手表': 'watch luxury', '珠宝': 'jewelry', '包': 'bag handbag',
-      '鞋': 'shoes sneakers', '太阳镜': 'sunglasses', '化妆': 'makeup beauty',
-      '护肤': 'skincare beauty', '发型': 'hairstyle', '纹身': 'tattoo',
-      '设计': 'design creative', '品牌': 'branding', '海报': 'poster',
-      '包装': 'packaging design', '平面设计': 'graphic design', 'UI': 'user interface',
-      '节日': 'festival holiday', '圣诞': 'christmas', '春节': 'chinese new year',
-      '万圣节': 'halloween', '情人节': 'valentine', '生日': 'birthday',
-
-      // 🌈 颜色/氛围
-      '红色': 'red color', '蓝色': 'blue color', '绿色': 'green color',
-      '粉色': 'pink color', '紫色': 'purple color', '黄色': 'yellow color',
-      '橙色': 'orange color', '金色': 'gold golden', '银色': 'silver metallic',
-      '白色': 'white clean', '灰色': 'gray neutral', '棕色': 'brown earth tone',
-      '莫兰迪': 'morandi muted tones', '马卡龙': 'macaron pastel',
-      '霓虹': 'neon glow', '渐变': 'gradient color',
-
-      // 🕐 季节/时间
-      '春天': 'spring season', '夏天': 'summer', '夏日': 'summer',
-      '秋天': 'autumn fall', '冬天': 'winter', '冬日': 'winter',
-      '雨天': 'rainy day', '晴天': 'sunny day', '清晨': 'early morning',
-      '黄昏': 'dusk twilight', '深夜': 'late night', '午后': 'afternoon',
-
-      // 🎯 情绪/感觉
-      '温暖': 'warm cozy', '清凉': 'cool fresh', '孤独': 'lonely solitude',
-      '自由': 'freedom free spirit', '浪漫': 'romantic', '神秘': 'mysterious',
-      '宁静': 'peaceful calm serene', '活力': 'energetic vibrant', '梦幻': 'dreamy fantasy',
-      '怀旧': 'nostalgic', '文艺': 'literary artistic', '禅意': 'zen peaceful',
-      '温馨': 'cozy warm homelike', '奢华': 'luxury luxurious',
-
-      // 📸 摄影技法
-      '街拍': 'street photography', '风光摄影': 'landscape photography',
-      '人文': 'documentary photography', '纪实': 'photojournalism',
-      '静物': 'still life', '产品': 'product photography', '美妆': 'beauty photography',
-      '时尚摄影': 'fashion photography', '婚纱照': 'wedding photography',
-      '写真': 'portrait session', '证件照': 'headshot portrait',
-      '全景': 'panoramic view', '特写': 'close up detail', '俯拍': 'overhead shot',
-      '仰拍': 'low angle shot', '散景': 'bokeh', '双重曝光': 'double exposure',
+      '潮牌': 'streetwear', '氛围感': 'moody aesthetic', '简约': 'simple clean minimal',
+      '极简': 'minimal', '复古': 'vintage retro', '赛博朋克': 'cyberpunk',
+      '日系': 'japanese style', '韩系': 'korean style', '北欧': 'scandinavian',
+      '中国风': 'chinese style', '古风': 'ancient chinese', '风景': 'landscape scenery',
+      '自然': 'nature', '山': 'mountain', '海': 'sea ocean', '海边': 'beach ocean',
+      '森林': 'forest', '沙漠': 'desert', '日出': 'sunrise', '日落': 'sunset',
+      '星空': 'starry sky', '极光': 'aurora northern lights', '樱花': 'cherry blossom',
+      '城市': 'urban city', '夜景': 'night city lights', '建筑': 'architecture',
+      '咖啡馆': 'cafe coffee shop', '家居': 'interior home', '客厅': 'living room',
+      '卧室': 'bedroom', '厨房': 'kitchen', '美食': 'food delicious',
+      '咖啡': 'coffee', '甜品': 'dessert', '人像': 'portrait', '婚礼': 'wedding',
+      '猫': 'cat kitten', '狗': 'dog puppy', '艺术': 'art artwork',
+      '抽象': 'abstract art', '黑白': 'black and white monochrome',
+      '办公': 'office workspace', '科技': 'technology', '运动': 'sport fitness',
+      '旅行': 'travel journey', '音乐': 'music', '电影': 'film cinema',
+      '设计': 'design creative', '花': 'flowers floral',
     };
 
     function translateQuery(input) {
@@ -520,6 +672,16 @@
       return translated.length > 0 ? translated.join(' ') : result;
     }
 
+    // ============ 类型是否需要翻译 ============
+    function needsTranslation(type) {
+      return ['photo', 'video', 'gif', 'illustration', 'quotes'].includes(type);
+    }
+
+    // ============ 类型是否是视觉类 ============
+    function isVisualType(type) {
+      return ['photo', 'video', 'gif', 'illustration'].includes(type);
+    }
+
     // ============ 初始化 ============
     async function init() {
       if (authToken) {
@@ -529,7 +691,7 @@
             const data = await res.json();
             currentUsername = data.username;
             showApp();
-            loadFavoriteIds(); // 预加载收藏ID
+            loadFavoriteIds();
             return;
           }
         } catch (e) {}
@@ -549,6 +711,7 @@
       document.getElementById('authPage').classList.add('hidden');
       document.getElementById('appPage').classList.remove('hidden');
       document.getElementById('navUsername').textContent = currentUsername;
+      renderQuickTags();
     }
 
     // ============ 登录/注册 ============
@@ -556,13 +719,11 @@
       const tabLogin = document.getElementById('tabLogin');
       const tabRegister = document.getElementById('tabRegister');
       if (tab === 'login') {
-        tabLogin.classList.add('active');
-        tabRegister.classList.remove('active');
+        tabLogin.classList.add('active'); tabRegister.classList.remove('active');
         document.getElementById('loginForm').classList.remove('hidden');
         document.getElementById('registerForm').classList.add('hidden');
       } else {
-        tabRegister.classList.add('active');
-        tabLogin.classList.remove('active');
+        tabRegister.classList.add('active'); tabLogin.classList.remove('active');
         document.getElementById('registerForm').classList.remove('hidden');
         document.getElementById('loginForm').classList.add('hidden');
       }
@@ -577,10 +738,8 @@
       const errorEl = document.getElementById('regError');
       const btn = document.getElementById('regBtn');
       errorEl.classList.add('hidden');
-
       if (!username || !password) { showError(errorEl, '请填写用户名和密码'); return; }
       if (password !== password2) { showError(errorEl, '两次密码输入不一致'); return; }
-
       btn.textContent = '创建中...'; btn.disabled = true;
       try {
         const res = await fetch('/api/register', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ username, password }) });
@@ -598,9 +757,7 @@
       const errorEl = document.getElementById('loginError');
       const btn = document.getElementById('loginBtn');
       errorEl.classList.add('hidden');
-
       if (!username || !password) { showError(errorEl, '请填写用户名和密码'); return; }
-
       btn.textContent = '登录中...'; btn.disabled = true;
       try {
         const res = await fetch('/api/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ username, password }) });
@@ -619,11 +776,47 @@
       authToken = null; currentUsername = null; favoriteIds.clear(); favoritesData = [];
       localStorage.removeItem('tide_token'); localStorage.removeItem('tide_username');
       showAuth();
-      document.getElementById('loginUsername').value = '';
-      document.getElementById('loginPassword').value = '';
-      document.getElementById('regUsername').value = '';
-      document.getElementById('regPassword').value = '';
-      document.getElementById('regPassword2').value = '';
+      ['loginUsername','loginPassword','regUsername','regPassword','regPassword2'].forEach(id => document.getElementById(id).value = '');
+    }
+
+    // ============ 类型切换 ============
+    function setSearchType(type) {
+      searchType = type;
+      document.querySelectorAll('.type-pill').forEach(el => {
+        el.classList.toggle('active', el.dataset.type === type);
+      });
+      renderQuickTags();
+      // 切换网格显示
+      const imgGrid = document.getElementById('imageGrid');
+      const txtGrid = document.getElementById('textGrid');
+      if (isVisualType(type)) {
+        imgGrid.classList.remove('hidden');
+        imgGrid.className = 'masonry';
+        txtGrid.classList.add('hidden');
+      } else {
+        imgGrid.classList.add('hidden');
+        txtGrid.classList.remove('hidden');
+      }
+      // 更新搜索框 placeholder
+      const placeholders = {
+        photo: '搜索图片...', video: '搜索视频...', gif: '搜索 GIF...',
+        illustration: '搜索插画...', news: '搜索新闻...', books: '搜索图书...',
+        wiki: '搜索百科...', quotes: '搜索名言...',
+      };
+      document.getElementById('searchInput').placeholder = placeholders[type] || '搜索素材...';
+      // 清空结果
+      imgGrid.innerHTML = '';
+      txtGrid.innerHTML = '';
+      document.getElementById('resultInfo').classList.add('hidden');
+      document.getElementById('emptyState').classList.remove('hidden');
+    }
+
+    function renderQuickTags() {
+      const tags = quickTagsMap[searchType] || [];
+      const container = document.getElementById('quickTags');
+      container.innerHTML = tags.map(t =>
+        `<button onclick="quickSearch('${t.q}')" class="tag-btn text-[13px] text-apple-text-secondary rounded-full px-4 py-2 font-normal">${t.label}</button>`
+      ).join('');
     }
 
     // ============ 收藏功能 ============
@@ -641,48 +834,28 @@
     async function toggleFavorite(photoId, photoUrl, photoThumb, photographer, width, height, originalUrl, btnEl) {
       const id = String(photoId);
       if (favoriteIds.has(id)) {
-        // 取消收藏
         favoriteIds.delete(id);
         favoritesData = favoritesData.filter(f => String(f.photo_id) !== id);
         updateFavBtnUI(btnEl, false);
-        try {
-          await fetch('/api/favorites', {
-            method: 'DELETE', headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + authToken },
-            body: JSON.stringify({ photo_id: id })
-          });
-        } catch (e) { console.error('取消收藏失败', e); }
+        try { await fetch('/api/favorites', { method: 'DELETE', headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + authToken }, body: JSON.stringify({ photo_id: id }) }); } catch (e) {}
       } else {
-        // 添加收藏
         favoriteIds.add(id);
         favoritesData.unshift({ photo_id: id, photo_url: photoUrl, photo_thumb: photoThumb, photographer, width, height, original_url: originalUrl });
         updateFavBtnUI(btnEl, true);
-        try {
-          await fetch('/api/favorites', {
-            method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + authToken },
-            body: JSON.stringify({ photo_id: id, photo_url: photoUrl, photo_thumb: photoThumb, photographer, width, height, original_url: originalUrl })
-          });
-        } catch (e) { console.error('收藏失败', e); }
+        try { await fetch('/api/favorites', { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + authToken }, body: JSON.stringify({ photo_id: id, photo_url: photoUrl, photo_thumb: photoThumb, photographer, width, height, original_url: originalUrl }) }); } catch (e) {}
       }
     }
 
     function updateFavBtnUI(btnEl, isFav) {
       if (!btnEl) return;
       const svg = btnEl.querySelector('svg');
-      if (isFav) {
-        btnEl.classList.add('is-fav');
-        svg.setAttribute('fill', '#FF453A');
-        svg.setAttribute('stroke', '#FF453A');
-      } else {
-        btnEl.classList.remove('is-fav');
-        svg.setAttribute('fill', 'none');
-        svg.setAttribute('stroke', 'white');
-      }
+      if (isFav) { btnEl.classList.add('is-fav'); svg.setAttribute('fill', '#FF3B30'); svg.setAttribute('stroke', '#FF3B30'); }
+      else { btnEl.classList.remove('is-fav'); svg.setAttribute('fill', 'none'); svg.setAttribute('stroke', '#86868b'); }
     }
 
     function toggleFavFromModal() {
       if (!currentModalPhoto) return;
       const p = currentModalPhoto;
-      // 找到网格中对应的收藏按钮
       const gridBtn = document.querySelector(`[data-photo-id="${p.id}"] .fav-btn`);
       toggleFavorite(p.id, p.photo_url, p.photo_thumb, p.photographer, p.width, p.height, p.original_url, gridBtn);
       updateModalFavUI();
@@ -694,139 +867,101 @@
       const icon = document.getElementById('modalFavIcon');
       const text = document.getElementById('modalFavText');
       const btn = document.getElementById('modalFavBtn');
-      if (isFav) {
-        icon.setAttribute('fill', '#FF453A');
-        text.textContent = '已收藏';
-        btn.style.background = 'rgba(255, 69, 58, 0.15)';
-      } else {
-        icon.setAttribute('fill', 'none');
-        text.textContent = '收藏';
-        btn.style.background = 'rgba(120, 120, 128, 0.24)';
-      }
+      if (isFav) { icon.setAttribute('fill', '#FF3B30'); text.textContent = '已收藏'; btn.style.background = 'rgba(255, 59, 48, 0.15)'; }
+      else { icon.setAttribute('fill', 'none'); text.textContent = '收藏'; btn.style.background = 'rgba(255, 255, 255, 0.15)'; }
     }
 
     // ============ 频率限制 UI ============
     function updateRateUI(remaining, limit) {
-      rateRemaining = remaining;
-      rateLimit = limit;
+      rateRemaining = remaining; rateLimit = limit;
       const infoEl = document.getElementById('rateInfo');
       const textEl = document.getElementById('rateText');
       const fillEl = document.getElementById('rateBarFill');
-
       infoEl.classList.remove('hidden');
       textEl.textContent = `${remaining} / ${limit}`;
       const pct = (remaining / limit) * 100;
       fillEl.style.width = pct + '%';
-
-      if (pct <= 20) {
-        fillEl.className = 'rate-bar-fill bg-apple-red';
-      } else if (pct <= 50) {
-        fillEl.className = 'rate-bar-fill bg-apple-orange';
-      } else {
-        fillEl.className = 'rate-bar-fill bg-apple-blue';
-      }
+      if (pct <= 20) fillEl.className = 'rate-bar-fill bg-apple-red';
+      else if (pct <= 50) fillEl.className = 'rate-bar-fill bg-apple-orange';
+      else fillEl.className = 'rate-bar-fill bg-apple-blue';
     }
 
-    // ============ 搜索图片（通过后端代理）============
-    async function searchImages(append = false) {
+    // ============ 主搜索入口 ============
+    async function doSearch(append = false) {
       const input = document.getElementById('searchInput');
       const query = input.value.trim();
       if (!query) return;
-
       if (!append) { currentQuery = query; currentPage = 1; }
 
-      const translatedQuery = translateQuery(currentQuery);
       showLoading(true);
-      if (!append) document.getElementById('imageGrid').innerHTML = '';
       document.getElementById('emptyState').classList.add('hidden');
+      if (!append) {
+        document.getElementById('imageGrid').innerHTML = '';
+        document.getElementById('textGrid').innerHTML = '';
+      }
 
       try {
-        const url = `/api/search?query=${encodeURIComponent(translatedQuery)}&per_page=${PER_PAGE}&page=${currentPage}`;
-        const response = await fetch(url, { headers: { 'Authorization': 'Bearer ' + authToken } });
-
-        if (response.status === 429) {
-          const data = await response.json();
-          if (data._rate || data.rate) {
-            const r = data._rate || data.rate;
-            updateRateUI(r.remaining || 0, r.limit || rateLimit);
-          }
-          throw new Error(data.error || '搜索次数已用完，请稍后再试');
+        switch (searchType) {
+          case 'photo': await searchPhoto(append); break;
+          case 'video': await searchVideo(append); break;
+          case 'gif': await searchGif(append); break;
+          case 'illustration': await searchIllustration(append); break;
+          case 'news': await searchNews(); break;
+          case 'books': await searchBooks(); break;
+          case 'wiki': await searchWiki(); break;
+          case 'quotes': await searchQuotes(); break;
         }
-
-        if (!response.ok) {
-          const data = await response.json();
-          throw new Error(data.error || 'API 请求失败');
-        }
-
-        const data = await response.json();
-        totalResults = data.total_results;
-
-        // 更新频率限制显示
-        if (data._rate) {
-          updateRateUI(data._rate.remaining, data._rate.limit);
-        }
-
-        document.getElementById('resultInfo').classList.remove('hidden');
-        document.getElementById('resultQuery').textContent = currentQuery;
-        document.getElementById('resultCount').textContent = totalResults.toLocaleString();
-
-        const loadMoreBtn = document.getElementById('loadMoreBtn');
-        if (currentPage * PER_PAGE < totalResults) { loadMoreBtn.classList.remove('hidden'); }
-        else { loadMoreBtn.classList.add('hidden'); }
-
-        renderImages(data.photos, append);
-
         // 保存搜索历史
         if (!append && authToken) {
-          fetch('/api/history', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + authToken },
-            body: JSON.stringify({ query: currentQuery })
-          }).catch(() => {});
+          fetch('/api/history', { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + authToken }, body: JSON.stringify({ query: currentQuery }) }).catch(() => {});
         }
       } catch (error) {
         console.error('搜索失败:', error);
+        const grid = isVisualType(searchType) ? document.getElementById('imageGrid') : document.getElementById('textGrid');
         if (!append) {
-          document.getElementById('imageGrid').innerHTML = `
-            <div class="col-span-full text-center py-24">
-              <svg class="mx-auto mb-4 text-apple-text-tertiary opacity-30" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
-              <p class="text-apple-text-tertiary text-[15px]">${error.message}</p>
-            </div>`;
+          grid.innerHTML = `<div class="col-span-full text-center py-28">
+            <svg class="mx-auto mb-4 text-apple-text-tertiary opacity-30" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+            <p class="text-apple-text-tertiary text-[15px]">${error.message}</p></div>`;
         }
       } finally {
         showLoading(false);
       }
     }
 
-    // ============ 渲染图片 ============
-    function renderImages(photos, append) {
-      const grid = document.getElementById('imageGrid');
-      if (!append && photos.length === 0) {
-        grid.innerHTML = `
-          <div class="col-span-full text-center py-24">
-            <svg class="mx-auto mb-4 text-apple-text-tertiary opacity-30" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-            <p class="text-apple-text-tertiary text-[15px]">没有找到相关图片，换个关键词试试</p>
-          </div>`;
-        return;
-      }
+    // ============ 搜索：Pexels 图片 ============
+    async function searchPhoto(append) {
+      const q = translateQuery(currentQuery);
+      const url = `/api/search?query=${encodeURIComponent(q)}&per_page=${PER_PAGE}&page=${currentPage}`;
+      const res = await fetch(url, { headers: { 'Authorization': 'Bearer ' + authToken } });
+      if (res.status === 429) { const d = await res.json(); if (d._rate || d.rate) updateRateUI((d._rate||d.rate).remaining||0, (d._rate||d.rate).limit||rateLimit); throw new Error(d.error || '搜索次数已用完'); }
+      if (!res.ok) { const d = await res.json(); throw new Error(d.error || 'API 请求失败'); }
+      const data = await res.json();
+      totalResults = data.total_results;
+      if (data._rate) updateRateUI(data._rate.remaining, data._rate.limit);
+      showResultInfo(currentQuery, totalResults + ' 张');
+      showLoadMore(currentPage * PER_PAGE < totalResults);
+      renderPhotos(data.photos, append);
+    }
 
+    function renderPhotos(photos, append) {
+      const grid = document.getElementById('imageGrid');
+      if (!append && photos.length === 0) { grid.innerHTML = emptyMsg('没有找到相关图片'); return; }
       const fragment = document.createDocumentFragment();
-      photos.forEach((photo, index) => {
+      photos.forEach((photo, i) => {
         const isFav = favoriteIds.has(String(photo.id));
         const item = document.createElement('div');
         item.className = 'masonry-item';
-        item.style.animation = `fadeIn 0.4s cubic-bezier(0.25, 0.1, 0.25, 1) ${index * 0.04}s both`;
+        item.style.animation = `fadeIn 0.4s cubic-bezier(0.25,0.1,0.25,1) ${i*0.04}s both`;
         item.innerHTML = `
-          <div class="img-card relative cursor-pointer bg-apple-card group" data-photo-id="${photo.id}"
-               onclick="openModal(${photo.id}, '${photo.src.large2x}', '${photo.photographer.replace(/'/g, "\\'")}', ${photo.width}, ${photo.height}, '${photo.src.original}', '${photo.src.medium}')">
-            <img src="${photo.src.medium}" alt="${(photo.alt || photo.photographer).replace(/"/g, '&quot;')}" loading="lazy" class="w-full block"
-                 style="aspect-ratio: ${photo.width}/${photo.height}" />
-            <button class="fav-btn ${isFav ? 'is-fav' : ''}" onclick="event.stopPropagation(); toggleFavorite(${photo.id}, '${photo.src.large2x}', '${photo.src.medium}', '${photo.photographer.replace(/'/g, "\\'")}', ${photo.width}, ${photo.height}, '${photo.src.original}', this)">
-              <svg viewBox="0 0 24 24" fill="${isFav ? '#FF453A' : 'none'}" stroke="${isFav ? '#FF453A' : 'white'}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+          <div class="img-card relative cursor-pointer group" data-photo-id="${photo.id}"
+               onclick="openModal('photo',{id:${photo.id},url:'${photo.src.large2x}',thumb:'${photo.src.medium}',photographer:'${esc(photo.photographer)}',w:${photo.width},h:${photo.height},original:'${photo.src.original}'})">
+            <img src="${photo.src.medium}" alt="${esc(photo.alt||photo.photographer)}" loading="lazy" class="w-full block" style="aspect-ratio:${photo.width}/${photo.height}" />
+            <button class="fav-btn ${isFav?'is-fav':''}" onclick="event.stopPropagation();toggleFavorite(${photo.id},'${photo.src.large2x}','${photo.src.medium}','${esc(photo.photographer)}',${photo.width},${photo.height},'${photo.src.original}',this)">
+              <svg viewBox="0 0 24 24" fill="${isFav?'#FF3B30':'none'}" stroke="${isFav?'#FF3B30':'#86868b'}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
             </button>
-            <div class="img-overlay absolute inset-0 bg-gradient-to-t from-black/60 via-black/0 to-black/0 opacity-0 transition-opacity duration-300 flex flex-col justify-end p-4 pointer-events-none">
+            <div class="img-overlay absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-0 transition-opacity duration-300 flex flex-col justify-end p-4 pointer-events-none rounded-2xl">
               <p class="text-white text-[13px] font-medium">${photo.photographer}</p>
-              <p class="text-white/50 text-[11px] mt-0.5">${photo.width} × ${photo.height}</p>
+              <p class="text-white/60 text-[11px] mt-0.5">${photo.width} × ${photo.height}</p>
             </div>
           </div>`;
         fragment.appendChild(item);
@@ -834,21 +969,374 @@
       grid.appendChild(fragment);
     }
 
-    function loadMore() { currentPage++; searchImages(true); }
+    // ============ 搜索：Pexels 视频 ============
+    async function searchVideo(append) {
+      const q = translateQuery(currentQuery);
+      const url = `/api/search/video?query=${encodeURIComponent(q)}&per_page=15&page=${currentPage}`;
+      const res = await fetch(url, { headers: { 'Authorization': 'Bearer ' + authToken } });
+      if (!res.ok) { const d = await res.json(); throw new Error(d.error || '视频搜索失败'); }
+      const data = await res.json();
+      totalResults = data.total_results || 0;
+      if (data._rate) updateRateUI(data._rate.remaining, data._rate.limit);
+      showResultInfo(currentQuery, totalResults + ' 个视频');
+      showLoadMore(currentPage * 15 < totalResults);
+      renderVideos(data.videos || [], append);
+    }
+
+    function renderVideos(videos, append) {
+      const grid = document.getElementById('imageGrid');
+      if (!append && videos.length === 0) { grid.innerHTML = emptyMsg('没有找到相关视频'); return; }
+      const fragment = document.createDocumentFragment();
+      videos.forEach((v, i) => {
+        const thumb = v.image;
+        const duration = v.duration ? formatDuration(v.duration) : '';
+        const videoFile = v.video_files?.find(f => f.quality === 'sd' || f.quality === 'hd') || v.video_files?.[0];
+        const videoUrl = videoFile?.link || '';
+        const item = document.createElement('div');
+        item.className = 'masonry-item';
+        item.style.animation = `fadeIn 0.4s cubic-bezier(0.25,0.1,0.25,1) ${i*0.04}s both`;
+        item.innerHTML = `
+          <div class="img-card relative cursor-pointer group" data-photo-id="v${v.id}"
+               onclick="openModal('video',{id:'v${v.id}',url:'${videoUrl}',thumb:'${thumb}',photographer:'${esc(v.user?.name||'')}',w:${v.width||0},h:${v.height||0},original:'${videoUrl}'})">
+            <img src="${thumb}" alt="${esc(v.user?.name||'')}" loading="lazy" class="w-full block" style="aspect-ratio:${v.width||16}/${v.height||9}" />
+            <div class="video-play-btn">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="#1d1d1f"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+            </div>
+            ${duration ? `<span class="video-duration">${duration}</span>` : ''}
+            <div class="img-overlay absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-0 transition-opacity duration-300 flex flex-col justify-end p-4 pointer-events-none rounded-2xl">
+              <p class="text-white text-[13px] font-medium">${v.user?.name || 'Pexels'}</p>
+              <p class="text-white/60 text-[11px] mt-0.5">${v.width} × ${v.height}</p>
+            </div>
+          </div>`;
+        fragment.appendChild(item);
+      });
+      grid.appendChild(fragment);
+    }
+
+    function formatDuration(sec) {
+      const m = Math.floor(sec / 60);
+      const s = sec % 60;
+      return `${m}:${String(s).padStart(2, '0')}`;
+    }
+
+    // ============ 搜索：GIPHY GIF ============
+    async function searchGif(append) {
+      const q = translateQuery(currentQuery);
+      const offset = append ? document.getElementById('imageGrid').children.length : 0;
+      const url = `/api/search/gif?query=${encodeURIComponent(q)}&limit=20&offset=${offset}`;
+      const res = await fetch(url, { headers: { 'Authorization': 'Bearer ' + authToken } });
+      if (!res.ok) { const d = await res.json(); throw new Error(d.error || 'GIF搜索失败'); }
+      const data = await res.json();
+      totalResults = data.pagination?.total_count || 0;
+      if (data._rate) updateRateUI(data._rate.remaining, data._rate.limit);
+      showResultInfo(currentQuery, totalResults + ' 个 GIF');
+      showLoadMore(offset + 20 < totalResults);
+      renderGifs(data.data || [], append);
+    }
+
+    function renderGifs(gifs, append) {
+      const grid = document.getElementById('imageGrid');
+      if (!append && gifs.length === 0) { grid.innerHTML = emptyMsg('没有找到相关 GIF'); return; }
+      const fragment = document.createDocumentFragment();
+      gifs.forEach((g, i) => {
+        const thumb = g.images?.fixed_width?.url || g.images?.original?.url || '';
+        const original = g.images?.original?.url || '';
+        const w = parseInt(g.images?.original?.width) || 200;
+        const h = parseInt(g.images?.original?.height) || 200;
+        const item = document.createElement('div');
+        item.className = 'masonry-item';
+        item.style.animation = `fadeIn 0.4s cubic-bezier(0.25,0.1,0.25,1) ${i*0.04}s both`;
+        item.innerHTML = `
+          <div class="img-card relative cursor-pointer group" data-photo-id="g${g.id}"
+               onclick="openModal('photo',{id:'g${g.id}',url:'${original}',thumb:'${thumb}',photographer:'${esc(g.username||'GIPHY')}',w:${w},h:${h},original:'${original}'})">
+            <img src="${thumb}" alt="${esc(g.title||'')}" loading="lazy" class="w-full block" style="aspect-ratio:${w}/${h}" />
+            <span class="gif-badge">GIF</span>
+            <div class="img-overlay absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-0 transition-opacity duration-300 flex flex-col justify-end p-4 pointer-events-none rounded-2xl">
+              <p class="text-white text-[13px] font-medium">${g.username || 'GIPHY'}</p>
+            </div>
+          </div>`;
+        fragment.appendChild(item);
+      });
+      grid.appendChild(fragment);
+    }
+
+    // ============ 搜索：Pixabay 插画 ============
+    async function searchIllustration(append) {
+      const q = translateQuery(currentQuery);
+      const url = `/api/search/illustration?query=${encodeURIComponent(q)}&per_page=${PER_PAGE}&page=${currentPage}`;
+      const res = await fetch(url, { headers: { 'Authorization': 'Bearer ' + authToken } });
+      if (!res.ok) { const d = await res.json(); throw new Error(d.error || '插画搜索失败'); }
+      const data = await res.json();
+      totalResults = data.totalHits || 0;
+      if (data._rate) updateRateUI(data._rate.remaining, data._rate.limit);
+      showResultInfo(currentQuery, totalResults + ' 张插画');
+      showLoadMore(currentPage * PER_PAGE < totalResults);
+      renderIllustrations(data.hits || [], append);
+    }
+
+    function renderIllustrations(hits, append) {
+      const grid = document.getElementById('imageGrid');
+      if (!append && hits.length === 0) { grid.innerHTML = emptyMsg('没有找到相关插画'); return; }
+      const fragment = document.createDocumentFragment();
+      hits.forEach((h, i) => {
+        const item = document.createElement('div');
+        item.className = 'masonry-item';
+        item.style.animation = `fadeIn 0.4s cubic-bezier(0.25,0.1,0.25,1) ${i*0.04}s both`;
+        item.innerHTML = `
+          <div class="img-card relative cursor-pointer group" data-photo-id="px${h.id}"
+               onclick="openModal('photo',{id:'px${h.id}',url:'${h.largeImageURL}',thumb:'${h.webformatURL}',photographer:'${esc(h.user||'')}',w:${h.imageWidth||0},h:${h.imageHeight||0},original:'${h.largeImageURL}'})">
+            <img src="${h.webformatURL}" alt="${esc(h.tags||'')}" loading="lazy" class="w-full block" style="aspect-ratio:${h.webformatWidth||h.imageWidth||4}/${h.webformatHeight||h.imageHeight||3}" />
+            <div class="img-overlay absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-0 transition-opacity duration-300 flex flex-col justify-end p-4 pointer-events-none rounded-2xl">
+              <p class="text-white text-[13px] font-medium">${h.user || 'Pixabay'}</p>
+              <p class="text-white/60 text-[11px] mt-0.5">${h.imageWidth} × ${h.imageHeight}</p>
+            </div>
+          </div>`;
+        fragment.appendChild(item);
+      });
+      grid.appendChild(fragment);
+    }
+
+    // ============ 搜索：GNews 新闻 ============
+    async function searchNews() {
+      const q = currentQuery;
+      const url = `/api/search/news?query=${encodeURIComponent(q)}`;
+      const res = await fetch(url, { headers: { 'Authorization': 'Bearer ' + authToken } });
+      if (!res.ok) { const d = await res.json(); throw new Error(d.error || '新闻搜索失败'); }
+      const data = await res.json();
+      if (data._rate) updateRateUI(data._rate.remaining, data._rate.limit);
+      const articles = data.articles || [];
+      showResultInfo(currentQuery, articles.length + ' 条新闻');
+      showLoadMore(false);
+      renderNews(articles);
+    }
+
+    function renderNews(articles) {
+      const grid = document.getElementById('textGrid');
+      if (articles.length === 0) { grid.innerHTML = emptyMsg('没有找到相关新闻'); return; }
+      grid.innerHTML = articles.map((a, i) => {
+        const time = a.publishedAt ? new Date(a.publishedAt).toLocaleDateString('zh-CN', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : '';
+        return `
+        <div class="text-card fade-in" style="animation-delay:${i*0.05}s">
+          <div class="flex gap-4">
+            ${a.image ? `<img src="${a.image}" class="w-28 h-24 rounded-xl object-cover flex-shrink-0" onerror="this.style.display='none'" />` : ''}
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center gap-2 mb-2">
+                <span class="text-[11px] text-apple-green font-semibold uppercase tracking-wide">${esc(a.source?.name || '新闻')}</span>
+                <span class="text-[11px] text-apple-text-tertiary">${time}</span>
+              </div>
+              <h3 class="text-[16px] font-semibold text-apple-text-primary leading-snug mb-1.5 line-clamp-2">${esc(a.title || '')}</h3>
+              <p class="text-[14px] text-apple-text-secondary leading-relaxed line-clamp-2">${esc(a.description || '')}</p>
+              <div class="flex items-center gap-4 mt-3">
+                <a href="${a.url}" target="_blank" class="apple-link text-[13px] font-normal">阅读原文 →</a>
+                <button onclick="copyText('${esc(a.title||'')}')" class="text-[13px] text-apple-text-tertiary hover:text-apple-text-primary transition-colors cursor-pointer bg-transparent border-none">复制标题</button>
+              </div>
+            </div>
+          </div>
+        </div>`;
+      }).join('');
+    }
+
+    // ============ 搜索：Open Library 图书 ============
+    async function searchBooks() {
+      const q = currentQuery;
+      const url = `https://openlibrary.org/search.json?q=${encodeURIComponent(q)}&limit=15&fields=key,title,author_name,first_publish_year,cover_i,subject,number_of_pages_median,isbn`;
+      const res = await fetch(url);
+      if (!res.ok) throw new Error('Open Library 请求失败');
+      const data = await res.json();
+      totalResults = data.numFound || 0;
+      showResultInfo(currentQuery, totalResults + ' 本图书');
+      showLoadMore(false);
+      renderBooks(data.docs || []);
+    }
+
+    function renderBooks(books) {
+      const grid = document.getElementById('textGrid');
+      if (books.length === 0) { grid.innerHTML = emptyMsg('没有找到相关图书'); return; }
+      grid.innerHTML = books.map((b, i) => {
+        const cover = b.cover_i ? `https://covers.openlibrary.org/b/id/${b.cover_i}-M.jpg` : '';
+        const authors = (b.author_name || []).slice(0, 2).join(', ');
+        const subjects = (b.subject || []).slice(0, 3).join(' · ');
+        const olUrl = `https://openlibrary.org${b.key}`;
+        return `
+        <div class="text-card fade-in" style="animation-delay:${i*0.05}s">
+          <div class="flex gap-5">
+            ${cover ? `<img src="${cover}" class="w-[72px] h-[104px] rounded-xl object-cover flex-shrink-0 shadow-md" onerror="this.style.display='none'" />` : '<div class="w-[72px] h-[104px] rounded-xl bg-[#f5f5f7] flex items-center justify-center flex-shrink-0 border border-[#d2d2d7]"><span class="text-2xl">📖</span></div>'}
+            <div class="flex-1 min-w-0">
+              <h3 class="text-[16px] font-semibold text-apple-text-primary leading-snug mb-1">${esc(b.title || '')}</h3>
+              <p class="text-[14px] text-apple-text-secondary mb-1">${esc(authors)}${b.first_publish_year ? ' · ' + b.first_publish_year : ''}</p>
+              ${subjects ? `<p class="text-[12px] text-apple-text-tertiary line-clamp-1">${esc(subjects)}</p>` : ''}
+              ${b.number_of_pages_median ? `<p class="text-[12px] text-apple-text-tertiary mt-1">${b.number_of_pages_median} 页</p>` : ''}
+              <div class="flex items-center gap-4 mt-3">
+                <a href="${olUrl}" target="_blank" class="apple-link text-[13px] font-normal">查看详情 →</a>
+                <button onclick="copyText('${esc(b.title||'')}')" class="text-[13px] text-apple-text-tertiary hover:text-apple-text-primary transition-colors cursor-pointer bg-transparent border-none">复制书名</button>
+              </div>
+            </div>
+          </div>
+        </div>`;
+      }).join('');
+    }
+
+    // ============ 搜索：Wikipedia 百科 ============
+    async function searchWiki() {
+      const q = currentQuery;
+      // 先尝试中文维基，再尝试英文
+      let articles = [];
+      try {
+        const zhSearch = `https://zh.wikipedia.org/w/api.php?action=query&list=search&srsearch=${encodeURIComponent(q)}&srlimit=10&format=json&origin=*`;
+        const res = await fetch(zhSearch);
+        if (res.ok) {
+          const data = await res.json();
+          articles = data.query?.search || [];
+        }
+      } catch (e) {
+        // 降级到英文
+        const enUrl = `https://en.wikipedia.org/w/api.php?action=query&list=search&srsearch=${encodeURIComponent(q)}&srlimit=10&format=json&origin=*`;
+        const res = await fetch(enUrl);
+        if (res.ok) {
+          const data = await res.json();
+          articles = data.query?.search || [];
+        }
+      }
+      showResultInfo(currentQuery, articles.length + ' 条百科');
+      showLoadMore(false);
+      renderWiki(articles);
+    }
+
+    function renderWiki(articles) {
+      const grid = document.getElementById('textGrid');
+      if (articles.length === 0) { grid.innerHTML = emptyMsg('没有找到相关百科'); return; }
+      grid.innerHTML = articles.map((a, i) => {
+        const snippet = a.snippet ? a.snippet.replace(/<[^>]*>/g, '') : '';
+        const wikiUrl = `https://zh.wikipedia.org/wiki/${encodeURIComponent(a.title)}`;
+        return `
+        <div class="text-card fade-in" style="animation-delay:${i*0.05}s">
+          <div class="flex items-start gap-4">
+            <div class="w-11 h-11 rounded-xl bg-[#e8f4fd] flex items-center justify-center flex-shrink-0 mt-0.5">
+              <span class="text-lg">🌐</span>
+            </div>
+            <div class="flex-1 min-w-0">
+              <h3 class="text-[16px] font-semibold text-apple-text-primary leading-snug mb-2">${esc(a.title)}</h3>
+              <p class="text-[14px] text-apple-text-secondary leading-relaxed line-clamp-3">${esc(snippet)}</p>
+              <div class="flex items-center gap-4 mt-3">
+                <a href="${wikiUrl}" target="_blank" class="apple-link text-[13px] font-normal">阅读完整词条 →</a>
+                <button onclick="copyText(\`${esc(a.title)}: ${esc(snippet.substring(0,100))}\`)" class="text-[13px] text-apple-text-tertiary hover:text-apple-text-primary transition-colors cursor-pointer bg-transparent border-none">复制摘要</button>
+              </div>
+            </div>
+          </div>
+        </div>`;
+      }).join('');
+    }
+
+    // ============ 搜索：名言（通过后端代理）============
+    async function searchQuotes() {
+      const q = translateQuery(currentQuery);
+      const url = `/api/search/quotes?query=${encodeURIComponent(q)}`;
+      const res = await fetch(url, { headers: { 'Authorization': 'Bearer ' + authToken } });
+      if (!res.ok) { const d = await res.json(); throw new Error(d.error || '名言搜索失败'); }
+      const data = await res.json();
+      const quotes = data.quotes || [];
+      showResultInfo(currentQuery, quotes.length + ' 条名言');
+      showLoadMore(false);
+      renderQuotes(quotes);
+    }
+
+    function renderQuotes(quotes) {
+      const grid = document.getElementById('textGrid');
+      if (quotes.length === 0) { grid.innerHTML = emptyMsg('没有找到相关名言'); return; }
+      grid.innerHTML = quotes.map((q, i) => `
+        <div class="text-card fade-in" style="animation-delay:${i*0.05}s">
+          <div class="flex gap-4">
+            <div class="text-4xl text-[#d2d2d7] leading-none select-none mt-1 font-serif">"</div>
+            <div class="flex-1">
+              <p class="text-[17px] text-apple-text-primary leading-relaxed font-normal italic mb-3">${esc(q.content)}</p>
+              <div class="flex items-center justify-between">
+                <p class="text-[14px] text-apple-text-secondary">— ${esc(q.author || '佚名')}</p>
+                <button onclick="copyText(\`${esc(q.content)} — ${esc(q.author||'佚名')}\`)" class="text-[13px] text-apple-text-tertiary hover:text-apple-text-primary transition-colors cursor-pointer bg-transparent border-none">复制</button>
+              </div>
+              ${q.tags?.length ? `<div class="flex gap-2 mt-3">${q.tags.slice(0,3).map(t => `<span class="text-[11px] text-apple-text-tertiary bg-[#f5f5f7] px-3 py-1 rounded-full">${t}</span>`).join('')}</div>` : ''}
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // ============ 通用工具 ============
+    function esc(str) { return String(str || '').replace(/'/g, "\\'").replace(/"/g, '&quot;').replace(/</g, '&lt;'); }
+    function emptyMsg(msg) { return `<div class="text-center py-28"><svg class="mx-auto mb-4 text-apple-text-tertiary opacity-20" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg><p class="text-apple-text-tertiary text-[17px]">${msg}</p></div>`; }
+    function showResultInfo(query, countText) { document.getElementById('resultInfo').classList.remove('hidden'); document.getElementById('resultQuery').textContent = query; document.getElementById('resultCount').textContent = countText; }
+    function showLoadMore(show) { document.getElementById('loadMoreBtn').classList.toggle('hidden', !show); }
+    function showLoading(show) { document.getElementById('loading').classList.toggle('hidden', !show); }
+
+    function loadMore() {
+      currentPage++;
+      if (searchType === 'gif') {
+        doSearch(true);
+      } else {
+        doSearch(true);
+      }
+    }
 
     function quickSearch(query) {
       document.getElementById('searchInput').value = query;
       currentQuery = query;
-      searchImages();
+      doSearch();
     }
 
-    // ============ 侧边面板（历史 + 收藏）============
+    function copyText(text) {
+      navigator.clipboard.writeText(text).then(() => {
+        // 小提示
+      }).catch(() => {});
+    }
+
+    function copyUrl() {
+      const url = document.getElementById('modalDownload').href;
+      navigator.clipboard.writeText(url).then(() => {
+        const btn = document.getElementById('copyBtn');
+        const orig = btn.innerHTML;
+        btn.innerHTML = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> 已复制`;
+        setTimeout(() => { btn.innerHTML = orig; }, 2000);
+      });
+    }
+
+    // ============ 弹窗预览 ============
+    function openModal(type, data) {
+      currentModalPhoto = { id: String(data.id), photo_url: data.url, photo_thumb: data.thumb || data.url, photographer: data.photographer, width: data.w, height: data.h, original_url: data.original };
+      const imgEl = document.getElementById('modalImg');
+      const videoEl = document.getElementById('modalVideo');
+
+      if (type === 'video' && data.url) {
+        imgEl.classList.add('hidden');
+        videoEl.classList.remove('hidden');
+        videoEl.src = data.url;
+      } else {
+        videoEl.classList.add('hidden');
+        videoEl.src = '';
+        imgEl.classList.remove('hidden');
+        imgEl.src = data.url;
+      }
+
+      document.getElementById('modalPhotographer').textContent = data.photographer || '';
+      document.getElementById('modalSize').textContent = (data.w && data.h) ? data.w + ' × ' + data.h : '';
+      document.getElementById('modalDownload').href = data.original || data.url;
+      document.getElementById('modal').classList.remove('hidden');
+      document.body.style.overflow = 'hidden';
+      updateModalFavUI();
+    }
+
+    function closeModal() {
+      document.getElementById('modal').classList.add('hidden');
+      document.body.style.overflow = '';
+      currentModalPhoto = null;
+      const videoEl = document.getElementById('modalVideo');
+      videoEl.pause();
+      videoEl.src = '';
+    }
+
+    // ============ 侧边面板 ============
     function openPanel(tab) {
       panelTab = tab || 'history';
-      const panel = document.getElementById('sidePanel');
-      const overlay = document.getElementById('panelOverlay');
-      panel.style.transform = 'translateX(0)';
-      overlay.classList.remove('hidden');
+      document.getElementById('sidePanel').style.transform = 'translateX(0)';
+      document.getElementById('panelOverlay').classList.remove('hidden');
       panelOpen = true;
       switchPanelTab(panelTab);
     }
@@ -865,7 +1353,6 @@
       const favTab = document.getElementById('panelTabFav');
       const historyContent = document.getElementById('historyContent');
       const favContent = document.getElementById('favoritesContent');
-
       if (tab === 'history') {
         historyTab.classList.add('active'); favTab.classList.remove('active');
         historyContent.classList.remove('hidden'); favContent.classList.add('hidden');
@@ -880,114 +1367,55 @@
     async function loadHistory() {
       const list = document.getElementById('historyList');
       list.innerHTML = '<div class="flex justify-center py-8"><div class="apple-spinner"></div></div>';
-
       try {
         const res = await fetch('/api/history', { headers: { 'Authorization': 'Bearer ' + authToken } });
         const data = await res.json();
-
-        if (!data.history || data.history.length === 0) {
-          list.innerHTML = '<p class="text-apple-text-tertiary text-[13px] text-center py-8">暂无搜索记录</p>';
-          return;
-        }
-
+        if (!data.history || data.history.length === 0) { list.innerHTML = '<p class="text-apple-text-tertiary text-[13px] text-center py-8">暂无搜索记录</p>'; return; }
         list.innerHTML = data.history.map(item => {
           const time = new Date(item.created_at).toLocaleString('zh-CN', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
-          return `
-            <div class="history-item flex items-center justify-between py-3 px-3 cursor-pointer -mx-1" onclick="quickSearch('${item.query.replace(/'/g, "\\'")}')">
-              <div class="min-w-0">
-                <p class="text-[14px] text-white truncate" style="letter-spacing: -0.01em;">${item.query}</p>
-                <p class="text-[11px] text-apple-text-tertiary mt-0.5">${time}</p>
-              </div>
+          return `<div class="history-item flex items-center justify-between py-3 px-3 cursor-pointer -mx-1" onclick="quickSearch('${item.query.replace(/'/g, "\\'")}')">
+              <div class="min-w-0"><p class="text-[14px] text-apple-text-primary truncate">${item.query}</p><p class="text-[11px] text-apple-text-tertiary mt-0.5">${time}</p></div>
               <svg class="flex-shrink-0 ml-2 text-apple-text-tertiary" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
             </div>`;
         }).join('');
-      } catch (e) {
-        list.innerHTML = '<p class="text-apple-text-tertiary text-[13px] text-center py-8">加载失败</p>';
-      }
+      } catch (e) { list.innerHTML = '<p class="text-apple-text-tertiary text-[13px] text-center py-8">加载失败</p>'; }
     }
 
     function renderFavoritesPanel() {
       const list = document.getElementById('favoritesList');
-      if (favoritesData.length === 0) {
-        list.innerHTML = '<p class="text-apple-text-tertiary text-[13px] text-center py-8">暂无收藏</p>';
-        return;
-      }
-
-      list.innerHTML = `
-        <p class="text-[12px] text-apple-text-tertiary mb-3">${favoritesData.length} 张收藏</p>
-        <div class="fav-grid">
-          ${favoritesData.map(f => `
-            <div class="fav-thumb" onclick="openModal('${f.photo_id}', '${f.photo_url}', '${(f.photographer || '').replace(/'/g, "\\'")}', ${f.width || 0}, ${f.height || 0}, '${f.original_url || f.photo_url}', '${f.photo_thumb || f.photo_url}')">
-              <img src="${f.photo_thumb || f.photo_url}" alt="${f.photographer || ''}" loading="lazy" />
-              <button class="fav-remove" onclick="event.stopPropagation(); removeFavFromPanel('${f.photo_id}', this)">
+      if (favoritesData.length === 0) { list.innerHTML = '<p class="text-apple-text-tertiary text-[13px] text-center py-8">暂无收藏</p>'; return; }
+      list.innerHTML = `<p class="text-[12px] text-apple-text-tertiary mb-3">${favoritesData.length} 张收藏</p>
+        <div class="fav-grid">${favoritesData.map(f => `
+            <div class="fav-thumb" onclick="openModal('photo',{id:'${f.photo_id}',url:'${f.photo_url}',thumb:'${f.photo_thumb||f.photo_url}',photographer:'${(f.photographer||'').replace(/'/g,"\\'")}',w:${f.width||0},h:${f.height||0},original:'${f.original_url||f.photo_url}'})">
+              <img src="${f.photo_thumb||f.photo_url}" alt="${f.photographer||''}" loading="lazy" />
+              <button class="fav-remove" onclick="event.stopPropagation();removeFavFromPanel('${f.photo_id}',this)">
                 <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
               </button>
-            </div>
-          `).join('')}
-        </div>`;
+            </div>`).join('')}</div>`;
     }
 
     async function removeFavFromPanel(photoId, btnEl) {
       const id = String(photoId);
       favoriteIds.delete(id);
       favoritesData = favoritesData.filter(f => String(f.photo_id) !== id);
-      // 更新网格中的收藏按钮
       const gridCard = document.querySelector(`[data-photo-id="${id}"] .fav-btn`);
       if (gridCard) updateFavBtnUI(gridCard, false);
       renderFavoritesPanel();
-      try {
-        await fetch('/api/favorites', {
-          method: 'DELETE', headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + authToken },
-          body: JSON.stringify({ photo_id: id })
-        });
-      } catch (e) { console.error('取消收藏失败', e); }
+      try { await fetch('/api/favorites', { method: 'DELETE', headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + authToken }, body: JSON.stringify({ photo_id: id }) }); } catch (e) {}
     }
 
-    // ============ 弹窗预览 ============
-    function openModal(photoId, imgUrl, photographer, width, height, originalUrl, thumbUrl) {
-      currentModalPhoto = { id: String(photoId), photo_url: imgUrl, photo_thumb: thumbUrl || imgUrl, photographer, width, height, original_url: originalUrl };
-      document.getElementById('modalImg').src = imgUrl;
-      document.getElementById('modalPhotographer').textContent = photographer;
-      document.getElementById('modalSize').textContent = width + ' × ' + height;
-      document.getElementById('modalDownload').href = originalUrl;
-      document.getElementById('modal').classList.remove('hidden');
-      document.body.style.overflow = 'hidden';
-      updateModalFavUI();
-    }
-
-    function closeModal() {
-      document.getElementById('modal').classList.add('hidden');
-      document.body.style.overflow = '';
-      currentModalPhoto = null;
-    }
-
+    // ============ 键盘事件 ============
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape') {
         if (!document.getElementById('modal').classList.contains('hidden')) closeModal();
         else if (panelOpen) closePanel();
       }
-    });
-
-    function copyImageUrl() {
-      const url = document.getElementById('modalDownload').href;
-      navigator.clipboard.writeText(url).then(() => {
-        const btn = document.getElementById('copyBtn');
-        const orig = btn.innerHTML;
-        btn.innerHTML = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> 已复制`;
-        setTimeout(() => { btn.innerHTML = orig; }, 2000);
-      });
-    }
-
-    function showLoading(show) { document.getElementById('loading').classList.toggle('hidden', !show); }
-
-    // 回车键支持
-    document.addEventListener('keydown', (e) => {
       if (e.key === 'Enter') {
         if (!document.getElementById('authPage').classList.contains('hidden')) {
           if (!document.getElementById('loginForm').classList.contains('hidden')) login();
           else register();
         }
-        if (document.activeElement === document.getElementById('searchInput')) searchImages();
+        if (document.activeElement === document.getElementById('searchInput')) doSearch();
       }
     });
 
