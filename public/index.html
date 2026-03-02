@@ -393,6 +393,37 @@
     .pixel-ctrl-btn:hover { background: rgba(0,0,0,0.08); }
     .pixel-ctrl-btn:active { transform: scale(0.92); }
 
+    /* 像素创作台功能开关 */
+    .px-toggle-wrap {
+      position: relative;
+    }
+    .px-toggle-btn {
+      height: 32px; padding: 0 10px 0 8px; border-radius: 980px;
+      display: flex; align-items: center; gap: 6px;
+      background: transparent; border: none; cursor: pointer;
+      transition: all 0.2s ease; color: #86868b; font-size: 12px;
+    }
+    .px-toggle-btn:hover { background: rgba(0,0,0,0.04); color: #1d1d1f; }
+    .px-toggle-btn.active { color: #af52de; }
+    .px-switch {
+      width: 34px; height: 20px; border-radius: 10px;
+      background: #d2d2d7; position: relative; flex-shrink: 0;
+      transition: background 0.25s ease;
+    }
+    .px-switch::after {
+      content: ''; position: absolute; top: 2px; left: 2px;
+      width: 16px; height: 16px; border-radius: 50%;
+      background: white; box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+      transition: transform 0.25s cubic-bezier(0.25, 0.1, 0.25, 1);
+    }
+    .px-toggle-btn.active .px-switch { background: #af52de; }
+    .px-toggle-btn.active .px-switch::after { transform: translateX(14px); }
+
+    /* 隐藏像素创作台相关元素 */
+    body:not(.px-mode) .pixel-fab { display: none !important; }
+    body:not(.px-mode) .pixel-studio { display: none !important; }
+    body:not(.px-mode) .add-studio-btn { display: none !important; }
+
     @media (max-width: 480px) {
       .pixel-studio { left: 8px; right: 8px; width: auto; bottom: 88px; }
       .pixel-fab { bottom: 20px; right: 20px; width: 50px; height: 50px; }
@@ -487,6 +518,12 @@
           <span class="text-[12px] font-normal text-apple-text-primary tracking-tight" style="letter-spacing: -0.01em;">TIDE Material</span>
         </div>
         <div class="flex items-center gap-0.5">
+          <button onclick="togglePxMode()" id="pxToggleBtn" class="px-toggle-btn" title="像素创作台">
+            <div class="px-switch"></div>
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="7" height="7" rx="1.5" fill="currentColor"/><rect x="14" y="3" width="7" height="7" rx="1.5" fill="currentColor" opacity="0.6"/><rect x="3" y="14" width="7" height="7" rx="1.5" fill="currentColor" opacity="0.6"/><rect x="14" y="14" width="7" height="7" rx="1.5" fill="currentColor" opacity="0.35"/></svg>
+            <span class="hidden sm:inline">创作台</span>
+          </button>
+          <div class="w-px h-4 bg-[#d2d2d7] mx-1"></div>
           <button onclick="openPanel('favorites')" class="h-8 px-3 rounded-full text-[12px] text-apple-text-secondary hover:text-apple-red hover:bg-black/[0.04] transition-all duration-200 flex items-center gap-1.5">
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
             <span class="hidden sm:inline">收藏</span>
@@ -1601,6 +1638,23 @@
       if (gridCard) updateFavBtnUI(gridCard, false);
       renderFavoritesPanel();
       try { await fetch('/api/favorites', { method: 'DELETE', headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + authToken }, body: JSON.stringify({ photo_id: id }) }); } catch (e) {}
+    }
+
+    // ============ 像素创作台 — 功能开关 ============
+    let pxModeOn = false;
+
+    function togglePxMode() {
+      pxModeOn = !pxModeOn;
+      document.body.classList.toggle('px-mode', pxModeOn);
+      document.getElementById('pxToggleBtn').classList.toggle('active', pxModeOn);
+      // 关闭时也关掉面板
+      if (!pxModeOn && pxStudio.isOpen) {
+        togglePixelStudio();
+      }
+      // 关闭时停止播放
+      if (!pxModeOn && pxStudio.isPlaying) {
+        studioTogglePlay();
+      }
     }
 
     // ============ 像素创作台 ============
