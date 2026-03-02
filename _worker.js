@@ -692,7 +692,7 @@ async function handleGenerateNarrative(request, env) {
 
     const userPrompt = `主题关键词：${keyword}\n\n素材：\n${context}\n\n请生成叙事卡片内容（严格 JSON 格式）。`;
 
-    const aiResponse = await env.AI.run('@cf/meta/llama-3.1-8b-instruct', {
+    const aiResponse = await env.AI.run('@cf/qwen/qwen1.5-7b-chat-awq', {
       messages: [
         { role: 'system', content: systemPrompt },
         { role: 'user', content: userPrompt }
@@ -743,6 +743,43 @@ async function handleGenerateNarrative(request, env) {
   }
 }
 
+// ============ AI 文生图 ============
+
+async function handleGenerateImage(request, env) {
+  try {
+    const user = await getUser(request, env);
+    if (!user) return json({ error: '未登录' }, 401);
+
+    // 频率限制：每小时 10 次
+    const rateCheck = await checkRateLimit(env, user.id, 'ai_image', 10);
+    if (!rateCheck.allowed) return json({ error: '本小时 AI 绘图次数已用完，请稍后再试' }, 429);
+
+    const { prompt } = await request.json();
+    if (!prompt || !prompt.trim()) return json({ error: '绘图描述不能为空' }, 400);
+
+    if (!env.AI) return json({ error: 'AI 未配置' }, 503);
+
+    // 调用 Stable Diffusion XL
+    const imageResponse = await env.AI.run('@cf/bytedance/stable-diffusion-xl-lightning', {
+      prompt: prompt.trim(),
+      num_steps: 4,
+    });
+
+    // imageResponse 是 ReadableStream（PNG 格式）
+    return new Response(imageResponse, {
+      headers: {
+        'Content-Type': 'image/png',
+        'Access-Control-Allow-Origin': '*',
+        'X-Rate-Remaining': String(rateCheck.remaining),
+        'X-Rate-Limit': '10',
+      }
+    });
+  } catch (error) {
+    console.error('AI image error:', error);
+    return json({ error: 'AI 绘图失败: ' + error.message }, 500);
+  }
+}
+
 // ============ API 路由 ============
 
 async function handleApi(request, env, url) {
@@ -784,8 +821,9 @@ async function handleApi(request, env, url) {
   if (path === 'favorites' && method === 'POST') return await handleAddFavorite(request, env);
   if (path === 'favorites' && method === 'DELETE') return await handleRemoveFavorite(request, env);
 
-  // AI 叙事生成
+  // AI 叙事生成 & 文生图
   if (path === 'narrative/generate' && method === 'POST') return await handleGenerateNarrative(request, env);
+  if (path === 'image/generate' && method === 'POST') return await handleGenerateImage(request, env);
 
   return json({ error: 'API 路由不存在' }, 404);
 }

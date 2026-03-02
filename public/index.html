@@ -480,6 +480,9 @@
     .story-content { transition: all 0.3s ease; }
     .story-content.collapsed { display: none; }
 
+    .ai-img-content { transition: all 0.3s ease; }
+    .ai-img-content.collapsed { display: none; }
+
     .story-item-card {
       display: flex; align-items: center; gap: 10px;
       padding: 8px 10px; border-radius: 10px; background: #f5f5f7;
@@ -937,6 +940,20 @@
           </div>
           <button class="mini-switch" id="storyFeatureSwitch" onclick="toggleStoryFeature()"></button>
         </div>
+
+        <!-- AI 绘图 -->
+        <div class="studio-feature-item">
+          <div class="flex items-center gap-3">
+            <div class="feature-icon" style="background:linear-gradient(135deg,#ff9500,#ff2d55);">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+            </div>
+            <div>
+              <p class="text-[13px] font-medium text-apple-text-primary leading-tight">AI 绘图</p>
+              <p class="text-[11px] text-apple-text-tertiary mt-0.5">文字描述 · AI 生成图片</p>
+            </div>
+          </div>
+          <button class="mini-switch" id="aiImgFeatureSwitch" onclick="toggleAiImgFeature()"></button>
+        </div>
       </div>
 
       <!-- ====== 像素块化内容区（子功能，默认隐藏）====== -->
@@ -1050,6 +1067,56 @@
             ✨ 生成叙事卡片
           </button>
           <p class="text-[10px] text-apple-text-tertiary text-center mt-2">至少添加 1 个素材即可生成</p>
+        </div>
+      </div>
+
+      <!-- ====== AI 绘图内容区（子功能，默认隐藏）====== -->
+      <div class="ai-img-content collapsed" id="aiImgContentArea" style="transition:all 0.3s ease;">
+        <div class="border-t border-[#d2d2d7]/40"></div>
+        <div class="flex items-center justify-between px-4 pt-3 pb-1">
+          <p class="text-[12px] font-semibold" style="color:#ff9500;">AI 绘图</p>
+          <span id="aiImgRateInfo" class="text-[11px] text-apple-text-tertiary">10 次/小时</span>
+        </div>
+
+        <!-- 提示词输入 -->
+        <div class="px-4 pb-2">
+          <textarea id="aiImgPrompt" rows="3" placeholder="描述你想生成的图片...&#10;例如：a samurai standing in cherry blossom rain, cinematic lighting, digital art" class="w-full bg-[#f5f5f7] border-none rounded-xl px-4 py-3 text-[13px] text-apple-text-primary placeholder-apple-text-tertiary outline-none resize-none" style="font-family:inherit;"></textarea>
+          <p class="text-[10px] text-apple-text-tertiary mt-1.5">💡 英文描述效果更好 · 支持风格关键词如 cinematic, watercolor, pixel art</p>
+        </div>
+
+        <!-- 风格快捷标签 -->
+        <div class="px-4 pb-3">
+          <div class="flex flex-wrap gap-1.5">
+            <button onclick="appendImgStyle('cinematic lighting, 8k')" class="text-[11px] px-2.5 py-1 rounded-full bg-[#f5f5f7] text-apple-text-secondary hover:bg-[#e8e8ed] transition-colors border-none cursor-pointer" style="font-family:inherit;">🎬 电影感</button>
+            <button onclick="appendImgStyle('watercolor painting style')" class="text-[11px] px-2.5 py-1 rounded-full bg-[#f5f5f7] text-apple-text-secondary hover:bg-[#e8e8ed] transition-colors border-none cursor-pointer" style="font-family:inherit;">🎨 水彩</button>
+            <button onclick="appendImgStyle('pixel art, retro game style')" class="text-[11px] px-2.5 py-1 rounded-full bg-[#f5f5f7] text-apple-text-secondary hover:bg-[#e8e8ed] transition-colors border-none cursor-pointer" style="font-family:inherit;">👾 像素风</button>
+            <button onclick="appendImgStyle('anime style, studio ghibli')" class="text-[11px] px-2.5 py-1 rounded-full bg-[#f5f5f7] text-apple-text-secondary hover:bg-[#e8e8ed] transition-colors border-none cursor-pointer" style="font-family:inherit;">🌸 动漫</button>
+            <button onclick="appendImgStyle('oil painting, renaissance style')" class="text-[11px] px-2.5 py-1 rounded-full bg-[#f5f5f7] text-apple-text-secondary hover:bg-[#e8e8ed] transition-colors border-none cursor-pointer" style="font-family:inherit;">🖼️ 油画</button>
+            <button onclick="appendImgStyle('minimalist, flat design, clean')" class="text-[11px] px-2.5 py-1 rounded-full bg-[#f5f5f7] text-apple-text-secondary hover:bg-[#e8e8ed] transition-colors border-none cursor-pointer" style="font-family:inherit;">✨ 极简</button>
+          </div>
+        </div>
+
+        <!-- 生成按钮 -->
+        <div class="px-4 pb-3">
+          <button id="aiImgGenBtn" onclick="generateAiImage()" class="w-full py-2.5 rounded-xl border-none text-[14px] font-semibold text-white cursor-pointer" style="background:linear-gradient(135deg,#ff9500,#ff2d55);font-family:inherit;transition:opacity 0.2s,transform 0.1s;" onmouseover="this.style.opacity='0.9'" onmouseout="this.style.opacity='1'">
+            🎨 生成图片
+          </button>
+        </div>
+
+        <!-- 生成结果 -->
+        <div id="aiImgResult" class="px-4 pb-3 hidden">
+          <div class="relative rounded-2xl overflow-hidden bg-[#1a1a1e]">
+            <img id="aiImgOutput" src="" alt="AI 生成的图片" class="w-full block" style="aspect-ratio:1;" />
+            <div class="absolute top-2 right-2 flex gap-1.5">
+              <button onclick="downloadAiImage()" class="w-8 h-8 rounded-full flex items-center justify-center border-none cursor-pointer" style="background:rgba(255,255,255,0.85);backdrop-filter:blur(10px);" title="下载">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#1d1d1f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              </button>
+              <button onclick="addAiImgToStory()" class="w-8 h-8 rounded-full flex items-center justify-center border-none cursor-pointer" style="background:rgba(255,255,255,0.85);backdrop-filter:blur(10px);" title="添加到故事">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#5856d6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+              </button>
+            </div>
+          </div>
+          <p id="aiImgPromptLabel" class="text-[10px] text-apple-text-tertiary mt-2 truncate"></p>
         </div>
       </div>
     </div>
@@ -2004,12 +2071,17 @@
       if (!pxFeatureOn && pxStudio.isPlaying) {
         studioTogglePlay();
       }
-      // 互斥：关闭故事工坊
+      // 互斥：关闭故事工坊和AI绘图
       if (pxFeatureOn && storyFeatureOn) {
         storyFeatureOn = false;
         document.body.classList.remove('story-mode');
         document.getElementById('storyFeatureSwitch').classList.remove('on');
         document.getElementById('storyContentArea').classList.add('collapsed');
+      }
+      if (pxFeatureOn && aiImgFeatureOn) {
+        aiImgFeatureOn = false;
+        document.getElementById('aiImgFeatureSwitch').classList.remove('on');
+        document.getElementById('aiImgContentArea').classList.add('collapsed');
       }
     }
 
@@ -2348,7 +2420,7 @@
       document.body.classList.toggle('story-mode', storyFeatureOn);
       document.getElementById('storyFeatureSwitch').classList.toggle('on', storyFeatureOn);
       document.getElementById('storyContentArea').classList.toggle('collapsed', !storyFeatureOn);
-      // 互斥：关闭像素块化
+      // 互斥：关闭像素块化和AI绘图
       if (storyFeatureOn && pxFeatureOn) {
         pxFeatureOn = false;
         document.body.classList.remove('px-mode');
@@ -2356,6 +2428,122 @@
         document.getElementById('pxContentArea').classList.add('collapsed');
         if (pxStudio.isPlaying) studioTogglePlay();
       }
+      if (storyFeatureOn && aiImgFeatureOn) {
+        aiImgFeatureOn = false;
+        document.getElementById('aiImgFeatureSwitch').classList.remove('on');
+        document.getElementById('aiImgContentArea').classList.add('collapsed');
+      }
+    }
+
+    // ============ AI 绘图 ============
+    let aiImgFeatureOn = false;
+    let lastAiImgBlob = null;
+    let lastAiImgPrompt = '';
+
+    function toggleAiImgFeature() {
+      aiImgFeatureOn = !aiImgFeatureOn;
+      document.getElementById('aiImgFeatureSwitch').classList.toggle('on', aiImgFeatureOn);
+      document.getElementById('aiImgContentArea').classList.toggle('collapsed', !aiImgFeatureOn);
+      // 互斥：关闭其他功能
+      if (aiImgFeatureOn) {
+        if (pxFeatureOn) {
+          pxFeatureOn = false;
+          document.body.classList.remove('px-mode');
+          document.getElementById('pxFeatureSwitch').classList.remove('on');
+          document.getElementById('pxContentArea').classList.add('collapsed');
+          if (pxStudio.isPlaying) studioTogglePlay();
+        }
+        if (storyFeatureOn) {
+          storyFeatureOn = false;
+          document.body.classList.remove('story-mode');
+          document.getElementById('storyFeatureSwitch').classList.remove('on');
+          document.getElementById('storyContentArea').classList.add('collapsed');
+        }
+      }
+      if (!studioPanelOpen) openStudioPanel();
+    }
+
+    function appendImgStyle(style) {
+      const ta = document.getElementById('aiImgPrompt');
+      const cur = ta.value.trim();
+      if (cur && !cur.endsWith(',')) {
+        ta.value = cur + ', ' + style;
+      } else {
+        ta.value = cur + (cur ? ' ' : '') + style;
+      }
+      ta.focus();
+    }
+
+    async function generateAiImage() {
+      const prompt = document.getElementById('aiImgPrompt').value.trim();
+      if (!prompt) { alert('请输入图片描述'); return; }
+
+      const btn = document.getElementById('aiImgGenBtn');
+      btn.textContent = '⏳ 生成中...';
+      btn.disabled = true;
+      btn.style.opacity = '0.6';
+
+      try {
+        const res = await fetch('/api/image/generate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + authToken },
+          body: JSON.stringify({ prompt })
+        });
+
+        if (!res.ok) {
+          const err = await res.json().catch(() => ({ error: '生成失败' }));
+          throw new Error(err.error || '生成失败');
+        }
+
+        const blob = await res.blob();
+        lastAiImgBlob = blob;
+        lastAiImgPrompt = prompt;
+
+        const url = URL.createObjectURL(blob);
+        const img = document.getElementById('aiImgOutput');
+        img.src = url;
+        document.getElementById('aiImgResult').classList.remove('hidden');
+        document.getElementById('aiImgPromptLabel').textContent = '📝 ' + prompt;
+
+        // 更新剩余次数
+        const remaining = res.headers.get('X-Rate-Remaining');
+        if (remaining !== null) {
+          document.getElementById('aiImgRateInfo').textContent = remaining + ' 次剩余';
+        }
+      } catch (e) {
+        alert('AI 绘图失败: ' + e.message);
+      } finally {
+        btn.textContent = '🎨 生成图片';
+        btn.disabled = false;
+        btn.style.opacity = '1';
+      }
+    }
+
+    function downloadAiImage() {
+      if (!lastAiImgBlob) return;
+      const link = document.createElement('a');
+      link.download = 'tide-ai-' + Date.now() + '.png';
+      link.href = URL.createObjectURL(lastAiImgBlob);
+      link.click();
+    }
+
+    function addAiImgToStory() {
+      if (!lastAiImgBlob || !storyFeatureOn) {
+        // 如果故事工坊没开，先打开
+        if (!storyFeatureOn) toggleStoryFeature();
+      }
+      if (!lastAiImgBlob) return;
+      const url = URL.createObjectURL(lastAiImgBlob);
+      const item = {
+        id: 'aiimg_' + Date.now(),
+        type: 'illustration',
+        thumb: url,
+        alt: lastAiImgPrompt || 'AI generated image',
+        photographer: 'AI · Stable Diffusion XL',
+        title: lastAiImgPrompt || 'AI 生成图片',
+      };
+      storyItems.push(item);
+      renderStoryPanel();
     }
 
     function addFromSearch(type, index) {
