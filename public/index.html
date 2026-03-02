@@ -17,6 +17,9 @@
             'apple-gray': '#48484A',
             'apple-blue': '#0A84FF',
             'apple-blue-hover': '#409CFF',
+            'apple-red': '#FF453A',
+            'apple-green': '#30D158',
+            'apple-orange': '#FF9F0A',
             'apple-text-primary': '#FFFFFF',
             'apple-text-secondary': '#98989D',
             'apple-text-tertiary': '#636366',
@@ -25,283 +28,155 @@
           fontFamily: {
             sans: ['-apple-system', 'BlinkMacSystemFont', 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', 'Helvetica', 'Arial', 'sans-serif'],
           },
-          borderRadius: {
-            'apple': '12px',
-            'apple-lg': '16px',
-            'apple-xl': '20px',
-            'apple-2xl': '24px',
-          }
         }
       }
     }
   </script>
   <style>
-    * {
-      -webkit-font-smoothing: antialiased;
-      -moz-osx-font-smoothing: grayscale;
-    }
+    * { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+    body { background-color: #000000; min-height: 100vh; font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', Helvetica, Arial, sans-serif; }
 
-    body {
-      background-color: #000000;
-      min-height: 100vh;
-      font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', Helvetica, Arial, sans-serif;
-    }
-
-    /* Apple-style scrollbar */
     ::-webkit-scrollbar { width: 8px; }
     ::-webkit-scrollbar-track { background: transparent; }
     ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 4px; }
     ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.25); }
 
-    /* Apple glass material */
-    .glass {
-      background: rgba(28, 28, 30, 0.72);
-      backdrop-filter: saturate(180%) blur(20px);
-      -webkit-backdrop-filter: saturate(180%) blur(20px);
-    }
+    .glass { background: rgba(28, 28, 30, 0.72); backdrop-filter: saturate(180%) blur(20px); -webkit-backdrop-filter: saturate(180%) blur(20px); }
+    .glass-thick { background: rgba(28, 28, 30, 0.88); backdrop-filter: saturate(180%) blur(40px); -webkit-backdrop-filter: saturate(180%) blur(40px); }
 
-    .glass-thick {
-      background: rgba(28, 28, 30, 0.85);
-      backdrop-filter: saturate(180%) blur(40px);
-      -webkit-backdrop-filter: saturate(180%) blur(40px);
-    }
-
-    /* Apple-style input focus */
     .apple-input {
-      background: rgba(120, 120, 128, 0.16);
-      border: 1px solid rgba(120, 120, 128, 0.24);
-      border-radius: 12px;
-      padding: 13px 16px;
-      color: white;
-      font-size: 15px;
-      width: 100%;
-      outline: none;
-      transition: all 0.25s cubic-bezier(0.25, 0.1, 0.25, 1);
-      letter-spacing: -0.01em;
+      background: rgba(120, 120, 128, 0.16); border: 1px solid rgba(120, 120, 128, 0.24);
+      border-radius: 12px; padding: 13px 16px; color: white; font-size: 15px;
+      width: 100%; outline: none; transition: all 0.25s cubic-bezier(0.25, 0.1, 0.25, 1); letter-spacing: -0.01em;
     }
-    .apple-input:focus {
-      border-color: #0A84FF;
-      box-shadow: 0 0 0 3px rgba(10, 132, 255, 0.25);
-      background: rgba(120, 120, 128, 0.24);
-    }
+    .apple-input:focus { border-color: #0A84FF; box-shadow: 0 0 0 3px rgba(10, 132, 255, 0.25); background: rgba(120, 120, 128, 0.24); }
     .apple-input::placeholder { color: #636366; }
 
-    /* Apple-style primary button */
     .apple-btn-primary {
-      background: #0A84FF;
-      color: white;
-      font-size: 15px;
-      font-weight: 600;
-      padding: 13px 24px;
-      border-radius: 12px;
-      width: 100%;
-      border: none;
-      cursor: pointer;
-      transition: all 0.25s cubic-bezier(0.25, 0.1, 0.25, 1);
-      letter-spacing: -0.01em;
+      background: #0A84FF; color: white; font-size: 15px; font-weight: 600;
+      padding: 13px 24px; border-radius: 12px; width: 100%; border: none; cursor: pointer;
+      transition: all 0.25s cubic-bezier(0.25, 0.1, 0.25, 1); letter-spacing: -0.01em;
     }
     .apple-btn-primary:hover { background: #409CFF; }
     .apple-btn-primary:active { transform: scale(0.98); opacity: 0.9; }
     .apple-btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
 
-    /* Apple-style secondary button */
     .apple-btn-secondary {
-      background: rgba(120, 120, 128, 0.24);
-      color: #0A84FF;
-      font-size: 15px;
-      font-weight: 600;
-      padding: 13px 24px;
-      border-radius: 12px;
-      border: none;
-      cursor: pointer;
+      background: rgba(120, 120, 128, 0.24); color: #0A84FF; font-size: 15px; font-weight: 600;
+      padding: 13px 24px; border-radius: 12px; border: none; cursor: pointer;
       transition: all 0.25s cubic-bezier(0.25, 0.1, 0.25, 1);
     }
     .apple-btn-secondary:hover { background: rgba(120, 120, 128, 0.36); }
     .apple-btn-secondary:active { transform: scale(0.98); }
 
-    /* Image card hover */
-    .img-card {
-      transition: all 0.35s cubic-bezier(0.25, 0.1, 0.25, 1);
-      border-radius: 12px;
-      overflow: hidden;
-    }
-    .img-card:hover {
-      transform: scale(1.02);
-      box-shadow: 0 8px 32px rgba(0,0,0,0.5);
-    }
+    .img-card { transition: all 0.35s cubic-bezier(0.25, 0.1, 0.25, 1); border-radius: 12px; overflow: hidden; }
+    .img-card:hover { transform: scale(1.02); box-shadow: 0 8px 32px rgba(0,0,0,0.5); }
     .img-card:hover .img-overlay { opacity: 1; }
+    .img-card:hover .fav-btn { opacity: 1; }
 
-    /* Masonry grid */
     .masonry { columns: 2; column-gap: 12px; }
     @media (min-width: 768px) { .masonry { columns: 3; column-gap: 16px; } }
     @media (min-width: 1024px) { .masonry { columns: 4; column-gap: 16px; } }
     .masonry-item { break-inside: avoid; margin-bottom: 12px; }
     @media (min-width: 768px) { .masonry-item { margin-bottom: 16px; } }
 
-    /* Apple loading spinner */
-    .apple-spinner {
-      width: 32px;
-      height: 32px;
-      border: 3px solid rgba(120, 120, 128, 0.24);
-      border-top-color: #0A84FF;
-      border-radius: 50%;
-      animation: spin 0.8s cubic-bezier(0.5, 0, 0.5, 1) infinite;
-    }
+    .apple-spinner { width: 32px; height: 32px; border: 3px solid rgba(120,120,128,0.24); border-top-color: #0A84FF; border-radius: 50%; animation: spin 0.8s cubic-bezier(0.5,0,0.5,1) infinite; }
     @keyframes spin { to { transform: rotate(360deg); } }
 
-    /* Fade in animation */
-    .fade-in {
-      animation: fadeIn 0.5s cubic-bezier(0.25, 0.1, 0.25, 1);
-    }
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(12px) scale(0.98); }
-      to { opacity: 1; transform: translateY(0) scale(1); }
-    }
+    .fade-in { animation: fadeIn 0.5s cubic-bezier(0.25, 0.1, 0.25, 1); }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(12px) scale(0.98); } to { opacity: 1; transform: translateY(0) scale(1); } }
 
-    /* Scale in for modal */
-    .scale-in {
-      animation: scaleIn 0.35s cubic-bezier(0.25, 0.1, 0.25, 1);
-    }
-    @keyframes scaleIn {
-      from { opacity: 0; transform: scale(0.92); }
-      to { opacity: 1; transform: scale(1); }
-    }
+    .scale-in { animation: scaleIn 0.35s cubic-bezier(0.25, 0.1, 0.25, 1); }
+    @keyframes scaleIn { from { opacity: 0; transform: scale(0.92); } to { opacity: 1; transform: scale(1); } }
 
-    /* Tag button */
-    .tag-btn {
-      transition: all 0.2s cubic-bezier(0.25, 0.1, 0.25, 1);
-      background: rgba(120, 120, 128, 0.12);
-      border: 1px solid rgba(120, 120, 128, 0.2);
-    }
-    .tag-btn:hover {
-      background: rgba(120, 120, 128, 0.24);
-      border-color: rgba(120, 120, 128, 0.36);
-    }
+    .tag-btn { transition: all 0.2s cubic-bezier(0.25, 0.1, 0.25, 1); background: rgba(120, 120, 128, 0.12); border: 1px solid rgba(120, 120, 128, 0.2); }
+    .tag-btn:hover { background: rgba(120, 120, 128, 0.24); border-color: rgba(120, 120, 128, 0.36); }
     .tag-btn:active { transform: scale(0.96); }
 
-    /* History panel */
-    .history-item {
-      transition: all 0.2s cubic-bezier(0.25, 0.1, 0.25, 1);
-      border-radius: 10px;
-    }
-    .history-item:hover {
-      background-color: rgba(120, 120, 128, 0.16);
-    }
-    .history-item:active {
-      background-color: rgba(120, 120, 128, 0.24);
-    }
+    .history-item { transition: all 0.2s cubic-bezier(0.25, 0.1, 0.25, 1); border-radius: 10px; }
+    .history-item:hover { background-color: rgba(120, 120, 128, 0.16); }
+    .history-item:active { background-color: rgba(120, 120, 128, 0.24); }
 
-    /* Segmented control (Apple-style tab) */
-    .segmented-control {
-      background: rgba(120, 120, 128, 0.12);
-      border-radius: 9px;
-      padding: 2px;
-      display: flex;
-      position: relative;
-    }
-    .segmented-btn {
-      flex: 1;
-      padding: 8px 16px;
-      font-size: 13px;
-      font-weight: 600;
-      border-radius: 7px;
-      color: #98989D;
-      transition: all 0.25s cubic-bezier(0.25, 0.1, 0.25, 1);
-      text-align: center;
-      cursor: pointer;
-      border: none;
-      background: transparent;
-      letter-spacing: -0.01em;
-    }
-    .segmented-btn.active {
-      background: rgba(120, 120, 128, 0.36);
-      color: #FFFFFF;
-      box-shadow: 0 1px 4px rgba(0,0,0,0.2);
-    }
+    .segmented-control { background: rgba(120, 120, 128, 0.12); border-radius: 9px; padding: 2px; display: flex; }
+    .segmented-btn { flex: 1; padding: 8px 16px; font-size: 13px; font-weight: 600; border-radius: 7px; color: #98989D; transition: all 0.25s cubic-bezier(0.25, 0.1, 0.25, 1); text-align: center; cursor: pointer; border: none; background: transparent; letter-spacing: -0.01em; }
+    .segmented-btn.active { background: rgba(120, 120, 128, 0.36); color: #FFFFFF; box-shadow: 0 1px 4px rgba(0,0,0,0.2); }
 
-    /* Search box glow */
-    .search-glow:focus-within {
-      box-shadow: 0 0 0 3px rgba(10, 132, 255, 0.2), 0 8px 24px rgba(0,0,0,0.3);
-      border-color: rgba(10, 132, 255, 0.5);
-    }
+    .search-glow:focus-within { box-shadow: 0 0 0 3px rgba(10, 132, 255, 0.2), 0 8px 24px rgba(0,0,0,0.3); border-color: rgba(10, 132, 255, 0.5); }
 
-    /* Tooltip animation */
-    .tooltip-enter {
-      animation: tooltipFade 0.2s ease;
+    /* 收藏按钮 */
+    .fav-btn {
+      position: absolute; top: 10px; right: 10px; z-index: 10;
+      width: 36px; height: 36px; border-radius: 50%;
+      background: rgba(0,0,0,0.5); backdrop-filter: blur(10px);
+      display: flex; align-items: center; justify-content: center;
+      opacity: 0; transition: all 0.2s ease; cursor: pointer; border: none;
     }
-    @keyframes tooltipFade {
-      from { opacity: 0; transform: translateY(4px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
+    .fav-btn:hover { background: rgba(0,0,0,0.7); transform: scale(1.1); }
+    .fav-btn:active { transform: scale(0.9); }
+    .fav-btn.is-fav { opacity: 1; }
+    .fav-btn svg { width: 18px; height: 18px; transition: all 0.2s ease; }
 
-    /* Smooth overlay */
-    .modal-overlay {
-      animation: overlayFade 0.3s ease;
+    /* 收藏夹缩略图网格 */
+    .fav-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
+    .fav-thumb {
+      border-radius: 8px; overflow: hidden; cursor: pointer;
+      transition: all 0.2s ease; aspect-ratio: 1; position: relative;
     }
-    @keyframes overlayFade {
-      from { opacity: 0; }
-      to { opacity: 1; }
+    .fav-thumb:hover { transform: scale(1.03); }
+    .fav-thumb img { width: 100%; height: 100%; object-fit: cover; }
+    .fav-thumb .fav-remove {
+      position: absolute; top: 4px; right: 4px; width: 22px; height: 22px;
+      border-radius: 50%; background: rgba(0,0,0,0.6); display: flex;
+      align-items: center; justify-content: center; opacity: 0;
+      transition: opacity 0.2s; cursor: pointer; border: none;
     }
+    .fav-thumb:hover .fav-remove { opacity: 1; }
 
-    /* Selection color */
-    ::selection {
-      background: rgba(10, 132, 255, 0.3);
-    }
+    /* 频率限制提示条 */
+    .rate-bar { height: 3px; border-radius: 2px; background: rgba(120,120,128,0.2); overflow: hidden; }
+    .rate-bar-fill { height: 100%; border-radius: 2px; transition: width 0.5s ease, background 0.5s ease; }
+
+    .modal-overlay { animation: overlayFade 0.3s ease; }
+    @keyframes overlayFade { from { opacity: 0; } to { opacity: 1; } }
+
+    ::selection { background: rgba(10, 132, 255, 0.3); }
   </style>
 </head>
 <body class="text-white antialiased">
 
-  <!-- ==================== 登录/注册页面 (Apple ID 风格) ==================== -->
+  <!-- ==================== 登录/注册页面 ==================== -->
   <div id="authPage" class="min-h-screen flex items-center justify-center px-6">
     <div class="w-full max-w-[360px] fade-in">
-      <!-- Logo -->
       <div class="text-center mb-10">
-        <div class="w-16 h-16 mx-auto mb-5 rounded-apple-xl bg-gradient-to-b from-[#1C1C1E] to-[#0a0a0a] border border-[#38383A] flex items-center justify-center shadow-lg shadow-black/50">
+        <div class="w-16 h-16 mx-auto mb-5 rounded-[20px] bg-gradient-to-b from-[#1C1C1E] to-[#0a0a0a] border border-[#38383A] flex items-center justify-center shadow-lg shadow-black/50">
           <span class="text-2xl font-bold tracking-wider bg-gradient-to-b from-white to-[#98989D] bg-clip-text text-transparent">T</span>
         </div>
         <h1 class="text-[28px] font-bold tracking-tight mb-1.5" style="letter-spacing: -0.02em;">TIDE Material</h1>
         <p class="text-[13px] text-apple-text-tertiary">高质量素材搜索平台</p>
       </div>
 
-      <!-- Apple-style 分段控制器 -->
       <div class="segmented-control mb-7">
         <button id="tabLogin" onclick="switchTab('login')" class="segmented-btn active">登录</button>
         <button id="tabRegister" onclick="switchTab('register')" class="segmented-btn">注册</button>
       </div>
 
-      <!-- 登录表单 -->
       <div id="loginForm">
         <div class="space-y-3">
-          <div>
-            <input id="loginUsername" type="text" placeholder="用户名" class="apple-input" autocomplete="username" />
-          </div>
-          <div>
-            <input id="loginPassword" type="password" placeholder="密码" class="apple-input" autocomplete="current-password" />
-          </div>
+          <input id="loginUsername" type="text" placeholder="用户名" class="apple-input" autocomplete="username" />
+          <input id="loginPassword" type="password" placeholder="密码" class="apple-input" autocomplete="current-password" />
         </div>
-        <button onclick="login()" id="loginBtn" class="apple-btn-primary mt-5">
-          登录
-        </button>
-        <p id="loginError" class="text-[#FF453A] text-[13px] text-center mt-4 hidden"></p>
+        <button onclick="login()" id="loginBtn" class="apple-btn-primary mt-5">登录</button>
+        <p id="loginError" class="text-apple-red text-[13px] text-center mt-4 hidden"></p>
       </div>
 
-      <!-- 注册表单 -->
       <div id="registerForm" class="hidden">
         <div class="space-y-3">
-          <div>
-            <input id="regUsername" type="text" placeholder="用户名（3-20 个字符）" class="apple-input" autocomplete="username" />
-          </div>
-          <div>
-            <input id="regPassword" type="password" placeholder="密码（至少 6 个字符）" class="apple-input" autocomplete="new-password" />
-          </div>
-          <div>
-            <input id="regPassword2" type="password" placeholder="确认密码" class="apple-input" autocomplete="new-password" />
-          </div>
+          <input id="regUsername" type="text" placeholder="用户名（3-20 个字符）" class="apple-input" autocomplete="username" />
+          <input id="regPassword" type="password" placeholder="密码（至少 6 个字符）" class="apple-input" autocomplete="new-password" />
+          <input id="regPassword2" type="password" placeholder="确认密码" class="apple-input" autocomplete="new-password" />
         </div>
-        <button onclick="register()" id="regBtn" class="apple-btn-primary mt-5">
-          创建账户
-        </button>
-        <p id="regError" class="text-[#FF453A] text-[13px] text-center mt-4 hidden"></p>
+        <button onclick="register()" id="regBtn" class="apple-btn-primary mt-5">创建账户</button>
+        <p id="regError" class="text-apple-red text-[13px] text-center mt-4 hidden"></p>
       </div>
 
       <p class="text-center text-apple-text-tertiary text-[12px] mt-10">免费使用 · 图片来源 Pexels</p>
@@ -311,7 +186,7 @@
   <!-- ==================== 主应用页面 ==================== -->
   <div id="appPage" class="hidden">
 
-    <!-- Apple 风格导航栏 (磨砂玻璃) -->
+    <!-- 导航栏 -->
     <nav class="fixed top-0 left-0 right-0 z-50 glass border-b border-white/[0.08]">
       <div class="max-w-7xl mx-auto px-6 h-12 flex items-center justify-between">
         <div class="flex items-center gap-2.5">
@@ -319,53 +194,55 @@
           <span class="text-[11px] text-apple-text-tertiary font-medium tracking-wide uppercase">Material</span>
         </div>
         <div class="flex items-center gap-1">
-          <button onclick="toggleHistory()" class="h-8 px-3 rounded-lg text-[13px] text-apple-text-secondary hover:text-white hover:bg-white/[0.06] transition-all duration-200 flex items-center gap-1.5">
+          <!-- 收藏按钮 -->
+          <button onclick="openPanel('favorites')" class="h-8 px-3 rounded-lg text-[13px] text-apple-text-secondary hover:text-apple-red hover:bg-white/[0.06] transition-all duration-200 flex items-center gap-1.5">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+            <span class="hidden sm:inline">收藏</span>
+          </button>
+          <!-- 历史按钮 -->
+          <button onclick="openPanel('history')" class="h-8 px-3 rounded-lg text-[13px] text-apple-text-secondary hover:text-white hover:bg-white/[0.06] transition-all duration-200 flex items-center gap-1.5">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
             <span class="hidden sm:inline">历史</span>
           </button>
           <div class="w-px h-4 bg-white/[0.08] mx-1"></div>
           <span id="navUsername" class="text-[13px] text-apple-text-secondary px-2"></span>
-          <button onclick="logout()" class="h-8 px-3 rounded-lg text-[13px] text-apple-text-tertiary hover:text-[#FF453A] hover:bg-white/[0.06] transition-all duration-200">退出</button>
+          <button onclick="logout()" class="h-8 px-3 rounded-lg text-[13px] text-apple-text-tertiary hover:text-apple-red hover:bg-white/[0.06] transition-all duration-200">退出</button>
         </div>
       </div>
     </nav>
 
-    <!-- 主内容区 -->
     <main class="pt-12">
-
       <!-- Hero 搜索区 -->
       <section class="px-6 pt-24 pb-16">
         <div class="max-w-2xl mx-auto text-center">
           <h1 class="text-[42px] md:text-[52px] font-bold tracking-tight leading-[1.08] mb-4" style="letter-spacing: -0.03em;">
             输入灵感<span class="text-apple-text-tertiary">，</span><br/>获取素材<span class="text-apple-blue">。</span>
           </h1>
-          <p class="text-apple-text-secondary text-[15px] leading-relaxed mb-12 max-w-md mx-auto" style="letter-spacing: -0.01em;">
+          <p class="text-apple-text-secondary text-[15px] leading-relaxed mb-4 max-w-md mx-auto" style="letter-spacing: -0.01em;">
             输入关键词或描述，从全球图库中搜寻最匹配的高质量图片
           </p>
 
-          <!-- Apple Spotlight 风格搜索框 -->
-          <div class="relative max-w-xl mx-auto search-glow rounded-2xl border border-white/[0.1] bg-apple-card transition-all duration-300">
-            <div class="flex items-center">
-              <svg class="ml-5 text-apple-text-tertiary flex-shrink-0" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-              <input
-                id="searchInput"
-                type="text"
-                placeholder="搜索素材..."
-                class="flex-1 bg-transparent px-4 py-4 text-[15px] text-white placeholder-apple-text-tertiary outline-none"
-                style="letter-spacing: -0.01em;"
-                autocomplete="off"
-              />
-              <button
-                id="searchBtn"
-                onclick="searchImages()"
-                class="mr-2 bg-apple-blue hover:bg-apple-blue-hover text-white text-[13px] font-semibold px-5 py-2 rounded-xl active:scale-95 transition-all duration-200 flex-shrink-0"
-              >
-                搜索
-              </button>
+          <!-- 频率限制指示器 -->
+          <div id="rateInfo" class="hidden max-w-xs mx-auto mb-8">
+            <div class="flex items-center justify-between mb-1.5">
+              <span class="text-[11px] text-apple-text-tertiary">本小时搜索配额</span>
+              <span id="rateText" class="text-[11px] text-apple-text-secondary font-medium"></span>
+            </div>
+            <div class="rate-bar">
+              <div id="rateBarFill" class="rate-bar-fill bg-apple-blue"></div>
             </div>
           </div>
 
-          <!-- 快捷标签 (Apple 风格胶囊按钮) -->
+          <!-- 搜索框 -->
+          <div class="relative max-w-xl mx-auto search-glow rounded-2xl border border-white/[0.1] bg-apple-card transition-all duration-300">
+            <div class="flex items-center">
+              <svg class="ml-5 text-apple-text-tertiary flex-shrink-0" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+              <input id="searchInput" type="text" placeholder="搜索素材..." class="flex-1 bg-transparent px-4 py-4 text-[15px] text-white placeholder-apple-text-tertiary outline-none" style="letter-spacing: -0.01em;" autocomplete="off" />
+              <button id="searchBtn" onclick="searchImages()" class="mr-2 bg-apple-blue hover:bg-apple-blue-hover text-white text-[13px] font-semibold px-5 py-2 rounded-xl active:scale-95 transition-all duration-200 flex-shrink-0">搜索</button>
+            </div>
+          </div>
+
+          <!-- 快捷标签 -->
           <div class="flex flex-wrap justify-center gap-2 mt-8">
             <button onclick="quickSearch('street fashion')" class="tag-btn text-[13px] text-apple-text-secondary rounded-full px-4 py-2">街头穿搭</button>
             <button onclick="quickSearch('minimal interior')" class="tag-btn text-[13px] text-apple-text-secondary rounded-full px-4 py-2">极简家居</button>
@@ -383,9 +260,7 @@
           <p class="text-[13px] text-apple-text-tertiary">
             搜索 "<span id="resultQuery" class="text-white font-medium"></span>" · <span id="resultCount" class="text-apple-text-secondary"></span> 张
           </p>
-          <button onclick="loadMore()" id="loadMoreBtn" class="hidden text-[13px] text-apple-blue font-medium hover:text-apple-blue-hover transition-colors duration-200">
-            加载更多
-          </button>
+          <button onclick="loadMore()" id="loadMoreBtn" class="hidden text-[13px] text-apple-blue font-medium hover:text-apple-blue-hover transition-colors duration-200">加载更多</button>
         </div>
       </div>
 
@@ -403,44 +278,61 @@
       </section>
     </main>
 
-    <!-- 搜索历史侧边栏 (Apple 风格面板) -->
-    <div id="historyOverlay" class="fixed inset-0 bg-black/40 z-40 hidden" onclick="toggleHistory()"></div>
-    <div id="historyPanel" class="fixed top-0 right-0 bottom-0 w-80 glass-thick border-l border-white/[0.08] z-50 transform translate-x-full transition-transform duration-[350ms] cubic-bezier(0.25, 0.1, 0.25, 1) overflow-y-auto" style="transition-timing-function: cubic-bezier(0.25, 0.1, 0.25, 1);">
+    <!-- 右侧面板 (历史 + 收藏 双标签) -->
+    <div id="panelOverlay" class="fixed inset-0 bg-black/40 z-40 hidden" onclick="closePanel()"></div>
+    <div id="sidePanel" class="fixed top-0 right-0 bottom-0 w-80 glass-thick border-l border-white/[0.08] z-50 transform translate-x-full overflow-y-auto" style="transition: transform 0.35s cubic-bezier(0.25, 0.1, 0.25, 1);">
       <div class="p-5 pt-4">
-        <div class="flex items-center justify-between mb-5 h-12">
-          <h3 class="text-[15px] font-semibold" style="letter-spacing: -0.01em;">搜索历史</h3>
-          <button onclick="toggleHistory()" class="w-8 h-8 rounded-full bg-white/[0.08] hover:bg-white/[0.12] flex items-center justify-center transition-colors duration-200">
+        <!-- 面板头部 -->
+        <div class="flex items-center justify-between mb-4 h-12">
+          <div class="segmented-control flex-1 mr-3">
+            <button onclick="switchPanelTab('history')" id="panelTabHistory" class="segmented-btn active text-[12px] !py-1.5">历史</button>
+            <button onclick="switchPanelTab('favorites')" id="panelTabFav" class="segmented-btn text-[12px] !py-1.5">收藏</button>
+          </div>
+          <button onclick="closePanel()" class="w-8 h-8 rounded-full bg-white/[0.08] hover:bg-white/[0.12] flex items-center justify-center transition-colors duration-200 flex-shrink-0">
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
           </button>
         </div>
-        <div id="historyList">
-          <p class="text-apple-text-tertiary text-[13px]">暂无搜索记录</p>
+
+        <!-- 历史列表 -->
+        <div id="historyContent">
+          <div id="historyList">
+            <p class="text-apple-text-tertiary text-[13px] text-center py-8">暂无搜索记录</p>
+          </div>
+        </div>
+
+        <!-- 收藏列表 -->
+        <div id="favoritesContent" class="hidden">
+          <div id="favoritesList">
+            <p class="text-apple-text-tertiary text-[13px] text-center py-8">暂无收藏</p>
+          </div>
         </div>
       </div>
     </div>
 
-    <!-- 图片预览弹窗 (Apple QuickLook 风格) -->
+    <!-- 图片预览弹窗 -->
     <div id="modal" class="fixed inset-0 z-[100] hidden">
       <div class="absolute inset-0 bg-black/80 backdrop-blur-xl modal-overlay" onclick="closeModal()"></div>
       <div class="relative z-10 flex flex-col items-center justify-center min-h-screen p-6 scale-in">
-        <!-- 顶部关闭按钮 -->
         <button onclick="closeModal()" class="absolute top-5 right-5 w-9 h-9 rounded-full bg-white/[0.1] hover:bg-white/[0.2] flex items-center justify-center transition-all duration-200">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
         </button>
-        <!-- 图片 -->
-        <img id="modalImg" src="" alt="" class="max-w-full max-h-[70vh] object-contain rounded-apple-lg shadow-2xl shadow-black/60" />
-        <!-- 底部信息栏 -->
-        <div class="mt-6 glass rounded-apple-lg px-6 py-4 flex items-center gap-5 border border-white/[0.08]">
+        <img id="modalImg" src="" alt="" class="max-w-full max-h-[70vh] object-contain rounded-2xl shadow-2xl shadow-black/60" />
+        <div class="mt-6 glass rounded-2xl px-6 py-4 flex items-center gap-4 border border-white/[0.08]">
           <div class="text-left">
             <p id="modalPhotographer" class="text-[14px] text-white font-medium"></p>
             <p id="modalSize" class="text-[12px] text-apple-text-tertiary mt-0.5"></p>
           </div>
           <div class="w-px h-8 bg-white/[0.1]"></div>
-          <a id="modalDownload" href="" target="_blank" download class="apple-btn-primary !w-auto !py-2.5 !px-5 !text-[13px] !rounded-[10px] flex items-center gap-1.5">
+          <!-- 收藏按钮 -->
+          <button onclick="toggleFavFromModal()" id="modalFavBtn" class="h-10 px-4 rounded-xl flex items-center gap-1.5 text-[13px] font-semibold transition-all duration-200" style="background: rgba(120,120,128,0.24); color: #FF453A;">
+            <svg id="modalFavIcon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+            <span id="modalFavText">收藏</span>
+          </button>
+          <a id="modalDownload" href="" target="_blank" download class="h-10 px-4 rounded-xl bg-apple-blue hover:bg-apple-blue-hover text-white text-[13px] font-semibold flex items-center gap-1.5 transition-all duration-200">
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
             下载
           </a>
-          <button onclick="copyImageUrl()" id="copyBtn" class="apple-btn-secondary !w-auto !py-2.5 !px-5 !text-[13px] !rounded-[10px] flex items-center gap-1.5">
+          <button onclick="copyImageUrl()" id="copyBtn" class="h-10 px-4 rounded-xl flex items-center gap-1.5 text-[13px] font-semibold transition-all duration-200" style="background: rgba(120,120,128,0.24); color: #0A84FF;">
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
             复制
           </button>
@@ -448,15 +340,13 @@
       </div>
     </div>
 
-    <!-- 底部 -->
     <footer class="border-t border-white/[0.06] py-8 text-center">
-      <p class="text-[12px] text-apple-text-tertiary">TIDE Material · 图片来源 <a href="https://www.pexels.com" target="_blank" class="text-apple-blue hover:text-apple-blue-hover transition-colors duration-200">Pexels</a> · 免费可商用</p>
+      <p class="text-[12px] text-apple-text-tertiary">TIDE Material · 图片来源 <a href="https://www.pexels.com" target="_blank" class="text-apple-blue hover:text-apple-blue-hover transition-colors duration-200">Pexels</a> · 免费可商用 · 每小时 <span id="footerLimit">30</span> 次搜索</p>
     </footer>
   </div>
 
   <script>
     // ============ 配置 ============
-    const PEXELS_API_KEY = 'QzRQUCCS2KSutNKlsXUE81M0zkPm56V01Nh0DrTW4nZZQOY939KBxhct';
     const PER_PAGE = 20;
 
     // ============ 状态 ============
@@ -465,19 +355,181 @@
     let totalResults = 0;
     let authToken = localStorage.getItem('tide_token');
     let currentUsername = localStorage.getItem('tide_username');
-    let historyOpen = false;
+    let panelOpen = false;
+    let panelTab = 'history';
+    let favoriteIds = new Set();      // 已收藏的 photo_id
+    let favoritesData = [];           // 收藏完整数据
+    let currentModalPhoto = null;     // 当前弹窗中的图片信息
+    let rateRemaining = 30;
+    let rateLimit = 30;
+
+    // ============ 超大中文→英文关键词映射（200+） ============
+    const keywordMap = {
+      // 🔥 热门/风格
+      '穿搭': 'fashion outfit', '街头': 'street style', '潮流': 'trendy fashion',
+      '潮牌': 'streetwear', 'ins风': 'instagram aesthetic', '氛围感': 'moody aesthetic',
+      '高级感': 'elegant premium', '简约': 'simple clean minimal', '极简': 'minimal',
+      '复古': 'vintage retro', '赛博朋克': 'cyberpunk', '蒸汽波': 'vaporwave',
+      '波西米亚': 'bohemian', '日系': 'japanese style', '韩系': 'korean style',
+      '法式': 'french style', '工业风': 'industrial style', '北欧': 'scandinavian',
+      '中国风': 'chinese style', '古风': 'ancient chinese', '水墨': 'ink painting',
+      '朋克': 'punk', '嘻哈': 'hip hop', '学院风': 'preppy academic',
+      '暗黑': 'dark aesthetic', '小清新': 'fresh aesthetic', '治愈系': 'healing aesthetic',
+      '少女': 'girly', '甜酷': 'sweet cool', '盐系': 'salt style minimal',
+
+      // 🌿 自然/风景
+      '风景': 'landscape scenery', '自然': 'nature', '山': 'mountain',
+      '海': 'sea ocean', '海边': 'beach ocean', '湖': 'lake',
+      '河': 'river', '瀑布': 'waterfall', '森林': 'forest',
+      '丛林': 'jungle', '草原': 'grassland prairie', '沙漠': 'desert',
+      '雪山': 'snow mountain', '冰川': 'glacier', '火山': 'volcano',
+      '日出': 'sunrise', '日落': 'sunset', '朝霞': 'dawn clouds',
+      '晚霞': 'evening glow', '星空': 'starry sky', '银河': 'milky way',
+      '极光': 'aurora northern lights', '彩虹': 'rainbow', '闪电': 'lightning',
+      '云': 'clouds sky', '雾': 'fog mist', '雨': 'rain',
+      '雪': 'snow winter', '樱花': 'cherry blossom', '枫叶': 'maple autumn',
+      '荷花': 'lotus flower', '向日葵': 'sunflower', '薰衣草': 'lavender',
+      '田野': 'field countryside', '梯田': 'rice terrace', '花海': 'flower field',
+      '溪流': 'creek stream', '珊瑚': 'coral reef', '水下': 'underwater',
+
+      // 🏙️ 城市/建筑
+      '城市': 'urban city', '夜景': 'night city lights', '天际线': 'skyline',
+      '摩天大楼': 'skyscraper', '建筑': 'architecture', '街道': 'street',
+      '胡同': 'alley', '小巷': 'narrow street', '桥': 'bridge',
+      '教堂': 'church cathedral', '寺庙': 'temple', '城堡': 'castle',
+      '宫殿': 'palace', '废墟': 'ruins', '灯塔': 'lighthouse',
+      '摩天轮': 'ferris wheel', '地铁': 'subway metro', '火车站': 'train station',
+      '机场': 'airport', '码头': 'dock harbor', '市场': 'market bazaar',
+      '商场': 'shopping mall', '图书馆': 'library', '博物馆': 'museum',
+      '咖啡馆': 'cafe coffee shop', '餐厅': 'restaurant', '酒吧': 'bar pub',
+
+      // 🏠 家居/室内
+      '家居': 'interior home', '客厅': 'living room', '卧室': 'bedroom',
+      '厨房': 'kitchen', '浴室': 'bathroom', '书房': 'study room',
+      '阳台': 'balcony', '花园': 'garden', '庭院': 'courtyard',
+      '装修': 'interior design', '家具': 'furniture', '灯具': 'lighting lamp',
+      '窗': 'window', '门': 'door', '楼梯': 'staircase',
+
+      // 🍜 美食/饮品
+      '美食': 'food delicious', '咖啡': 'coffee', '茶': 'tea',
+      '甜品': 'dessert', '蛋糕': 'cake', '面包': 'bread bakery',
+      '披萨': 'pizza', '寿司': 'sushi', '拉面': 'ramen noodles',
+      '火锅': 'hot pot', '烧烤': 'barbecue grill', '沙拉': 'salad',
+      '水果': 'fruits', '冰淇淋': 'ice cream', '鸡尾酒': 'cocktail',
+      '红酒': 'red wine', '啤酒': 'beer', '奶茶': 'bubble tea',
+      '早餐': 'breakfast', '晚餐': 'dinner', '下午茶': 'afternoon tea',
+      '料理': 'cuisine cooking', '烘焙': 'baking',
+
+      // 👤 人物/人像
+      '人像': 'portrait', '肖像': 'portrait face', '模特': 'model',
+      '情侣': 'couple love', '家庭': 'family', '儿童': 'children kids',
+      '婴儿': 'baby', '老人': 'elderly senior', '女孩': 'girl',
+      '男孩': 'boy', '闺蜜': 'best friends girls', '兄弟': 'brothers',
+      '婚礼': 'wedding', '毕业': 'graduation', '派对': 'party',
+      '舞蹈': 'dance dancing', '瑜伽': 'yoga', '冥想': 'meditation',
+
+      // 🐾 动物
+      '猫': 'cat kitten', '狗': 'dog puppy', '鸟': 'bird',
+      '鱼': 'fish', '蝴蝶': 'butterfly', '马': 'horse',
+      '兔子': 'rabbit bunny', '熊猫': 'panda', '老虎': 'tiger',
+      '狮子': 'lion', '鹿': 'deer', '鹰': 'eagle hawk',
+      '海豚': 'dolphin', '鲸鱼': 'whale', '企鹅': 'penguin',
+      '狐狸': 'fox', '松鼠': 'squirrel', '仓鼠': 'hamster',
+      '宠物': 'pet', '野生动物': 'wildlife',
+
+      // 🎨 艺术/创意
+      '艺术': 'art artwork', '绘画': 'painting', '插画': 'illustration',
+      '雕塑': 'sculpture', '涂鸦': 'graffiti street art', '素描': 'sketch drawing',
+      '水彩': 'watercolor', '油画': 'oil painting', '抽象': 'abstract art',
+      '几何': 'geometric pattern', '纹理': 'texture pattern', '色彩': 'colorful',
+      '黑白': 'black and white monochrome', '光影': 'light shadow',
+      '剪影': 'silhouette', '倒影': 'reflection', '长曝光': 'long exposure',
+      '微距': 'macro photography', '航拍': 'aerial drone',
+
+      // 💼 工作/科技
+      '办公': 'office workspace', '电脑': 'computer laptop', '手机': 'smartphone mobile',
+      '科技': 'technology', '编程': 'coding programming', '会议': 'meeting conference',
+      '创业': 'startup business', '团队': 'team collaboration', '书桌': 'desk workspace',
+      '笔记本': 'notebook', '咖啡办公': 'coffee work', '远程办公': 'remote work',
+      '人工智能': 'artificial intelligence AI', '机器人': 'robot',
+      '数据': 'data analytics', '网络': 'internet network', '芯片': 'chip semiconductor',
+
+      // 🏃 运动/健身
+      '运动': 'sport fitness', '跑步': 'running jogging', '游泳': 'swimming',
+      '篮球': 'basketball', '足球': 'soccer football', '网球': 'tennis',
+      '滑板': 'skateboard', '冲浪': 'surfing', '攀岩': 'rock climbing',
+      '登山': 'hiking mountain', '骑行': 'cycling bike', '滑雪': 'skiing',
+      '健身': 'gym workout', '拳击': 'boxing',
+
+      // ✈️ 旅行
+      '旅行': 'travel journey', '背包客': 'backpacker travel', '露营': 'camping',
+      '公路旅行': 'road trip', '行李': 'luggage travel', '地图': 'map',
+      '护照': 'passport', '飞机': 'airplane flight', '火车': 'train',
+      '船': 'boat ship', '热气球': 'hot air balloon', '帐篷': 'tent camping',
+
+      // 📚 文化/生活
+      '书': 'books reading', '音乐': 'music', '电影': 'film cinema',
+      '吉他': 'guitar', '钢琴': 'piano', '耳机': 'headphones',
+      '相机': 'camera photography', '杂志': 'magazine', '报纸': 'newspaper',
+      '花': 'flowers floral', '蜡烛': 'candle', '香水': 'perfume',
+      '手表': 'watch luxury', '珠宝': 'jewelry', '包': 'bag handbag',
+      '鞋': 'shoes sneakers', '太阳镜': 'sunglasses', '化妆': 'makeup beauty',
+      '护肤': 'skincare beauty', '发型': 'hairstyle', '纹身': 'tattoo',
+      '设计': 'design creative', '品牌': 'branding', '海报': 'poster',
+      '包装': 'packaging design', '平面设计': 'graphic design', 'UI': 'user interface',
+      '节日': 'festival holiday', '圣诞': 'christmas', '春节': 'chinese new year',
+      '万圣节': 'halloween', '情人节': 'valentine', '生日': 'birthday',
+
+      // 🌈 颜色/氛围
+      '红色': 'red color', '蓝色': 'blue color', '绿色': 'green color',
+      '粉色': 'pink color', '紫色': 'purple color', '黄色': 'yellow color',
+      '橙色': 'orange color', '金色': 'gold golden', '银色': 'silver metallic',
+      '白色': 'white clean', '灰色': 'gray neutral', '棕色': 'brown earth tone',
+      '莫兰迪': 'morandi muted tones', '马卡龙': 'macaron pastel',
+      '霓虹': 'neon glow', '渐变': 'gradient color',
+
+      // 🕐 季节/时间
+      '春天': 'spring season', '夏天': 'summer', '夏日': 'summer',
+      '秋天': 'autumn fall', '冬天': 'winter', '冬日': 'winter',
+      '雨天': 'rainy day', '晴天': 'sunny day', '清晨': 'early morning',
+      '黄昏': 'dusk twilight', '深夜': 'late night', '午后': 'afternoon',
+
+      // 🎯 情绪/感觉
+      '温暖': 'warm cozy', '清凉': 'cool fresh', '孤独': 'lonely solitude',
+      '自由': 'freedom free spirit', '浪漫': 'romantic', '神秘': 'mysterious',
+      '宁静': 'peaceful calm serene', '活力': 'energetic vibrant', '梦幻': 'dreamy fantasy',
+      '怀旧': 'nostalgic', '文艺': 'literary artistic', '禅意': 'zen peaceful',
+      '温馨': 'cozy warm homelike', '奢华': 'luxury luxurious',
+
+      // 📸 摄影技法
+      '街拍': 'street photography', '风光摄影': 'landscape photography',
+      '人文': 'documentary photography', '纪实': 'photojournalism',
+      '静物': 'still life', '产品': 'product photography', '美妆': 'beauty photography',
+      '时尚摄影': 'fashion photography', '婚纱照': 'wedding photography',
+      '写真': 'portrait session', '证件照': 'headshot portrait',
+      '全景': 'panoramic view', '特写': 'close up detail', '俯拍': 'overhead shot',
+      '仰拍': 'low angle shot', '散景': 'bokeh', '双重曝光': 'double exposure',
+    };
+
+    function translateQuery(input) {
+      let result = input.trim();
+      let translated = [];
+      for (const [cn, en] of Object.entries(keywordMap)) {
+        if (result.includes(cn)) translated.push(en);
+      }
+      return translated.length > 0 ? translated.join(' ') : result;
+    }
 
     // ============ 初始化 ============
     async function init() {
       if (authToken) {
         try {
-          const res = await fetch('/api/me', {
-            headers: { 'Authorization': 'Bearer ' + authToken }
-          });
+          const res = await fetch('/api/me', { headers: { 'Authorization': 'Bearer ' + authToken } });
           if (res.ok) {
             const data = await res.json();
             currentUsername = data.username;
             showApp();
+            loadFavoriteIds(); // 预加载收藏ID
             return;
           }
         } catch (e) {}
@@ -499,144 +551,74 @@
       document.getElementById('navUsername').textContent = currentUsername;
     }
 
-    // ============ 登录/注册切换 (分段控制器) ============
+    // ============ 登录/注册 ============
     function switchTab(tab) {
       const tabLogin = document.getElementById('tabLogin');
       const tabRegister = document.getElementById('tabRegister');
-      const loginForm = document.getElementById('loginForm');
-      const registerForm = document.getElementById('registerForm');
-
       if (tab === 'login') {
         tabLogin.classList.add('active');
         tabRegister.classList.remove('active');
-        loginForm.classList.remove('hidden');
-        registerForm.classList.add('hidden');
+        document.getElementById('loginForm').classList.remove('hidden');
+        document.getElementById('registerForm').classList.add('hidden');
       } else {
         tabRegister.classList.add('active');
         tabLogin.classList.remove('active');
-        registerForm.classList.remove('hidden');
-        loginForm.classList.add('hidden');
+        document.getElementById('registerForm').classList.remove('hidden');
+        document.getElementById('loginForm').classList.add('hidden');
       }
       document.getElementById('loginError').classList.add('hidden');
       document.getElementById('regError').classList.add('hidden');
     }
 
-    // ============ 注册 ============
     async function register() {
       const username = document.getElementById('regUsername').value.trim();
       const password = document.getElementById('regPassword').value;
       const password2 = document.getElementById('regPassword2').value;
       const errorEl = document.getElementById('regError');
       const btn = document.getElementById('regBtn');
-
       errorEl.classList.add('hidden');
 
-      if (!username || !password) {
-        errorEl.textContent = '请填写用户名和密码';
-        errorEl.classList.remove('hidden');
-        return;
-      }
+      if (!username || !password) { showError(errorEl, '请填写用户名和密码'); return; }
+      if (password !== password2) { showError(errorEl, '两次密码输入不一致'); return; }
 
-      if (password !== password2) {
-        errorEl.textContent = '两次密码输入不一致';
-        errorEl.classList.remove('hidden');
-        return;
-      }
-
-      btn.textContent = '创建中...';
-      btn.disabled = true;
-
+      btn.textContent = '创建中...'; btn.disabled = true;
       try {
-        const res = await fetch('/api/register', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ username, password })
-        });
-
-        const text = await res.text();
-        let data;
-        try { data = JSON.parse(text); } catch(e) { throw new Error('服务器返回异常，请确认 D1 数据库已绑定'); }
-
-        if (!res.ok) {
-          throw new Error(data.error || '注册失败');
-        }
-
-        authToken = data.token;
-        currentUsername = data.username;
-        localStorage.setItem('tide_token', authToken);
-        localStorage.setItem('tide_username', currentUsername);
-        showApp();
-      } catch (error) {
-        errorEl.textContent = error.message;
-        errorEl.classList.remove('hidden');
-      } finally {
-        btn.textContent = '创建账户';
-        btn.disabled = false;
-      }
+        const res = await fetch('/api/register', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ username, password }) });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || '注册失败');
+        authToken = data.token; currentUsername = data.username;
+        localStorage.setItem('tide_token', authToken); localStorage.setItem('tide_username', currentUsername);
+        showApp(); loadFavoriteIds();
+      } catch (e) { showError(errorEl, e.message); } finally { btn.textContent = '创建账户'; btn.disabled = false; }
     }
 
-    // ============ 登录 ============
     async function login() {
       const username = document.getElementById('loginUsername').value.trim();
       const password = document.getElementById('loginPassword').value;
       const errorEl = document.getElementById('loginError');
       const btn = document.getElementById('loginBtn');
-
       errorEl.classList.add('hidden');
 
-      if (!username || !password) {
-        errorEl.textContent = '请填写用户名和密码';
-        errorEl.classList.remove('hidden');
-        return;
-      }
+      if (!username || !password) { showError(errorEl, '请填写用户名和密码'); return; }
 
-      btn.textContent = '登录中...';
-      btn.disabled = true;
-
+      btn.textContent = '登录中...'; btn.disabled = true;
       try {
-        const res = await fetch('/api/login', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ username, password })
-        });
-
-        const text = await res.text();
-        let data;
-        try { data = JSON.parse(text); } catch(e) { throw new Error('服务器返回异常，请确认 D1 数据库已绑定'); }
-
-        if (!res.ok) {
-          throw new Error(data.error || '登录失败');
-        }
-
-        authToken = data.token;
-        currentUsername = data.username;
-        localStorage.setItem('tide_token', authToken);
-        localStorage.setItem('tide_username', currentUsername);
-        showApp();
-      } catch (error) {
-        errorEl.textContent = error.message;
-        errorEl.classList.remove('hidden');
-      } finally {
-        btn.textContent = '登录';
-        btn.disabled = false;
-      }
+        const res = await fetch('/api/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ username, password }) });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || '登录失败');
+        authToken = data.token; currentUsername = data.username;
+        localStorage.setItem('tide_token', authToken); localStorage.setItem('tide_username', currentUsername);
+        showApp(); loadFavoriteIds();
+      } catch (e) { showError(errorEl, e.message); } finally { btn.textContent = '登录'; btn.disabled = false; }
     }
 
-    // ============ 登出 ============
+    function showError(el, msg) { el.textContent = msg; el.classList.remove('hidden'); }
+
     async function logout() {
-      try {
-        await fetch('/api/logout', {
-          method: 'POST',
-          headers: { 'Authorization': 'Bearer ' + authToken }
-        });
-      } catch (e) {}
-
-      authToken = null;
-      currentUsername = null;
-      localStorage.removeItem('tide_token');
-      localStorage.removeItem('tide_username');
+      try { await fetch('/api/logout', { method: 'POST', headers: { 'Authorization': 'Bearer ' + authToken } }); } catch (e) {}
+      authToken = null; currentUsername = null; favoriteIds.clear(); favoritesData = [];
+      localStorage.removeItem('tide_token'); localStorage.removeItem('tide_username');
       showAuth();
-
       document.getElementById('loginUsername').value = '';
       document.getElementById('loginPassword').value = '';
       document.getElementById('regUsername').value = '';
@@ -644,43 +626,114 @@
       document.getElementById('regPassword2').value = '';
     }
 
-    // ============ 中文→英文关键词映射 ============
-    const keywordMap = {
-      '穿搭': 'fashion outfit', '街头': 'street style', '夏日': 'summer',
-      '冬日': 'winter', '春天': 'spring', '秋天': 'autumn fall',
-      '极简': 'minimal', '家居': 'interior home', '咖啡': 'coffee',
-      '美食': 'food', '风景': 'landscape scenery', '城市': 'urban city',
-      '夜景': 'night city lights', '海边': 'beach ocean', '森林': 'forest',
-      '建筑': 'architecture', '人像': 'portrait', '黑白': 'black and white',
-      '复古': 'vintage retro', '科技': 'technology', '潮牌': 'streetwear',
-      '运动': 'sport fitness', '旅行': 'travel', '花': 'flowers',
-      '猫': 'cat', '狗': 'dog', '日落': 'sunset', '星空': 'starry sky',
-      '雨天': 'rainy day', '书': 'books reading', '音乐': 'music',
-      '艺术': 'art', '设计': 'design', '清凉': 'cool fresh',
-      '温暖': 'warm cozy', '简约': 'simple clean', '奢华': 'luxury',
-      '街拍': 'street photography', 'ins风': 'instagram aesthetic',
-      '氛围感': 'moody aesthetic', '高级感': 'elegant premium',
-    };
-
-    function translateQuery(input) {
-      let result = input.trim();
-      let translated = [];
-      for (const [cn, en] of Object.entries(keywordMap)) {
-        if (result.includes(cn)) translated.push(en);
-      }
-      return translated.length > 0 ? translated.join(' ') : result;
+    // ============ 收藏功能 ============
+    async function loadFavoriteIds() {
+      try {
+        const res = await fetch('/api/favorites', { headers: { 'Authorization': 'Bearer ' + authToken } });
+        const data = await res.json();
+        if (data.favorites) {
+          favoritesData = data.favorites;
+          favoriteIds = new Set(data.favorites.map(f => String(f.photo_id)));
+        }
+      } catch (e) { console.error('加载收藏失败', e); }
     }
 
-    // ============ 搜索图片 ============
+    async function toggleFavorite(photoId, photoUrl, photoThumb, photographer, width, height, originalUrl, btnEl) {
+      const id = String(photoId);
+      if (favoriteIds.has(id)) {
+        // 取消收藏
+        favoriteIds.delete(id);
+        favoritesData = favoritesData.filter(f => String(f.photo_id) !== id);
+        updateFavBtnUI(btnEl, false);
+        try {
+          await fetch('/api/favorites', {
+            method: 'DELETE', headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + authToken },
+            body: JSON.stringify({ photo_id: id })
+          });
+        } catch (e) { console.error('取消收藏失败', e); }
+      } else {
+        // 添加收藏
+        favoriteIds.add(id);
+        favoritesData.unshift({ photo_id: id, photo_url: photoUrl, photo_thumb: photoThumb, photographer, width, height, original_url: originalUrl });
+        updateFavBtnUI(btnEl, true);
+        try {
+          await fetch('/api/favorites', {
+            method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + authToken },
+            body: JSON.stringify({ photo_id: id, photo_url: photoUrl, photo_thumb: photoThumb, photographer, width, height, original_url: originalUrl })
+          });
+        } catch (e) { console.error('收藏失败', e); }
+      }
+    }
+
+    function updateFavBtnUI(btnEl, isFav) {
+      if (!btnEl) return;
+      const svg = btnEl.querySelector('svg');
+      if (isFav) {
+        btnEl.classList.add('is-fav');
+        svg.setAttribute('fill', '#FF453A');
+        svg.setAttribute('stroke', '#FF453A');
+      } else {
+        btnEl.classList.remove('is-fav');
+        svg.setAttribute('fill', 'none');
+        svg.setAttribute('stroke', 'white');
+      }
+    }
+
+    function toggleFavFromModal() {
+      if (!currentModalPhoto) return;
+      const p = currentModalPhoto;
+      // 找到网格中对应的收藏按钮
+      const gridBtn = document.querySelector(`[data-photo-id="${p.id}"] .fav-btn`);
+      toggleFavorite(p.id, p.photo_url, p.photo_thumb, p.photographer, p.width, p.height, p.original_url, gridBtn);
+      updateModalFavUI();
+    }
+
+    function updateModalFavUI() {
+      if (!currentModalPhoto) return;
+      const isFav = favoriteIds.has(String(currentModalPhoto.id));
+      const icon = document.getElementById('modalFavIcon');
+      const text = document.getElementById('modalFavText');
+      const btn = document.getElementById('modalFavBtn');
+      if (isFav) {
+        icon.setAttribute('fill', '#FF453A');
+        text.textContent = '已收藏';
+        btn.style.background = 'rgba(255, 69, 58, 0.15)';
+      } else {
+        icon.setAttribute('fill', 'none');
+        text.textContent = '收藏';
+        btn.style.background = 'rgba(120, 120, 128, 0.24)';
+      }
+    }
+
+    // ============ 频率限制 UI ============
+    function updateRateUI(remaining, limit) {
+      rateRemaining = remaining;
+      rateLimit = limit;
+      const infoEl = document.getElementById('rateInfo');
+      const textEl = document.getElementById('rateText');
+      const fillEl = document.getElementById('rateBarFill');
+
+      infoEl.classList.remove('hidden');
+      textEl.textContent = `${remaining} / ${limit}`;
+      const pct = (remaining / limit) * 100;
+      fillEl.style.width = pct + '%';
+
+      if (pct <= 20) {
+        fillEl.className = 'rate-bar-fill bg-apple-red';
+      } else if (pct <= 50) {
+        fillEl.className = 'rate-bar-fill bg-apple-orange';
+      } else {
+        fillEl.className = 'rate-bar-fill bg-apple-blue';
+      }
+    }
+
+    // ============ 搜索图片（通过后端代理）============
     async function searchImages(append = false) {
       const input = document.getElementById('searchInput');
       const query = input.value.trim();
       if (!query) return;
 
-      if (!append) {
-        currentQuery = query;
-        currentPage = 1;
-      }
+      if (!append) { currentQuery = query; currentPage = 1; }
 
       const translatedQuery = translateQuery(currentQuery);
       showLoading(true);
@@ -688,44 +741,56 @@
       document.getElementById('emptyState').classList.add('hidden');
 
       try {
-        const url = `https://api.pexels.com/v1/search?query=${encodeURIComponent(translatedQuery)}&per_page=${PER_PAGE}&page=${currentPage}`;
-        const response = await fetch(url, { headers: { 'Authorization': PEXELS_API_KEY } });
-        if (!response.ok) throw new Error('API 请求失败');
+        const url = `/api/search?query=${encodeURIComponent(translatedQuery)}&per_page=${PER_PAGE}&page=${currentPage}`;
+        const response = await fetch(url, { headers: { 'Authorization': 'Bearer ' + authToken } });
+
+        if (response.status === 429) {
+          const data = await response.json();
+          if (data._rate || data.rate) {
+            const r = data._rate || data.rate;
+            updateRateUI(r.remaining || 0, r.limit || rateLimit);
+          }
+          throw new Error(data.error || '搜索次数已用完，请稍后再试');
+        }
+
+        if (!response.ok) {
+          const data = await response.json();
+          throw new Error(data.error || 'API 请求失败');
+        }
 
         const data = await response.json();
         totalResults = data.total_results;
+
+        // 更新频率限制显示
+        if (data._rate) {
+          updateRateUI(data._rate.remaining, data._rate.limit);
+        }
 
         document.getElementById('resultInfo').classList.remove('hidden');
         document.getElementById('resultQuery').textContent = currentQuery;
         document.getElementById('resultCount').textContent = totalResults.toLocaleString();
 
         const loadMoreBtn = document.getElementById('loadMoreBtn');
-        if (currentPage * PER_PAGE < totalResults) {
-          loadMoreBtn.classList.remove('hidden');
-        } else {
-          loadMoreBtn.classList.add('hidden');
-        }
+        if (currentPage * PER_PAGE < totalResults) { loadMoreBtn.classList.remove('hidden'); }
+        else { loadMoreBtn.classList.add('hidden'); }
 
         renderImages(data.photos, append);
 
+        // 保存搜索历史
         if (!append && authToken) {
           fetch('/api/history', {
             method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': 'Bearer ' + authToken
-            },
+            headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + authToken },
             body: JSON.stringify({ query: currentQuery })
           }).catch(() => {});
         }
-
       } catch (error) {
         console.error('搜索失败:', error);
         if (!append) {
           document.getElementById('imageGrid').innerHTML = `
             <div class="col-span-full text-center py-24">
               <svg class="mx-auto mb-4 text-apple-text-tertiary opacity-30" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
-              <p class="text-apple-text-tertiary text-[15px]">搜索出错了，请稍后重试</p>
+              <p class="text-apple-text-tertiary text-[15px]">${error.message}</p>
             </div>`;
         }
       } finally {
@@ -747,15 +812,19 @@
 
       const fragment = document.createDocumentFragment();
       photos.forEach((photo, index) => {
+        const isFav = favoriteIds.has(String(photo.id));
         const item = document.createElement('div');
         item.className = 'masonry-item';
         item.style.animation = `fadeIn 0.4s cubic-bezier(0.25, 0.1, 0.25, 1) ${index * 0.04}s both`;
         item.innerHTML = `
-          <div class="img-card relative cursor-pointer bg-apple-card group"
-               onclick="openModal('${photo.src.large2x}', '${photo.photographer}', ${photo.width}, ${photo.height}, '${photo.src.original}')">
-            <img src="${photo.src.medium}" alt="${photo.alt || photo.photographer}" loading="lazy" class="w-full block"
+          <div class="img-card relative cursor-pointer bg-apple-card group" data-photo-id="${photo.id}"
+               onclick="openModal(${photo.id}, '${photo.src.large2x}', '${photo.photographer.replace(/'/g, "\\'")}', ${photo.width}, ${photo.height}, '${photo.src.original}', '${photo.src.medium}')">
+            <img src="${photo.src.medium}" alt="${(photo.alt || photo.photographer).replace(/"/g, '&quot;')}" loading="lazy" class="w-full block"
                  style="aspect-ratio: ${photo.width}/${photo.height}" />
-            <div class="img-overlay absolute inset-0 bg-gradient-to-t from-black/60 via-black/0 to-black/0 opacity-0 transition-opacity duration-300 flex flex-col justify-end p-4">
+            <button class="fav-btn ${isFav ? 'is-fav' : ''}" onclick="event.stopPropagation(); toggleFavorite(${photo.id}, '${photo.src.large2x}', '${photo.src.medium}', '${photo.photographer.replace(/'/g, "\\'")}', ${photo.width}, ${photo.height}, '${photo.src.original}', this)">
+              <svg viewBox="0 0 24 24" fill="${isFav ? '#FF453A' : 'none'}" stroke="${isFav ? '#FF453A' : 'white'}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+            </button>
+            <div class="img-overlay absolute inset-0 bg-gradient-to-t from-black/60 via-black/0 to-black/0 opacity-0 transition-opacity duration-300 flex flex-col justify-end p-4 pointer-events-none">
               <p class="text-white text-[13px] font-medium">${photo.photographer}</p>
               <p class="text-white/50 text-[11px] mt-0.5">${photo.width} × ${photo.height}</p>
             </div>
@@ -773,19 +842,38 @@
       searchImages();
     }
 
-    // ============ 搜索历史 ============
-    function toggleHistory() {
-      const panel = document.getElementById('historyPanel');
-      const overlay = document.getElementById('historyOverlay');
-      historyOpen = !historyOpen;
+    // ============ 侧边面板（历史 + 收藏）============
+    function openPanel(tab) {
+      panelTab = tab || 'history';
+      const panel = document.getElementById('sidePanel');
+      const overlay = document.getElementById('panelOverlay');
+      panel.style.transform = 'translateX(0)';
+      overlay.classList.remove('hidden');
+      panelOpen = true;
+      switchPanelTab(panelTab);
+    }
 
-      if (historyOpen) {
-        panel.style.transform = 'translateX(0)';
-        overlay.classList.remove('hidden');
+    function closePanel() {
+      document.getElementById('sidePanel').style.transform = 'translateX(100%)';
+      document.getElementById('panelOverlay').classList.add('hidden');
+      panelOpen = false;
+    }
+
+    function switchPanelTab(tab) {
+      panelTab = tab;
+      const historyTab = document.getElementById('panelTabHistory');
+      const favTab = document.getElementById('panelTabFav');
+      const historyContent = document.getElementById('historyContent');
+      const favContent = document.getElementById('favoritesContent');
+
+      if (tab === 'history') {
+        historyTab.classList.add('active'); favTab.classList.remove('active');
+        historyContent.classList.remove('hidden'); favContent.classList.add('hidden');
         loadHistory();
       } else {
-        panel.style.transform = 'translateX(100%)';
-        overlay.classList.add('hidden');
+        favTab.classList.add('active'); historyTab.classList.remove('active');
+        favContent.classList.remove('hidden'); historyContent.classList.add('hidden');
+        renderFavoritesPanel();
       }
     }
 
@@ -794,9 +882,7 @@
       list.innerHTML = '<div class="flex justify-center py-8"><div class="apple-spinner"></div></div>';
 
       try {
-        const res = await fetch('/api/history', {
-          headers: { 'Authorization': 'Bearer ' + authToken }
-        });
+        const res = await fetch('/api/history', { headers: { 'Authorization': 'Bearer ' + authToken } });
         const data = await res.json();
 
         if (!data.history || data.history.length === 0) {
@@ -805,12 +891,9 @@
         }
 
         list.innerHTML = data.history.map(item => {
-          const time = new Date(item.created_at).toLocaleString('zh-CN', {
-            month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'
-          });
+          const time = new Date(item.created_at).toLocaleString('zh-CN', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
           return `
-            <div class="history-item flex items-center justify-between py-3 px-3 cursor-pointer -mx-1"
-                 onclick="quickSearch('${item.query.replace(/'/g, "\\'")}')">
+            <div class="history-item flex items-center justify-between py-3 px-3 cursor-pointer -mx-1" onclick="quickSearch('${item.query.replace(/'/g, "\\'")}')">
               <div class="min-w-0">
                 <p class="text-[14px] text-white truncate" style="letter-spacing: -0.01em;">${item.query}</p>
                 <p class="text-[11px] text-apple-text-tertiary mt-0.5">${time}</p>
@@ -823,28 +906,65 @@
       }
     }
 
+    function renderFavoritesPanel() {
+      const list = document.getElementById('favoritesList');
+      if (favoritesData.length === 0) {
+        list.innerHTML = '<p class="text-apple-text-tertiary text-[13px] text-center py-8">暂无收藏</p>';
+        return;
+      }
+
+      list.innerHTML = `
+        <p class="text-[12px] text-apple-text-tertiary mb-3">${favoritesData.length} 张收藏</p>
+        <div class="fav-grid">
+          ${favoritesData.map(f => `
+            <div class="fav-thumb" onclick="openModal('${f.photo_id}', '${f.photo_url}', '${(f.photographer || '').replace(/'/g, "\\'")}', ${f.width || 0}, ${f.height || 0}, '${f.original_url || f.photo_url}', '${f.photo_thumb || f.photo_url}')">
+              <img src="${f.photo_thumb || f.photo_url}" alt="${f.photographer || ''}" loading="lazy" />
+              <button class="fav-remove" onclick="event.stopPropagation(); removeFavFromPanel('${f.photo_id}', this)">
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+              </button>
+            </div>
+          `).join('')}
+        </div>`;
+    }
+
+    async function removeFavFromPanel(photoId, btnEl) {
+      const id = String(photoId);
+      favoriteIds.delete(id);
+      favoritesData = favoritesData.filter(f => String(f.photo_id) !== id);
+      // 更新网格中的收藏按钮
+      const gridCard = document.querySelector(`[data-photo-id="${id}"] .fav-btn`);
+      if (gridCard) updateFavBtnUI(gridCard, false);
+      renderFavoritesPanel();
+      try {
+        await fetch('/api/favorites', {
+          method: 'DELETE', headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + authToken },
+          body: JSON.stringify({ photo_id: id })
+        });
+      } catch (e) { console.error('取消收藏失败', e); }
+    }
+
     // ============ 弹窗预览 ============
-    function openModal(imgUrl, photographer, width, height, originalUrl) {
+    function openModal(photoId, imgUrl, photographer, width, height, originalUrl, thumbUrl) {
+      currentModalPhoto = { id: String(photoId), photo_url: imgUrl, photo_thumb: thumbUrl || imgUrl, photographer, width, height, original_url: originalUrl };
       document.getElementById('modalImg').src = imgUrl;
       document.getElementById('modalPhotographer').textContent = photographer;
       document.getElementById('modalSize').textContent = width + ' × ' + height;
       document.getElementById('modalDownload').href = originalUrl;
       document.getElementById('modal').classList.remove('hidden');
       document.body.style.overflow = 'hidden';
+      updateModalFavUI();
     }
 
     function closeModal() {
       document.getElementById('modal').classList.add('hidden');
       document.body.style.overflow = '';
+      currentModalPhoto = null;
     }
 
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape') {
-        if (!document.getElementById('modal').classList.contains('hidden')) {
-          closeModal();
-        } else if (historyOpen) {
-          toggleHistory();
-        }
+        if (!document.getElementById('modal').classList.contains('hidden')) closeModal();
+        else if (panelOpen) closePanel();
       }
     });
 
@@ -852,15 +972,13 @@
       const url = document.getElementById('modalDownload').href;
       navigator.clipboard.writeText(url).then(() => {
         const btn = document.getElementById('copyBtn');
-        const originalHTML = btn.innerHTML;
+        const orig = btn.innerHTML;
         btn.innerHTML = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> 已复制`;
-        setTimeout(() => { btn.innerHTML = originalHTML; }, 2000);
+        setTimeout(() => { btn.innerHTML = orig; }, 2000);
       });
     }
 
-    function showLoading(show) {
-      document.getElementById('loading').classList.toggle('hidden', !show);
-    }
+    function showLoading(show) { document.getElementById('loading').classList.toggle('hidden', !show); }
 
     // 回车键支持
     document.addEventListener('keydown', (e) => {
