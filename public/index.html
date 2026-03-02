@@ -419,10 +419,40 @@
     .px-toggle-btn.active .px-switch { background: #af52de; }
     .px-toggle-btn.active .px-switch::after { transform: translateX(14px); }
 
-    /* 隐藏像素创作台相关元素 */
+    /* 创作台主开关控制面板可见性 */
+    body:not(.studio-on) .pixel-studio { display: none !important; }
+    /* 像素块化子开关控制 FAB 和 + 按钮 */
     body:not(.px-mode) .pixel-fab { display: none !important; }
-    body:not(.px-mode) .pixel-studio { display: none !important; }
     body:not(.px-mode) .add-studio-btn { display: none !important; }
+
+    /* 创作台功能列表项 */
+    .studio-feature-item {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 14px 16px; border-radius: 14px;
+      background: #f5f5f7; transition: all 0.2s ease; cursor: default;
+    }
+    .studio-feature-item:hover { background: #ededf0; }
+    .studio-feature-item .feature-icon {
+      width: 38px; height: 38px; border-radius: 10px;
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    }
+    .studio-feature-item .mini-switch {
+      width: 42px; height: 26px; border-radius: 13px;
+      background: #d2d2d7; position: relative; flex-shrink: 0;
+      transition: background 0.25s ease; cursor: pointer; border: none;
+    }
+    .studio-feature-item .mini-switch::after {
+      content: ''; position: absolute; top: 3px; left: 3px;
+      width: 20px; height: 20px; border-radius: 50%;
+      background: white; box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+      transition: transform 0.25s cubic-bezier(0.25, 0.1, 0.25, 1);
+    }
+    .studio-feature-item .mini-switch.on { background: #af52de; }
+    .studio-feature-item .mini-switch.on::after { transform: translateX(16px); }
+
+    /* 像素块内容区显隐 */
+    .px-content { transition: all 0.3s ease; }
+    .px-content.collapsed { display: none; }
 
     @media (max-width: 480px) {
       .pixel-studio { left: 8px; right: 8px; width: auto; bottom: 88px; }
@@ -702,90 +732,131 @@
       <span class="fab-badge" id="studioCount" style="display:none;">0</span>
     </button>
 
-    <!-- 像素创作台面板 -->
+    <!-- 创作台面板 -->
     <div class="pixel-studio hidden" id="pixelStudio">
       <!-- 头部 -->
-      <div class="flex items-center justify-between p-4 pb-2">
+      <div class="flex items-center justify-between p-4 pb-3">
         <div>
-          <h3 class="text-[15px] font-semibold text-apple-text-primary" style="letter-spacing:-0.02em;">像素创作台</h3>
-          <p class="text-[11px] text-apple-text-tertiary mt-0.5">添加素材，生成像素动画</p>
+          <h3 class="text-[15px] font-semibold text-apple-text-primary" style="letter-spacing:-0.02em;">创作台</h3>
+          <p class="text-[11px] text-apple-text-tertiary mt-0.5">开启功能模块，创造你的素材</p>
         </div>
-        <button onclick="togglePixelStudio()" class="w-8 h-8 rounded-full bg-black/[0.05] hover:bg-black/[0.1] flex items-center justify-center transition-colors duration-200">
+        <button onclick="toggleStudioPanel()" class="w-8 h-8 rounded-full bg-black/[0.05] hover:bg-black/[0.1] flex items-center justify-center transition-colors duration-200">
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#1d1d1f" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
         </button>
       </div>
 
-      <!-- Canvas 画布 -->
-      <div class="pixel-canvas-wrap" id="pixelCanvasWrap">
-        <canvas id="pixelCanvas" width="384" height="384"></canvas>
-        <div id="pixelEmpty" class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-          <svg class="mb-2 opacity-20" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
-          <p class="text-white/25 text-[13px]">搜索素材后点击 + 添加</p>
-        </div>
-      </div>
-
-      <!-- 控制栏 -->
-      <div class="px-4 py-3">
-        <div class="flex items-center justify-between mb-2.5">
-          <div class="flex items-center gap-1">
-            <button onclick="studioPrev()" class="pixel-ctrl-btn" title="上一帧">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="#1d1d1f"><polygon points="19 20 9 12 19 4"/><rect x="5" y="4" width="2" height="16"/></svg>
-            </button>
-            <button onclick="studioTogglePlay()" id="studioPlayBtn" class="pixel-ctrl-btn" style="background:rgba(175,82,222,0.1)" title="播放/暂停">
-              <svg id="studioPlayIcon" width="14" height="14" viewBox="0 0 24 24" fill="#af52de"><polygon points="5 3 19 12 5 21"/></svg>
-            </button>
-            <button onclick="studioNext()" class="pixel-ctrl-btn" title="下一帧">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="#1d1d1f"><polygon points="5 4 15 12 5 20"/><rect x="17" y="4" width="2" height="16"/></svg>
-            </button>
-            <span id="studioFrameInfo" class="text-[11px] text-apple-text-tertiary ml-2">0 / 0</span>
-          </div>
+      <!-- 功能列表 -->
+      <div class="px-4 pb-3 space-y-2" id="studioFeatureList">
+        <!-- 像素块化 -->
+        <div class="studio-feature-item">
           <div class="flex items-center gap-3">
-            <div class="flex items-center gap-1.5">
-              <span class="text-[11px] text-apple-text-tertiary">像素</span>
-              <select id="gridSizeSelect" onchange="studioChangeGrid(this.value)" class="text-[12px] bg-black/[0.04] border-none rounded-lg px-2 py-1 text-apple-text-primary outline-none cursor-pointer appearance-none">
-                <option value="16">16</option>
-                <option value="32" selected>32</option>
-                <option value="48">48</option>
-                <option value="64">64</option>
-              </select>
+            <div class="feature-icon" style="background:linear-gradient(135deg,#af52de,#5856d6);">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="7" height="7" rx="1.5" fill="white"/><rect x="14" y="3" width="7" height="7" rx="1.5" fill="white" opacity="0.7"/><rect x="3" y="14" width="7" height="7" rx="1.5" fill="white" opacity="0.7"/><rect x="14" y="14" width="7" height="7" rx="1.5" fill="white" opacity="0.45"/></svg>
             </div>
-            <div class="flex items-center gap-1.5">
-              <span class="text-[11px] text-apple-text-tertiary">速度</span>
-              <select id="fpsSelect" onchange="studioChangeFps(this.value)" class="text-[12px] bg-black/[0.04] border-none rounded-lg px-2 py-1 text-apple-text-primary outline-none cursor-pointer appearance-none">
-                <option value="600">慢</option>
-                <option value="300" selected>中</option>
-                <option value="120">快</option>
-              </select>
+            <div>
+              <p class="text-[13px] font-medium text-apple-text-primary leading-tight">像素块化</p>
+              <p class="text-[11px] text-apple-text-tertiary mt-0.5">素材像素化 · 帧动画 · 过渡特效</p>
             </div>
           </div>
+          <button class="mini-switch" id="pxFeatureSwitch" onclick="togglePxFeature()"></button>
         </div>
-        <!-- 过渡效果 -->
-        <div class="flex items-center gap-2">
-          <span class="text-[11px] text-apple-text-tertiary flex-shrink-0">过渡</span>
-          <div class="flex gap-1">
-            <button onclick="studioSetTrans('none')" class="trans-btn active text-[11px] px-3 py-1 rounded-full" data-trans="none">无</button>
-            <button onclick="studioSetTrans('dissolve')" class="trans-btn text-[11px] px-3 py-1 rounded-full" data-trans="dissolve">溶解</button>
-            <button onclick="studioSetTrans('wipe')" class="trans-btn text-[11px] px-3 py-1 rounded-full" data-trans="wipe">擦除</button>
-            <button onclick="studioSetTrans('rain')" class="trans-btn text-[11px] px-3 py-1 rounded-full" data-trans="rain">像素雨</button>
+
+        <!-- 未来功能占位 -->
+        <div class="studio-feature-item" style="opacity:0.5;">
+          <div class="flex items-center gap-3">
+            <div class="feature-icon" style="background:linear-gradient(135deg,#ff9500,#ff3b30);">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+            </div>
+            <div>
+              <p class="text-[13px] font-medium text-apple-text-primary leading-tight">更多功能</p>
+              <p class="text-[11px] text-apple-text-tertiary mt-0.5">敬请期待...</p>
+            </div>
           </div>
+          <div class="text-[11px] text-apple-text-tertiary px-2">即将推出</div>
         </div>
       </div>
 
-      <!-- 时间轴 -->
-      <div class="border-t border-[#d2d2d7]/40">
-        <div class="pixel-timeline" id="pixelTimeline">
-          <div class="flex items-center justify-center w-full py-4">
-            <p class="text-[12px] text-apple-text-tertiary">暂无帧 — 搜索素材后点击 + 添加</p>
+      <!-- ====== 像素块化内容区（子功能，默认隐藏）====== -->
+      <div class="px-content collapsed" id="pxContentArea">
+        <div class="border-t border-[#d2d2d7]/40"></div>
+
+        <!-- 小标题 -->
+        <div class="flex items-center justify-between px-4 pt-3 pb-1">
+          <p class="text-[12px] font-semibold text-apple-purple">像素块化</p>
+          <span id="studioFrameInfo" class="text-[11px] text-apple-text-tertiary">0 / 0</span>
+        </div>
+
+        <!-- Canvas 画布 -->
+        <div class="pixel-canvas-wrap" id="pixelCanvasWrap">
+          <canvas id="pixelCanvas" width="384" height="384"></canvas>
+          <div id="pixelEmpty" class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+            <svg class="mb-2 opacity-20" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+            <p class="text-white/25 text-[13px]">搜索素材后点击 + 添加</p>
           </div>
         </div>
-      </div>
 
-      <!-- 底部操作 -->
-      <div class="border-t border-[#d2d2d7]/40 px-4 py-3 flex items-center justify-between">
-        <button onclick="studioClear()" class="text-[12px] text-apple-text-tertiary hover:text-apple-red transition-colors duration-200 bg-transparent border-none cursor-pointer">清空全部</button>
-        <div class="flex items-center gap-2">
-          <button onclick="studioExportAll()" id="studioExportAllBtn" class="hidden text-[12px] text-apple-purple hover:text-purple-700 transition-colors duration-200 bg-transparent border-none cursor-pointer">导出全部帧</button>
-          <button onclick="studioExport()" class="text-[12px] bg-[#af52de] hover:bg-[#9b3dc8] text-white px-4 py-1.5 rounded-full transition-colors duration-200 border-none cursor-pointer">导出当前帧</button>
+        <!-- 控制栏 -->
+        <div class="px-4 py-3">
+          <div class="flex items-center justify-between mb-2.5">
+            <div class="flex items-center gap-1">
+              <button onclick="studioPrev()" class="pixel-ctrl-btn" title="上一帧">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="#1d1d1f"><polygon points="19 20 9 12 19 4"/><rect x="5" y="4" width="2" height="16"/></svg>
+              </button>
+              <button onclick="studioTogglePlay()" id="studioPlayBtn" class="pixel-ctrl-btn" style="background:rgba(175,82,222,0.1)" title="播放/暂停">
+                <svg id="studioPlayIcon" width="14" height="14" viewBox="0 0 24 24" fill="#af52de"><polygon points="5 3 19 12 5 21"/></svg>
+              </button>
+              <button onclick="studioNext()" class="pixel-ctrl-btn" title="下一帧">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="#1d1d1f"><polygon points="5 4 15 12 5 20"/><rect x="17" y="4" width="2" height="16"/></svg>
+              </button>
+            </div>
+            <div class="flex items-center gap-3">
+              <div class="flex items-center gap-1.5">
+                <span class="text-[11px] text-apple-text-tertiary">像素</span>
+                <select id="gridSizeSelect" onchange="studioChangeGrid(this.value)" class="text-[12px] bg-black/[0.04] border-none rounded-lg px-2 py-1 text-apple-text-primary outline-none cursor-pointer appearance-none">
+                  <option value="16">16</option>
+                  <option value="32" selected>32</option>
+                  <option value="48">48</option>
+                  <option value="64">64</option>
+                </select>
+              </div>
+              <div class="flex items-center gap-1.5">
+                <span class="text-[11px] text-apple-text-tertiary">速度</span>
+                <select id="fpsSelect" onchange="studioChangeFps(this.value)" class="text-[12px] bg-black/[0.04] border-none rounded-lg px-2 py-1 text-apple-text-primary outline-none cursor-pointer appearance-none">
+                  <option value="600">慢</option>
+                  <option value="300" selected>中</option>
+                  <option value="120">快</option>
+                </select>
+              </div>
+            </div>
+          </div>
+          <!-- 过渡效果 -->
+          <div class="flex items-center gap-2">
+            <span class="text-[11px] text-apple-text-tertiary flex-shrink-0">过渡</span>
+            <div class="flex gap-1">
+              <button onclick="studioSetTrans('none')" class="trans-btn active text-[11px] px-3 py-1 rounded-full" data-trans="none">无</button>
+              <button onclick="studioSetTrans('dissolve')" class="trans-btn text-[11px] px-3 py-1 rounded-full" data-trans="dissolve">溶解</button>
+              <button onclick="studioSetTrans('wipe')" class="trans-btn text-[11px] px-3 py-1 rounded-full" data-trans="wipe">擦除</button>
+              <button onclick="studioSetTrans('rain')" class="trans-btn text-[11px] px-3 py-1 rounded-full" data-trans="rain">像素雨</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- 时间轴 -->
+        <div class="border-t border-[#d2d2d7]/40">
+          <div class="pixel-timeline" id="pixelTimeline">
+            <div class="flex items-center justify-center w-full py-4">
+              <p class="text-[12px] text-apple-text-tertiary">暂无帧 — 搜索素材后点击 + 添加</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- 底部操作 -->
+        <div class="border-t border-[#d2d2d7]/40 px-4 py-3 flex items-center justify-between">
+          <button onclick="studioClear()" class="text-[12px] text-apple-text-tertiary hover:text-apple-red transition-colors duration-200 bg-transparent border-none cursor-pointer">清空全部</button>
+          <div class="flex items-center gap-2">
+            <button onclick="studioExportAll()" id="studioExportAllBtn" class="hidden text-[12px] text-apple-purple hover:text-purple-700 transition-colors duration-200 bg-transparent border-none cursor-pointer">导出全部帧</button>
+            <button onclick="studioExport()" class="text-[12px] bg-[#af52de] hover:bg-[#9b3dc8] text-white px-4 py-1.5 rounded-full transition-colors duration-200 border-none cursor-pointer">导出当前帧</button>
+          </div>
         </div>
       </div>
     </div>
@@ -1640,19 +1711,39 @@
       try { await fetch('/api/favorites', { method: 'DELETE', headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + authToken }, body: JSON.stringify({ photo_id: id }) }); } catch (e) {}
     }
 
-    // ============ 像素创作台 — 功能开关 ============
-    let pxModeOn = false;
+    // ============ 创作台 — 主面板开关 ============
+    let studioPanelOpen = false;
+    let pxFeatureOn = false;
 
     function togglePxMode() {
-      pxModeOn = !pxModeOn;
-      document.body.classList.toggle('px-mode', pxModeOn);
-      document.getElementById('pxToggleBtn').classList.toggle('active', pxModeOn);
-      // 关闭时也关掉面板
-      if (!pxModeOn && pxStudio.isOpen) {
-        togglePixelStudio();
+      // 导航栏开关：打开/关闭创作台面板
+      studioPanelOpen = !studioPanelOpen;
+      document.body.classList.toggle('studio-on', studioPanelOpen);
+      document.getElementById('pxToggleBtn').classList.toggle('active', studioPanelOpen);
+      document.getElementById('pixelStudio').classList.toggle('hidden', !studioPanelOpen);
+      // 关闭面板时，停止播放
+      if (!studioPanelOpen && pxStudio.isPlaying) {
+        studioTogglePlay();
       }
+    }
+
+    function toggleStudioPanel() {
+      // 面板内的关闭按钮
+      studioPanelOpen = false;
+      document.body.classList.remove('studio-on');
+      document.getElementById('pxToggleBtn').classList.remove('active');
+      document.getElementById('pixelStudio').classList.add('hidden');
+      if (pxStudio.isPlaying) studioTogglePlay();
+    }
+
+    function togglePxFeature() {
+      // 像素块化子功能开关
+      pxFeatureOn = !pxFeatureOn;
+      document.body.classList.toggle('px-mode', pxFeatureOn);
+      document.getElementById('pxFeatureSwitch').classList.toggle('on', pxFeatureOn);
+      document.getElementById('pxContentArea').classList.toggle('collapsed', !pxFeatureOn);
       // 关闭时停止播放
-      if (!pxModeOn && pxStudio.isPlaying) {
+      if (!pxFeatureOn && pxStudio.isPlaying) {
         studioTogglePlay();
       }
     }
@@ -1667,8 +1758,17 @@
     let pxAnim = { lastTime: 0, trans: false, from: null, to: null, tStart: 0, tDur: 0, order: null };
 
     function togglePixelStudio() {
-      pxStudio.isOpen = !pxStudio.isOpen;
-      document.getElementById('pixelStudio').classList.toggle('hidden', !pxStudio.isOpen);
+      // FAB 点击：确保面板打开且滚动到像素区
+      if (!studioPanelOpen) {
+        studioPanelOpen = true;
+        document.body.classList.add('studio-on');
+        document.getElementById('pxToggleBtn').classList.add('active');
+        document.getElementById('pixelStudio').classList.remove('hidden');
+      }
+      // 确保像素块化功能已开启
+      if (!pxFeatureOn) {
+        togglePxFeature();
+      }
     }
 
     function addToStudio(imgUrl) {
