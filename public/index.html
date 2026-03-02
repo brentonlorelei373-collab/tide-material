@@ -4,6 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>TIDE Material — 超级素材搜索</title>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="apple-touch-icon" href="/favicon.svg">
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwindcss.config = {
@@ -302,6 +304,99 @@
       backdrop-filter: saturate(180%) blur(20px);
       -webkit-backdrop-filter: saturate(180%) blur(20px);
     }
+
+    /* ====== 像素创作台 ====== */
+    .pixel-fab {
+      position: fixed; bottom: 28px; right: 28px; z-index: 45;
+      width: 56px; height: 56px; border-radius: 50%;
+      background: linear-gradient(135deg, #af52de, #5856d6);
+      color: white; border: none; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 4px 20px rgba(175, 82, 222, 0.4);
+      transition: all 0.3s cubic-bezier(0.25, 0.1, 0.25, 1);
+    }
+    .pixel-fab:hover { transform: scale(1.08); box-shadow: 0 6px 28px rgba(175, 82, 222, 0.5); }
+    .pixel-fab:active { transform: scale(0.95); }
+    .pixel-fab .fab-badge {
+      position: absolute; top: -4px; right: -4px;
+      min-width: 20px; height: 20px; border-radius: 10px;
+      background: #ff3b30; color: white; font-size: 11px; font-weight: 700;
+      display: flex; align-items: center; justify-content: center; padding: 0 5px;
+    }
+
+    .pixel-studio {
+      position: fixed; bottom: 96px; right: 28px; z-index: 46;
+      width: 420px;
+      background: rgba(255,255,255,0.96);
+      backdrop-filter: saturate(180%) blur(40px);
+      -webkit-backdrop-filter: saturate(180%) blur(40px);
+      border-radius: 20px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.18), 0 0 0 0.5px rgba(0,0,0,0.08);
+      overflow: hidden;
+      transform-origin: bottom right;
+      transition: transform 0.35s cubic-bezier(0.25, 0.1, 0.25, 1), opacity 0.35s cubic-bezier(0.25, 0.1, 0.25, 1);
+    }
+    .pixel-studio.hidden { transform: scale(0.92); opacity: 0; pointer-events: none; }
+
+    .pixel-canvas-wrap {
+      background: #1a1a1e; border-radius: 14px; overflow: hidden;
+      margin: 0 16px; position: relative;
+    }
+    .pixel-canvas-wrap canvas { display: block; width: 100%; aspect-ratio: 1; }
+
+    .pixel-timeline {
+      display: flex; gap: 8px; overflow-x: auto; padding: 12px 16px;
+      scrollbar-width: none; align-items: center;
+    }
+    .pixel-timeline::-webkit-scrollbar { display: none; }
+
+    .pixel-frame-thumb {
+      width: 52px; height: 52px; border-radius: 10px; overflow: hidden;
+      border: 2px solid transparent; cursor: pointer; flex-shrink: 0;
+      transition: all 0.2s ease; position: relative; background: #1a1a1e;
+    }
+    .pixel-frame-thumb.active { border-color: #af52de; box-shadow: 0 0 0 2px rgba(175,82,222,0.25); }
+    .pixel-frame-thumb:hover { transform: scale(1.06); }
+    .pixel-frame-thumb canvas { width: 100%; height: 100%; display: block; }
+    .pixel-frame-thumb .frame-remove {
+      position: absolute; top: -5px; right: -5px; width: 18px; height: 18px;
+      border-radius: 50%; background: #ff3b30; display: flex; align-items: center;
+      justify-content: center; opacity: 0; transition: opacity 0.2s; cursor: pointer; border: none;
+    }
+    .pixel-frame-thumb:hover .frame-remove { opacity: 1; }
+
+    .add-studio-btn {
+      position: absolute; bottom: 10px; left: 10px; z-index: 10;
+      width: 36px; height: 36px; border-radius: 50%;
+      background: rgba(175, 82, 222, 0.85); backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      display: flex; align-items: center; justify-content: center;
+      opacity: 0; transition: all 0.2s ease; cursor: pointer; border: none;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15); color: white;
+    }
+    .add-studio-btn:hover { background: rgba(175, 82, 222, 1); transform: scale(1.1); }
+    .add-studio-btn:active { transform: scale(0.9); }
+    .img-card:hover .add-studio-btn { opacity: 1; }
+
+    .trans-btn {
+      background: #f5f5f7; color: #86868b; border: none; cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .trans-btn:hover { background: #e8e8ed; color: #1d1d1f; }
+    .trans-btn.active { background: #af52de; color: white; }
+
+    .pixel-ctrl-btn {
+      width: 32px; height: 32px; border-radius: 8px; background: rgba(0,0,0,0.04);
+      border: none; cursor: pointer; display: flex; align-items: center; justify-content: center;
+      transition: all 0.2s ease;
+    }
+    .pixel-ctrl-btn:hover { background: rgba(0,0,0,0.08); }
+    .pixel-ctrl-btn:active { transform: scale(0.92); }
+
+    @media (max-width: 480px) {
+      .pixel-studio { left: 8px; right: 8px; width: auto; bottom: 88px; }
+      .pixel-fab { bottom: 20px; right: 20px; width: 50px; height: 50px; }
+    }
   </style>
 </head>
 <body class="antialiased">
@@ -554,6 +649,106 @@
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
             复制
           </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==================== 像素创作台 ==================== -->
+    <!-- FAB 按钮 -->
+    <button class="pixel-fab" onclick="togglePixelStudio()" title="像素创作台">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+        <rect x="3" y="3" width="7" height="7" rx="1.5" fill="white"/>
+        <rect x="14" y="3" width="7" height="7" rx="1.5" fill="white" opacity="0.7"/>
+        <rect x="3" y="14" width="7" height="7" rx="1.5" fill="white" opacity="0.7"/>
+        <rect x="14" y="14" width="7" height="7" rx="1.5" fill="white" opacity="0.45"/>
+      </svg>
+      <span class="fab-badge" id="studioCount" style="display:none;">0</span>
+    </button>
+
+    <!-- 像素创作台面板 -->
+    <div class="pixel-studio hidden" id="pixelStudio">
+      <!-- 头部 -->
+      <div class="flex items-center justify-between p-4 pb-2">
+        <div>
+          <h3 class="text-[15px] font-semibold text-apple-text-primary" style="letter-spacing:-0.02em;">像素创作台</h3>
+          <p class="text-[11px] text-apple-text-tertiary mt-0.5">添加素材，生成像素动画</p>
+        </div>
+        <button onclick="togglePixelStudio()" class="w-8 h-8 rounded-full bg-black/[0.05] hover:bg-black/[0.1] flex items-center justify-center transition-colors duration-200">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#1d1d1f" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+
+      <!-- Canvas 画布 -->
+      <div class="pixel-canvas-wrap" id="pixelCanvasWrap">
+        <canvas id="pixelCanvas" width="384" height="384"></canvas>
+        <div id="pixelEmpty" class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+          <svg class="mb-2 opacity-20" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+          <p class="text-white/25 text-[13px]">搜索素材后点击 + 添加</p>
+        </div>
+      </div>
+
+      <!-- 控制栏 -->
+      <div class="px-4 py-3">
+        <div class="flex items-center justify-between mb-2.5">
+          <div class="flex items-center gap-1">
+            <button onclick="studioPrev()" class="pixel-ctrl-btn" title="上一帧">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="#1d1d1f"><polygon points="19 20 9 12 19 4"/><rect x="5" y="4" width="2" height="16"/></svg>
+            </button>
+            <button onclick="studioTogglePlay()" id="studioPlayBtn" class="pixel-ctrl-btn" style="background:rgba(175,82,222,0.1)" title="播放/暂停">
+              <svg id="studioPlayIcon" width="14" height="14" viewBox="0 0 24 24" fill="#af52de"><polygon points="5 3 19 12 5 21"/></svg>
+            </button>
+            <button onclick="studioNext()" class="pixel-ctrl-btn" title="下一帧">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="#1d1d1f"><polygon points="5 4 15 12 5 20"/><rect x="17" y="4" width="2" height="16"/></svg>
+            </button>
+            <span id="studioFrameInfo" class="text-[11px] text-apple-text-tertiary ml-2">0 / 0</span>
+          </div>
+          <div class="flex items-center gap-3">
+            <div class="flex items-center gap-1.5">
+              <span class="text-[11px] text-apple-text-tertiary">像素</span>
+              <select id="gridSizeSelect" onchange="studioChangeGrid(this.value)" class="text-[12px] bg-black/[0.04] border-none rounded-lg px-2 py-1 text-apple-text-primary outline-none cursor-pointer appearance-none">
+                <option value="16">16</option>
+                <option value="32" selected>32</option>
+                <option value="48">48</option>
+                <option value="64">64</option>
+              </select>
+            </div>
+            <div class="flex items-center gap-1.5">
+              <span class="text-[11px] text-apple-text-tertiary">速度</span>
+              <select id="fpsSelect" onchange="studioChangeFps(this.value)" class="text-[12px] bg-black/[0.04] border-none rounded-lg px-2 py-1 text-apple-text-primary outline-none cursor-pointer appearance-none">
+                <option value="600">慢</option>
+                <option value="300" selected>中</option>
+                <option value="120">快</option>
+              </select>
+            </div>
+          </div>
+        </div>
+        <!-- 过渡效果 -->
+        <div class="flex items-center gap-2">
+          <span class="text-[11px] text-apple-text-tertiary flex-shrink-0">过渡</span>
+          <div class="flex gap-1">
+            <button onclick="studioSetTrans('none')" class="trans-btn active text-[11px] px-3 py-1 rounded-full" data-trans="none">无</button>
+            <button onclick="studioSetTrans('dissolve')" class="trans-btn text-[11px] px-3 py-1 rounded-full" data-trans="dissolve">溶解</button>
+            <button onclick="studioSetTrans('wipe')" class="trans-btn text-[11px] px-3 py-1 rounded-full" data-trans="wipe">擦除</button>
+            <button onclick="studioSetTrans('rain')" class="trans-btn text-[11px] px-3 py-1 rounded-full" data-trans="rain">像素雨</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 时间轴 -->
+      <div class="border-t border-[#d2d2d7]/40">
+        <div class="pixel-timeline" id="pixelTimeline">
+          <div class="flex items-center justify-center w-full py-4">
+            <p class="text-[12px] text-apple-text-tertiary">暂无帧 — 搜索素材后点击 + 添加</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- 底部操作 -->
+      <div class="border-t border-[#d2d2d7]/40 px-4 py-3 flex items-center justify-between">
+        <button onclick="studioClear()" class="text-[12px] text-apple-text-tertiary hover:text-apple-red transition-colors duration-200 bg-transparent border-none cursor-pointer">清空全部</button>
+        <div class="flex items-center gap-2">
+          <button onclick="studioExportAll()" id="studioExportAllBtn" class="hidden text-[12px] text-apple-purple hover:text-purple-700 transition-colors duration-200 bg-transparent border-none cursor-pointer">导出全部帧</button>
+          <button onclick="studioExport()" class="text-[12px] bg-[#af52de] hover:bg-[#9b3dc8] text-white px-4 py-1.5 rounded-full transition-colors duration-200 border-none cursor-pointer">导出当前帧</button>
         </div>
       </div>
     </div>
@@ -956,6 +1151,7 @@
           <div class="img-card relative cursor-pointer group" data-photo-id="${photo.id}"
                onclick="openModal('photo',{id:${photo.id},url:'${photo.src.large2x}',thumb:'${photo.src.medium}',photographer:'${esc(photo.photographer)}',w:${photo.width},h:${photo.height},original:'${photo.src.original}'})">
             <img src="${photo.src.medium}" alt="${esc(photo.alt||photo.photographer)}" loading="lazy" class="w-full block" style="aspect-ratio:${photo.width}/${photo.height}" />
+            <button class="add-studio-btn" onclick="event.stopPropagation();addToStudio('${photo.src.medium}')" title="添加到创作台"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></button>
             <button class="fav-btn ${isFav?'is-fav':''}" onclick="event.stopPropagation();toggleFavorite(${photo.id},'${photo.src.large2x}','${photo.src.medium}','${esc(photo.photographer)}',${photo.width},${photo.height},'${photo.src.original}',this)">
               <svg viewBox="0 0 24 24" fill="${isFav?'#FF3B30':'none'}" stroke="${isFav?'#FF3B30':'#86868b'}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
             </button>
@@ -999,6 +1195,7 @@
           <div class="img-card relative cursor-pointer group" data-photo-id="v${v.id}"
                onclick="openModal('video',{id:'v${v.id}',url:'${videoUrl}',thumb:'${thumb}',photographer:'${esc(v.user?.name||'')}',w:${v.width||0},h:${v.height||0},original:'${videoUrl}'})">
             <img src="${thumb}" alt="${esc(v.user?.name||'')}" loading="lazy" class="w-full block" style="aspect-ratio:${v.width||16}/${v.height||9}" />
+            <button class="add-studio-btn" onclick="event.stopPropagation();addToStudio('${thumb}')" title="添加到创作台"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></button>
             <div class="video-play-btn">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="#1d1d1f"><polygon points="5 3 19 12 5 21 5 3"/></svg>
             </div>
@@ -1050,6 +1247,7 @@
           <div class="img-card relative cursor-pointer group" data-photo-id="g${g.id}"
                onclick="openModal('photo',{id:'g${g.id}',url:'${original}',thumb:'${thumb}',photographer:'${esc(g.username||'GIPHY')}',w:${w},h:${h},original:'${original}'})">
             <img src="${thumb}" alt="${esc(g.title||'')}" loading="lazy" class="w-full block" style="aspect-ratio:${w}/${h}" />
+            <button class="add-studio-btn" onclick="event.stopPropagation();addToStudio('${original}')" title="添加到创作台"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></button>
             <span class="gif-badge">GIF</span>
             <div class="img-overlay absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-0 transition-opacity duration-300 flex flex-col justify-end p-4 pointer-events-none rounded-2xl">
               <p class="text-white text-[13px] font-medium">${g.username || 'GIPHY'}</p>
@@ -1086,6 +1284,7 @@
           <div class="img-card relative cursor-pointer group" data-photo-id="px${h.id}"
                onclick="openModal('photo',{id:'px${h.id}',url:'${h.largeImageURL}',thumb:'${h.webformatURL}',photographer:'${esc(h.user||'')}',w:${h.imageWidth||0},h:${h.imageHeight||0},original:'${h.largeImageURL}'})">
             <img src="${h.webformatURL}" alt="${esc(h.tags||'')}" loading="lazy" class="w-full block" style="aspect-ratio:${h.webformatWidth||h.imageWidth||4}/${h.webformatHeight||h.imageHeight||3}" />
+            <button class="add-studio-btn" onclick="event.stopPropagation();addToStudio('${h.webformatURL}')" title="添加到创作台"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></button>
             <div class="img-overlay absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-0 transition-opacity duration-300 flex flex-col justify-end p-4 pointer-events-none rounded-2xl">
               <p class="text-white text-[13px] font-medium">${h.user || 'Pixabay'}</p>
               <p class="text-white/60 text-[11px] mt-0.5">${h.imageWidth} × ${h.imageHeight}</p>
@@ -1402,6 +1601,330 @@
       if (gridCard) updateFavBtnUI(gridCard, false);
       renderFavoritesPanel();
       try { await fetch('/api/favorites', { method: 'DELETE', headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + authToken }, body: JSON.stringify({ photo_id: id }) }); } catch (e) {}
+    }
+
+    // ============ 像素创作台 ============
+    const pxStudio = {
+      frames: [], currentFrame: 0, gridSize: 32, canvasSize: 384,
+      isPlaying: false, fps: 300, transition: 'none', isOpen: false,
+    };
+    const pxCache = new Map();
+    let pxRAF = null;
+    let pxAnim = { lastTime: 0, trans: false, from: null, to: null, tStart: 0, tDur: 0, order: null };
+
+    function togglePixelStudio() {
+      pxStudio.isOpen = !pxStudio.isOpen;
+      document.getElementById('pixelStudio').classList.toggle('hidden', !pxStudio.isOpen);
+    }
+
+    function addToStudio(imgUrl) {
+      const img = new Image();
+      img.crossOrigin = 'anonymous';
+      img.onload = () => {
+        pxCache.set(imgUrl, img);
+        const pixels = pxPixelate(img, pxStudio.gridSize);
+        const thumb = pxMakeThumb(pixels, pxStudio.gridSize);
+        pxStudio.frames.push({ pixels, thumb, src: imgUrl });
+        pxStudio.currentFrame = pxStudio.frames.length - 1;
+        pxRenderCurrent();
+        pxRenderTimeline();
+        pxUpdateBadge();
+        pxUpdateFrameInfo();
+        if (!pxStudio.isOpen) togglePixelStudio();
+        // Pulse FAB
+        const fab = document.querySelector('.pixel-fab');
+        fab.style.transform = 'scale(1.2)';
+        setTimeout(() => fab.style.transform = '', 300);
+        // Show export-all if 2+ frames
+        document.getElementById('studioExportAllBtn').classList.toggle('hidden', pxStudio.frames.length < 2);
+      };
+      img.onerror = () => {
+        console.warn('无法加载图片到创作台（可能存在跨域限制）');
+      };
+      img.src = imgUrl;
+    }
+
+    function pxPixelate(img, gs) {
+      const c = document.createElement('canvas');
+      c.width = gs; c.height = gs;
+      const ctx = c.getContext('2d');
+      const iw = img.naturalWidth || img.width;
+      const ih = img.naturalHeight || img.height;
+      const size = Math.min(iw, ih);
+      const sx = (iw - size) / 2, sy = (ih - size) / 2;
+      ctx.drawImage(img, sx, sy, size, size, 0, 0, gs, gs);
+      const d = ctx.getImageData(0, 0, gs, gs).data;
+      const pixels = [];
+      for (let i = 0; i < d.length; i += 4) pixels.push([d[i], d[i+1], d[i+2], d[i+3]]);
+      return pixels;
+    }
+
+    function pxMakeThumb(pixels, gs) {
+      const c = document.createElement('canvas');
+      c.width = 52; c.height = 52;
+      const ctx = c.getContext('2d');
+      const bs = 52 / gs;
+      for (let i = 0; i < pixels.length; i++) {
+        const p = pixels[i];
+        ctx.fillStyle = `rgb(${p[0]},${p[1]},${p[2]})`;
+        ctx.fillRect((i % gs) * bs, Math.floor(i / gs) * bs, Math.ceil(bs), Math.ceil(bs));
+      }
+      return c;
+    }
+
+    function pxRenderCurrent() {
+      if (pxStudio.frames.length === 0) return;
+      const canvas = document.getElementById('pixelCanvas');
+      const ctx = canvas.getContext('2d');
+      pxDraw(ctx, pxStudio.frames[pxStudio.currentFrame].pixels, pxStudio.gridSize, pxStudio.canvasSize);
+      document.getElementById('pixelEmpty').style.display = 'none';
+    }
+
+    function pxDraw(ctx, pixels, gs, cs) {
+      const bs = cs / gs;
+      const gap = gs <= 32 ? 1 : 0.5;
+      ctx.clearRect(0, 0, cs, cs);
+      ctx.fillStyle = '#1a1a1e';
+      ctx.fillRect(0, 0, cs, cs);
+      for (let i = 0; i < pixels.length; i++) {
+        const p = pixels[i];
+        const x = (i % gs) * bs + gap / 2;
+        const y = Math.floor(i / gs) * bs + gap / 2;
+        const s = bs - gap;
+        const r = Math.min(s * 0.12, 2);
+        ctx.fillStyle = `rgb(${p[0]},${p[1]},${p[2]})`;
+        ctx.beginPath();
+        ctx.moveTo(x + r, y);
+        ctx.lineTo(x + s - r, y);
+        ctx.quadraticCurveTo(x + s, y, x + s, y + r);
+        ctx.lineTo(x + s, y + s - r);
+        ctx.quadraticCurveTo(x + s, y + s, x + s - r, y + s);
+        ctx.lineTo(x + r, y + s);
+        ctx.quadraticCurveTo(x, y + s, x, y + s - r);
+        ctx.lineTo(x, y + r);
+        ctx.quadraticCurveTo(x, y, x + r, y);
+        ctx.fill();
+      }
+    }
+
+    function pxRenderTimeline() {
+      const tl = document.getElementById('pixelTimeline');
+      if (pxStudio.frames.length === 0) {
+        tl.innerHTML = '<div class="flex items-center justify-center w-full py-4"><p class="text-[12px] text-apple-text-tertiary">暂无帧 — 搜索素材后点击 + 添加</p></div>';
+        return;
+      }
+      tl.innerHTML = pxStudio.frames.map((f, i) =>
+        `<div class="pixel-frame-thumb ${i === pxStudio.currentFrame ? 'active' : ''}" onclick="pxGoFrame(${i})" title="帧 ${i+1}">
+          <button class="frame-remove" onclick="event.stopPropagation();pxRemoveFrame(${i})">
+            <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
+        </div>`
+      ).join('');
+      tl.querySelectorAll('.pixel-frame-thumb').forEach((el, i) => {
+        el.insertBefore(pxStudio.frames[i].thumb.cloneNode(true), el.firstChild);
+      });
+      // Scroll active into view
+      const active = tl.querySelector('.active');
+      if (active) active.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+    }
+
+    function pxUpdateFrameInfo() {
+      const el = document.getElementById('studioFrameInfo');
+      if (pxStudio.frames.length === 0) el.textContent = '0 / 0';
+      else el.textContent = `${pxStudio.currentFrame + 1} / ${pxStudio.frames.length}`;
+    }
+
+    function pxGoFrame(idx) {
+      pxStudio.currentFrame = idx;
+      pxRenderCurrent();
+      pxRenderTimeline();
+      pxUpdateFrameInfo();
+    }
+
+    function pxRemoveFrame(idx) {
+      pxStudio.frames.splice(idx, 1);
+      if (pxStudio.currentFrame >= pxStudio.frames.length) pxStudio.currentFrame = Math.max(0, pxStudio.frames.length - 1);
+      if (pxStudio.frames.length === 0) {
+        document.getElementById('pixelCanvas').getContext('2d').clearRect(0, 0, pxStudio.canvasSize, pxStudio.canvasSize);
+        document.getElementById('pixelEmpty').style.display = '';
+        if (pxStudio.isPlaying) studioTogglePlay();
+      } else {
+        pxRenderCurrent();
+      }
+      pxRenderTimeline();
+      pxUpdateBadge();
+      pxUpdateFrameInfo();
+      document.getElementById('studioExportAllBtn').classList.toggle('hidden', pxStudio.frames.length < 2);
+    }
+
+    function pxUpdateBadge() {
+      const badge = document.getElementById('studioCount');
+      const n = pxStudio.frames.length;
+      if (n > 0) { badge.style.display = ''; badge.textContent = n; }
+      else { badge.style.display = 'none'; }
+    }
+
+    function studioPrev() {
+      if (pxStudio.frames.length === 0) return;
+      pxStudio.currentFrame = (pxStudio.currentFrame - 1 + pxStudio.frames.length) % pxStudio.frames.length;
+      pxRenderCurrent(); pxRenderTimeline(); pxUpdateFrameInfo();
+    }
+    function studioNext() {
+      if (pxStudio.frames.length === 0) return;
+      pxStudio.currentFrame = (pxStudio.currentFrame + 1) % pxStudio.frames.length;
+      pxRenderCurrent(); pxRenderTimeline(); pxUpdateFrameInfo();
+    }
+
+    function studioTogglePlay() {
+      if (pxStudio.frames.length < 2) return;
+      pxStudio.isPlaying = !pxStudio.isPlaying;
+      const icon = document.getElementById('studioPlayIcon');
+      if (pxStudio.isPlaying) {
+        icon.innerHTML = '<rect x="6" y="4" width="4" height="16" fill="#af52de"/><rect x="14" y="4" width="4" height="16" fill="#af52de"/>';
+        pxAnim.lastTime = performance.now();
+        pxAnim.trans = false;
+        pxAnimLoop();
+      } else {
+        icon.innerHTML = '<polygon points="5 3 19 12 5 21" fill="#af52de"/>';
+        if (pxRAF) cancelAnimationFrame(pxRAF);
+      }
+    }
+
+    function pxAnimLoop() {
+      if (!pxStudio.isPlaying) return;
+      const now = performance.now();
+      const canvas = document.getElementById('pixelCanvas');
+      const ctx = canvas.getContext('2d');
+
+      if (pxAnim.trans) {
+        const progress = Math.min(1, (now - pxAnim.tStart) / pxAnim.tDur);
+        const blended = pxBlend(pxAnim.from, pxAnim.to, progress);
+        pxDraw(ctx, blended, pxStudio.gridSize, pxStudio.canvasSize);
+        if (progress >= 1) {
+          pxAnim.trans = false;
+          pxAnim.lastTime = now;
+        }
+      } else if (now - pxAnim.lastTime >= pxStudio.fps) {
+        const prev = pxStudio.currentFrame;
+        pxStudio.currentFrame = (pxStudio.currentFrame + 1) % pxStudio.frames.length;
+        pxRenderTimeline();
+        pxUpdateFrameInfo();
+        if (pxStudio.transition !== 'none') {
+          pxAnim.trans = true;
+          pxAnim.from = pxStudio.frames[prev].pixels;
+          pxAnim.to = pxStudio.frames[pxStudio.currentFrame].pixels;
+          pxAnim.tStart = now;
+          pxAnim.tDur = Math.min(pxStudio.fps * 0.6, 400);
+          // Shuffle for dissolve
+          const total = pxStudio.gridSize * pxStudio.gridSize;
+          pxAnim.order = Array.from({length: total}, (_, i) => i);
+          for (let i = total - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [pxAnim.order[i], pxAnim.order[j]] = [pxAnim.order[j], pxAnim.order[i]];
+          }
+        } else {
+          pxRenderCurrent();
+          pxAnim.lastTime = now;
+        }
+      }
+      pxRAF = requestAnimationFrame(pxAnimLoop);
+    }
+
+    function pxBlend(from, to, progress) {
+      const gs = pxStudio.gridSize;
+      const total = gs * gs;
+      const result = new Array(total);
+      switch (pxStudio.transition) {
+        case 'dissolve': {
+          const n = Math.floor(progress * total);
+          for (let i = 0; i < total; i++) result[i] = from[i];
+          for (let i = 0; i < n; i++) result[pxAnim.order[i]] = to[pxAnim.order[i]];
+          break;
+        }
+        case 'wipe': {
+          const col = Math.floor(progress * gs);
+          for (let i = 0; i < total; i++) result[i] = (i % gs) < col ? to[i] : from[i];
+          break;
+        }
+        case 'rain': {
+          for (let i = 0; i < total; i++) {
+            const row = Math.floor(i / gs);
+            const rp = Math.max(0, Math.min(1, progress * 1.5 - (row / gs) * 0.5));
+            if (rp >= 1) result[i] = to[i];
+            else if (rp <= 0) result[i] = from[i];
+            else {
+              const f = from[i], t = to[i];
+              result[i] = [
+                Math.round(f[0] + (t[0] - f[0]) * rp),
+                Math.round(f[1] + (t[1] - f[1]) * rp),
+                Math.round(f[2] + (t[2] - f[2]) * rp),
+                Math.round(f[3] + (t[3] - f[3]) * rp),
+              ];
+            }
+          }
+          break;
+        }
+        default: return to;
+      }
+      return result;
+    }
+
+    function studioChangeGrid(val) {
+      pxStudio.gridSize = parseInt(val);
+      pxStudio.frames.forEach(f => {
+        const img = pxCache.get(f.src);
+        if (img) {
+          f.pixels = pxPixelate(img, pxStudio.gridSize);
+          f.thumb = pxMakeThumb(f.pixels, pxStudio.gridSize);
+        }
+      });
+      if (pxStudio.frames.length > 0) pxRenderCurrent();
+      pxRenderTimeline();
+    }
+
+    function studioChangeFps(val) { pxStudio.fps = parseInt(val); }
+
+    function studioSetTrans(type) {
+      pxStudio.transition = type;
+      document.querySelectorAll('.trans-btn').forEach(b => b.classList.toggle('active', b.dataset.trans === type));
+    }
+
+    function studioClear() {
+      if (pxStudio.frames.length === 0) return;
+      if (!confirm('确定清空所有帧吗？')) return;
+      pxStudio.frames = [];
+      pxStudio.currentFrame = 0;
+      if (pxStudio.isPlaying) studioTogglePlay();
+      document.getElementById('pixelCanvas').getContext('2d').clearRect(0, 0, pxStudio.canvasSize, pxStudio.canvasSize);
+      document.getElementById('pixelEmpty').style.display = '';
+      pxRenderTimeline();
+      pxUpdateBadge();
+      pxUpdateFrameInfo();
+      document.getElementById('studioExportAllBtn').classList.add('hidden');
+    }
+
+    function studioExport() {
+      if (pxStudio.frames.length === 0) return;
+      const canvas = document.getElementById('pixelCanvas');
+      const link = document.createElement('a');
+      link.download = `pixel-frame-${pxStudio.currentFrame + 1}.png`;
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+    }
+
+    function studioExportAll() {
+      if (pxStudio.frames.length < 2) return;
+      const tmpCanvas = document.createElement('canvas');
+      tmpCanvas.width = pxStudio.canvasSize;
+      tmpCanvas.height = pxStudio.canvasSize;
+      const tmpCtx = tmpCanvas.getContext('2d');
+      pxStudio.frames.forEach((f, i) => {
+        pxDraw(tmpCtx, f.pixels, pxStudio.gridSize, pxStudio.canvasSize);
+        const link = document.createElement('a');
+        link.download = `pixel-frame-${i + 1}.png`;
+        link.href = tmpCanvas.toDataURL('image/png');
+        link.click();
+      });
     }
 
     // ============ 键盘事件 ============
