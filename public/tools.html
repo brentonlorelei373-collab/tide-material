@@ -1,0 +1,812 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TIDE Tools — 转录 · 翻译 · 格式化 · 热搜</title>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="apple-touch-icon" href="/favicon.svg">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwindcss.config = {
+      theme: {
+        extend: {
+          colors: {
+            'apple-bg': '#ffffff',
+            'apple-bg-secondary': '#f5f5f7',
+            'apple-card': '#ffffff',
+            'apple-separator': '#d2d2d7',
+            'apple-gray': '#86868b',
+            'apple-blue': '#0071e3',
+            'apple-blue-hover': '#0077ed',
+            'apple-red': '#ff3b30',
+            'apple-green': '#34c759',
+            'apple-text-primary': '#1d1d1f',
+            'apple-text-secondary': '#6e6e73',
+            'apple-text-tertiary': '#86868b',
+          },
+          fontFamily: {
+            sans: ['-apple-system', 'BlinkMacSystemFont', 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', 'Helvetica', 'Arial', 'sans-serif'],
+          },
+        }
+      }
+    }
+  </script>
+  <style>
+    * { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+    body { background-color: #f5f5f7; min-height: 100vh; font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', sans-serif; color: #1d1d1f; }
+
+    ::-webkit-scrollbar { width: 8px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.15); border-radius: 4px; }
+
+    .glass-nav {
+      background: rgba(255,255,255,0.72);
+      backdrop-filter: saturate(180%) blur(20px);
+      -webkit-backdrop-filter: saturate(180%) blur(20px);
+    }
+
+    .tool-card {
+      background: #ffffff;
+      border-radius: 18px;
+      padding: 24px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 0 1px rgba(0,0,0,0.04);
+    }
+
+    .tool-input {
+      background: #f5f5f7;
+      border: 1px solid transparent;
+      border-radius: 10px;
+      padding: 12px 14px;
+      color: #1d1d1f;
+      font-size: 15px;
+      width: 100%;
+      outline: none;
+      transition: all 0.2s;
+      letter-spacing: -0.015em;
+    }
+    .tool-input:focus {
+      background: #fff;
+      border-color: #0071e3;
+      box-shadow: 0 0 0 3px rgba(0,113,227,0.12);
+    }
+    .tool-input::placeholder { color: #86868b; }
+    textarea.tool-input { resize: vertical; }
+
+    .btn-primary {
+      background: #0071e3;
+      color: #fff;
+      font-size: 15px;
+      font-weight: 500;
+      padding: 11px 22px;
+      border-radius: 980px;
+      border: none;
+      cursor: pointer;
+      transition: all 0.2s;
+      letter-spacing: -0.015em;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .btn-primary:hover { background: #0077ed; }
+    .btn-primary:active { transform: scale(0.97); opacity: 0.9; }
+    .btn-primary:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+
+    .btn-secondary {
+      background: transparent;
+      color: #0071e3;
+      font-size: 13px;
+      font-weight: 500;
+      padding: 7px 14px;
+      border-radius: 980px;
+      border: 1px solid #0071e3;
+      cursor: pointer;
+      transition: all 0.2s;
+      letter-spacing: -0.01em;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .btn-secondary:hover { background: #0071e3; color: #fff; }
+    .btn-secondary:active { transform: scale(0.96); }
+
+    .btn-ghost {
+      background: #f5f5f7;
+      color: #1d1d1f;
+      font-size: 13px;
+      font-weight: 500;
+      padding: 7px 14px;
+      border-radius: 980px;
+      border: none;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .btn-ghost:hover { background: #e8e8ed; }
+    .btn-ghost:active { transform: scale(0.96); }
+
+    /* 分段控制器 */
+    .seg-ctrl {
+      background: rgba(0,0,0,0.06);
+      border-radius: 10px;
+      padding: 2px;
+      display: inline-flex;
+    }
+    .seg-btn {
+      padding: 7px 16px;
+      font-size: 13px;
+      font-weight: 500;
+      border-radius: 8px;
+      color: #6e6e73;
+      transition: all 0.2s;
+      cursor: pointer;
+      border: none;
+      background: transparent;
+      letter-spacing: -0.01em;
+      white-space: nowrap;
+    }
+    .seg-btn.active {
+      background: #fff;
+      color: #1d1d1f;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.1), 0 0 1px rgba(0,0,0,0.04);
+    }
+
+    /* 标签栏 */
+    .tab-bar {
+      background: rgba(0,0,0,0.06);
+      border-radius: 12px;
+      padding: 3px;
+      display: flex;
+      gap: 1px;
+    }
+    .tab-btn {
+      flex: 1;
+      padding: 8px 12px;
+      font-size: 13px;
+      font-weight: 500;
+      border-radius: 9px;
+      color: #6e6e73;
+      transition: all 0.2s;
+      cursor: pointer;
+      border: none;
+      background: transparent;
+      white-space: nowrap;
+    }
+    .tab-btn.active {
+      background: #fff;
+      color: #1d1d1f;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+    }
+
+    .spinner {
+      width: 20px; height: 20px;
+      border: 2px solid rgba(255,255,255,0.4);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      display: inline-block;
+    }
+    .spinner-blue {
+      border-color: rgba(0,113,227,0.2);
+      border-top-color: #0071e3;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .fade-in { animation: fadeIn 0.35s ease; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+    /* 结果区域 */
+    .result-box {
+      background: #f5f5f7;
+      border-radius: 12px;
+      padding: 16px;
+      font-size: 14px;
+      line-height: 1.7;
+      color: #1d1d1f;
+      min-height: 120px;
+      white-space: pre-wrap;
+      word-break: break-word;
+      letter-spacing: -0.01em;
+    }
+
+    /* 文件拖拽区域 */
+    .drop-zone {
+      border: 2px dashed #d2d2d7;
+      border-radius: 14px;
+      padding: 36px 24px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .drop-zone:hover, .drop-zone.drag-over {
+      border-color: #0071e3;
+      background: rgba(0,113,227,0.03);
+    }
+
+    /* 热搜条目 */
+    .trend-item {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 10px 14px;
+      border-radius: 10px;
+      transition: background 0.15s;
+      cursor: default;
+    }
+    .trend-item:hover { background: #f5f5f7; }
+    .trend-rank {
+      font-size: 13px;
+      font-weight: 600;
+      color: #86868b;
+      min-width: 22px;
+      text-align: right;
+    }
+    .trend-rank.top3 { color: #0071e3; }
+
+    /* Toast */
+    .toast {
+      position: fixed;
+      bottom: 32px;
+      left: 50%;
+      transform: translateX(-50%) translateY(10px);
+      background: rgba(29,29,31,0.88);
+      backdrop-filter: blur(20px);
+      color: #fff;
+      padding: 12px 22px;
+      border-radius: 980px;
+      font-size: 14px;
+      letter-spacing: -0.01em;
+      opacity: 0;
+      transition: all 0.3s cubic-bezier(0.25, 0.1, 0.25, 1);
+      z-index: 9999;
+      pointer-events: none;
+      white-space: nowrap;
+    }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+    /* 标签选择器 */
+    select.tool-input {
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2386868b' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 14px center;
+      padding-right: 36px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 导航栏 -->
+  <nav class="fixed top-0 left-0 right-0 z-50 glass-nav border-b border-[#d2d2d7]/50">
+    <div class="max-w-[860px] mx-auto px-6 h-11 flex items-center justify-between">
+      <div class="flex items-center gap-2">
+        <a href="/" class="flex items-center gap-2 opacity-60 hover:opacity-100 transition-opacity">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none">
+            <rect width="24" height="24" rx="5" fill="#1d1d1f"/>
+            <text x="12" y="17" text-anchor="middle" fill="white" font-size="13" font-weight="700" font-family="-apple-system, sans-serif">T</text>
+          </svg>
+          <span class="text-[12px] font-normal text-apple-text-primary tracking-tight" style="letter-spacing: -0.01em;">TIDE Material</span>
+        </a>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#d2d2d7" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+        <span class="text-[12px] font-semibold text-apple-text-primary" style="letter-spacing: -0.01em;">Tools</span>
+      </div>
+      <a href="/" class="h-8 px-3 rounded-full text-[12px] text-apple-text-secondary hover:text-apple-blue hover:bg-black/[0.04] transition-all duration-200 flex items-center gap-1.5">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+        <span class="hidden sm:inline">返回素材库</span>
+      </a>
+    </div>
+  </nav>
+
+  <!-- 主内容 -->
+  <main class="pt-11 pb-24">
+
+    <!-- Hero -->
+    <section class="bg-white border-b border-[#d2d2d7]/60 px-6 pt-12 pb-10 text-center">
+      <div class="max-w-[600px] mx-auto">
+        <div class="inline-flex items-center gap-2 bg-[#f5f5f7] rounded-full px-4 py-1.5 mb-5">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#0071e3" stroke-width="2"><path d="M12 2a3 3 0 0 0-3 3v1H5a2 2 0 0 0-2 2v3a2 2 0 0 0 2 2h1v3a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2v-3h1a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-4V5a3 3 0 0 0-3-3z"/></svg>
+          <span class="text-[11px] font-semibold text-[#0071e3] tracking-wide uppercase">TIDE Tools</span>
+        </div>
+        <h1 class="text-[32px] font-semibold tracking-tight text-apple-text-primary mb-3" style="letter-spacing: -0.03em;">视频转录 · 翻译 · 格式化</h1>
+        <p class="text-[15px] text-apple-text-secondary leading-relaxed" style="letter-spacing: -0.015em;">上传音频文件由 AI 转录，或直接翻译、整理你的文字内容，一并查看 Google 实时热搜</p>
+      </div>
+    </section>
+
+    <div class="max-w-[860px] mx-auto px-6 pt-8">
+
+      <!-- Groq API Key -->
+      <div class="tool-card mb-6">
+        <div class="flex items-start gap-3">
+          <div class="w-8 h-8 rounded-full bg-[#f5f5f7] flex items-center justify-center flex-shrink-0 mt-0.5">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6e6e73" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          </div>
+          <div class="flex-1">
+            <p class="text-[13px] font-semibold text-apple-text-primary mb-1" style="letter-spacing: -0.01em;">Groq API Key</p>
+            <p class="text-[12px] text-apple-text-secondary mb-3" style="letter-spacing: -0.01em;">转录 / 翻译 / 格式化功能需要 · Key 仅本地使用，不会上传存储 · <a href="https://console.groq.com" target="_blank" class="text-apple-blue hover:underline">免费获取 →</a></p>
+            <div class="flex gap-2">
+              <input id="globalApiKey" type="password" placeholder="gsk_..."
+                class="tool-input flex-1 text-[13px] py-2.5" autocomplete="off" />
+              <button onclick="toggleKeyVis()" class="btn-ghost text-[12px] px-3 py-2.5 flex-shrink-0">
+                <span id="keyVisIcon">显示</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab Bar -->
+      <div class="tab-bar mb-6">
+        <button id="tab-transcribe" class="tab-btn active" onclick="switchTab('transcribe')">🎙️ 转录</button>
+        <button id="tab-translate" class="tab-btn" onclick="switchTab('translate')">🌐 翻译</button>
+        <button id="tab-format" class="tab-btn" onclick="switchTab('format')">✏️ 格式化</button>
+        <button id="tab-trends" class="tab-btn" onclick="switchTab('trends')">📈 Google 热搜</button>
+      </div>
+
+      <!-- ===== 转录 Tab ===== -->
+      <div id="panel-transcribe" class="fade-in">
+
+        <!-- 输入模式切换 -->
+        <div class="seg-ctrl w-full mb-4" style="display:flex;">
+          <button id="mode-url" class="seg-btn active flex-1" onclick="switchMode('url')">🔗 YouTube 链接</button>
+          <button id="mode-file" class="seg-btn flex-1" onclick="switchMode('file')">📁 上传音频</button>
+        </div>
+
+        <!-- 模式 A：YouTube URL -->
+        <div id="input-url" class="tool-card mb-4">
+          <p class="text-[13px] font-semibold text-apple-text-primary mb-1" style="letter-spacing: -0.01em;">视频链接</p>
+          <p class="text-[12px] text-apple-text-secondary mb-3" style="letter-spacing: -0.01em;">由 <a href="https://cobalt.tools" target="_blank" class="text-apple-blue hover:underline">Cobalt</a> 免费解析下载，无需部署后端，支持 YouTube · BiliBili · Twitter 等</p>
+          <input id="videoUrl" type="url" placeholder="https://www.youtube.com/watch?v=..."
+            class="tool-input text-[14px]" />
+        </div>
+
+        <!-- 模式 B：上传文件 -->
+        <div id="input-file" class="tool-card mb-4 hidden">
+          <p class="text-[13px] font-semibold text-apple-text-primary mb-3" style="letter-spacing: -0.01em;">上传音频文件</p>
+          <div id="dropZone" class="drop-zone mb-3"
+            onclick="document.getElementById('audioFile').click()"
+            ondragover="dragOver(event)"
+            ondragleave="dragLeave(event)"
+            ondrop="handleDrop(event)">
+            <div class="text-3xl mb-2">🎵</div>
+            <p class="text-[14px] text-apple-text-secondary font-medium" style="letter-spacing: -0.01em;">点击选择 或 拖拽音频文件至此</p>
+            <p class="text-[12px] text-apple-text-tertiary mt-1">支持 MP3 · M4A · WAV · WEBM · OGG · OPUS（最大 25 MB）</p>
+          </div>
+          <input id="audioFile" type="file" accept=".mp3,.m4a,.wav,.webm,.ogg,.opus" class="hidden" onchange="fileSelected(this)" />
+          <div id="fileInfo" class="hidden bg-[#f5f5f7] rounded-xl px-4 py-3 flex items-center gap-3">
+            <span class="text-xl">🎵</span>
+            <div class="flex-1 min-w-0">
+              <p id="fileName" class="text-[13px] font-medium text-apple-text-primary truncate"></p>
+              <p id="fileSize" class="text-[11px] text-apple-text-tertiary mt-0.5"></p>
+            </div>
+            <button onclick="clearFile()" class="text-apple-text-tertiary hover:text-apple-red transition-colors text-lg leading-none">✕</button>
+          </div>
+        </div>
+
+        <button id="transcribeBtn" onclick="doTranscribe()"
+          class="btn-primary w-full justify-center text-[15px] py-3 mb-6 rounded-2xl">
+          🎙️ 开始转录
+        </button>
+
+        <div id="transcribeResult" class="hidden tool-card fade-in">
+          <div class="flex items-center justify-between mb-3">
+            <p class="text-[13px] font-semibold text-apple-text-primary" style="letter-spacing: -0.01em;">转录结果</p>
+            <div class="flex gap-2 flex-wrap">
+              <button onclick="copyResult('transcribeOutput')" class="btn-ghost text-[12px]">📋 复制</button>
+              <button onclick="downloadResult('transcribeOutput', '转录结果')" class="btn-ghost text-[12px]">⬇ 下载</button>
+              <button onclick="sendTo('translate')" class="btn-secondary text-[12px]">→ 翻译</button>
+              <button onclick="sendTo('format')" class="btn-secondary text-[12px]">→ 整理</button>
+            </div>
+          </div>
+          <div id="transcribeOutput" class="result-box" contenteditable="true"></div>
+        </div>
+      </div>
+
+      <!-- ===== 翻译 Tab ===== -->
+      <div id="panel-translate" class="hidden fade-in">
+        <div class="tool-card mb-4">
+          <p class="text-[13px] font-semibold text-apple-text-primary mb-3" style="letter-spacing: -0.01em;">待翻译文本</p>
+          <textarea id="translateInput" class="tool-input min-h-[160px] mb-4" placeholder="粘贴要翻译的内容…"></textarea>
+          <div class="flex items-center gap-3">
+            <span class="text-[13px] text-apple-text-secondary flex-shrink-0" style="letter-spacing: -0.01em;">翻译为</span>
+            <div class="seg-ctrl">
+              <button id="lang-zh" class="seg-btn active" onclick="setLang('zh')">🇨🇳 中文</button>
+              <button id="lang-en" class="seg-btn" onclick="setLang('en')">🇺🇸 English</button>
+            </div>
+          </div>
+        </div>
+
+        <button id="translateBtn" onclick="doTranslate()"
+          class="btn-primary w-full justify-center text-[15px] py-3 mb-6 rounded-2xl">
+          🌐 开始翻译
+        </button>
+
+        <div id="translateResult" class="hidden tool-card fade-in">
+          <div class="flex items-center justify-between mb-3">
+            <p class="text-[13px] font-semibold text-apple-text-primary" style="letter-spacing: -0.01em;">翻译结果</p>
+            <div class="flex gap-2">
+              <button onclick="copyResult('translateOutput')" class="btn-ghost text-[12px]">📋 复制</button>
+              <button onclick="downloadResult('translateOutput', '翻译结果')" class="btn-ghost text-[12px]">⬇ 下载</button>
+            </div>
+          </div>
+          <div id="translateOutput" class="result-box" contenteditable="true"></div>
+        </div>
+      </div>
+
+      <!-- ===== 格式化 Tab ===== -->
+      <div id="panel-format" class="hidden fade-in">
+        <div class="tool-card mb-4">
+          <p class="text-[13px] font-semibold text-apple-text-primary mb-1" style="letter-spacing: -0.01em;">原始文本</p>
+          <p class="text-[12px] text-apple-text-secondary mb-3" style="letter-spacing: -0.01em;">AI 会自动加标点、分段、去除口语词，保持原语言不翻译</p>
+          <textarea id="formatInput" class="tool-input min-h-[160px]" placeholder="粘贴需要整理的逐字稿或粗糙文本…"></textarea>
+        </div>
+
+        <button id="formatBtn" onclick="doFormat()"
+          class="btn-primary w-full justify-center text-[15px] py-3 mb-6 rounded-2xl">
+          ✏️ AI 整理格式
+        </button>
+
+        <div id="formatResult" class="hidden tool-card fade-in">
+          <div class="flex items-center justify-between mb-3">
+            <p class="text-[13px] font-semibold text-apple-text-primary" style="letter-spacing: -0.01em;">整理结果</p>
+            <div class="flex gap-2">
+              <button onclick="copyResult('formatOutput')" class="btn-ghost text-[12px]">📋 复制</button>
+              <button onclick="downloadResult('formatOutput', '格式化结果')" class="btn-ghost text-[12px]">⬇ 下载</button>
+            </div>
+          </div>
+          <div id="formatOutput" class="result-box" contenteditable="true"></div>
+        </div>
+      </div>
+
+      <!-- ===== Google 热搜 Tab ===== -->
+      <div id="panel-trends" class="hidden fade-in">
+        <div class="tool-card mb-4">
+          <p class="text-[13px] font-semibold text-apple-text-primary mb-3" style="letter-spacing: -0.01em;">选择地区</p>
+          <select id="geoSelect" class="tool-input text-[14px]">
+            <option value="US">🇺🇸 美国</option>
+            <option value="CN">🇨🇳 中国大陆</option>
+            <option value="TW">🇹🇼 台湾</option>
+            <option value="HK">🇭🇰 香港</option>
+            <option value="JP">🇯🇵 日本</option>
+            <option value="KR">🇰🇷 韩国</option>
+            <option value="GB">🇬🇧 英国</option>
+            <option value="DE">🇩🇪 德国</option>
+            <option value="FR">🇫🇷 法国</option>
+            <option value="SG">🇸🇬 新加坡</option>
+            <option value="AU">🇦🇺 澳大利亚</option>
+            <option value="CA">🇨🇦 加拿大</option>
+          </select>
+        </div>
+
+        <button id="trendsBtn" onclick="doTrends()"
+          class="btn-primary w-full justify-center text-[15px] py-3 mb-6 rounded-2xl">
+          🔥 获取实时热搜 Top 20
+        </button>
+
+        <div id="trendsResult" class="hidden tool-card fade-in">
+          <div class="flex items-center justify-between mb-1">
+            <p class="text-[13px] font-semibold text-apple-text-primary" style="letter-spacing: -0.01em;" id="trendsTitle">实时热搜</p>
+            <button onclick="doTrends()" class="btn-ghost text-[12px] py-1.5 px-3">🔄 刷新</button>
+          </div>
+          <p class="text-[12px] text-apple-text-tertiary mb-4" style="letter-spacing: -0.01em;">数据来源：Google Trends</p>
+          <div id="trendsList"></div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- Toast 提示 -->
+  <div id="toast" class="toast"></div>
+
+  <script>
+    // ============ 状态 ============
+    let currentTab = 'transcribe';
+    let transcribeMode = 'url'; // 'url' | 'file'
+    let targetLang = 'zh';
+    let selectedFile = null;
+
+    // ============ Tab 切换 ============
+    function switchTab(tab) {
+      ['transcribe','translate','format','trends'].forEach(t => {
+        document.getElementById('panel-' + t).classList.add('hidden');
+        document.getElementById('tab-' + t).classList.remove('active');
+      });
+      document.getElementById('panel-' + tab).classList.remove('hidden');
+      document.getElementById('tab-' + tab).classList.add('active');
+      currentTab = tab;
+    }
+
+    // ============ API Key ============
+    function toggleKeyVis() {
+      const input = document.getElementById('globalApiKey');
+      const icon = document.getElementById('keyVisIcon');
+      if (input.type === 'password') {
+        input.type = 'text';
+        icon.textContent = '隐藏';
+      } else {
+        input.type = 'password';
+        icon.textContent = '显示';
+      }
+    }
+
+    function getApiKey() {
+      return document.getElementById('globalApiKey').value.trim();
+    }
+
+    // ============ 转录模式切换 ============
+    function switchMode(mode) {
+      transcribeMode = mode;
+      document.getElementById('mode-url').classList.toggle('active', mode === 'url');
+      document.getElementById('mode-file').classList.toggle('active', mode === 'file');
+      document.getElementById('input-url').classList.toggle('hidden', mode !== 'url');
+      document.getElementById('input-file').classList.toggle('hidden', mode !== 'file');
+    }
+
+    // ============ 文件处理 ============
+    function dragOver(e) {
+      e.preventDefault();
+      document.getElementById('dropZone').classList.add('drag-over');
+    }
+    function dragLeave(e) {
+      document.getElementById('dropZone').classList.remove('drag-over');
+    }
+    function handleDrop(e) {
+      e.preventDefault();
+      dragLeave(e);
+      const file = e.dataTransfer.files[0];
+      if (file) setFile(file);
+    }
+    function fileSelected(input) {
+      if (input.files[0]) setFile(input.files[0]);
+    }
+    function setFile(file) {
+      const allowed = ['audio/mpeg','audio/mp4','audio/wav','audio/webm','audio/ogg','audio/opus','audio/x-m4a','video/webm'];
+      const ext = file.name.split('.').pop().toLowerCase();
+      const allowedExts = ['mp3','m4a','wav','webm','ogg','opus'];
+      if (!allowed.includes(file.type) && !allowedExts.includes(ext)) {
+        showToast('❌ 不支持的文件格式，请上传 MP3 / M4A / WAV / WEBM / OGG');
+        return;
+      }
+      if (file.size > 25 * 1024 * 1024) {
+        showToast('❌ 文件超过 25 MB，Groq 最大支持 25 MB');
+        return;
+      }
+      selectedFile = file;
+      document.getElementById('fileName').textContent = file.name;
+      document.getElementById('fileSize').textContent = (file.size / 1024 / 1024).toFixed(2) + ' MB';
+      document.getElementById('fileInfo').classList.remove('hidden');
+      document.getElementById('dropZone').classList.add('hidden');
+    }
+    function clearFile() {
+      selectedFile = null;
+      document.getElementById('audioFile').value = '';
+      document.getElementById('fileInfo').classList.add('hidden');
+      document.getElementById('dropZone').classList.remove('hidden');
+    }
+
+    // ============ 转录 ============
+    async function doTranscribe() {
+      const apiKey = getApiKey();
+      if (!apiKey) { showToast('⚠️ 请先填写 Groq API Key'); return; }
+
+      const btn = document.getElementById('transcribeBtn');
+      let resp, data;
+
+      if (transcribeMode === 'url') {
+        // ── 模式 A：YouTube URL（Cobalt 下载） ──
+        const url = document.getElementById('videoUrl').value.trim();
+        if (!url) { showToast('⚠️ 请输入视频链接'); return; }
+
+        setLoading(btn, '下载音频中…');
+        try {
+          resp = await fetch('/api/tool/transcribe', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ url, api_key: apiKey }),
+          });
+          data = await resp.json();
+        } catch (e) {
+          showToast('❌ 请求失败：' + e.message);
+          resetBtn(btn, '🎙️ 开始转录');
+          return;
+        }
+
+      } else {
+        // ── 模式 B：上传音频文件 ──
+        if (!selectedFile) { showToast('⚠️ 请先选择音频文件'); return; }
+
+        setLoading(btn, '转录中…');
+        try {
+          const form = new FormData();
+          form.append('audio', selectedFile, selectedFile.name);
+          form.append('api_key', apiKey);
+          resp = await fetch('/api/tool/transcribe', { method: 'POST', body: form });
+          data = await resp.json();
+        } catch (e) {
+          showToast('❌ 请求失败：' + e.message);
+          resetBtn(btn, '🎙️ 开始转录');
+          return;
+        }
+      }
+
+      resetBtn(btn, '🎙️ 开始转录');
+
+      if (!resp.ok || data.error) {
+        showToast('❌ ' + (data.error || '转录失败'));
+        return;
+      }
+
+      document.getElementById('transcribeOutput').textContent = data.transcript;
+      document.getElementById('transcribeResult').classList.remove('hidden');
+      showToast('✅ 转录完成');
+      document.getElementById('transcribeResult').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+
+    // ============ 翻译 ============
+    function setLang(lang) {
+      targetLang = lang;
+      document.getElementById('lang-zh').classList.toggle('active', lang === 'zh');
+      document.getElementById('lang-en').classList.toggle('active', lang === 'en');
+    }
+
+    async function doTranslate() {
+      const apiKey = getApiKey();
+      if (!apiKey) { showToast('⚠️ 请先填写 Groq API Key'); return; }
+      const text = document.getElementById('translateInput').value.trim();
+      if (!text) { showToast('⚠️ 请输入要翻译的文本'); return; }
+
+      const btn = document.getElementById('translateBtn');
+      setLoading(btn, '翻译中…');
+
+      try {
+        const resp = await fetch('/api/tool/translate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ text, target: targetLang, api_key: apiKey })
+        });
+        const data = await resp.json();
+
+        if (!resp.ok || data.error) {
+          showToast('❌ ' + (data.error || '翻译失败'));
+          return;
+        }
+        if (data.already) {
+          showToast('ℹ️ ' + data.message);
+          return;
+        }
+
+        document.getElementById('translateOutput').textContent = data.result;
+        document.getElementById('translateResult').classList.remove('hidden');
+        showToast('✅ 翻译完成');
+        document.getElementById('translateResult').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      } catch (e) {
+        showToast('❌ 请求失败：' + e.message);
+      } finally {
+        resetBtn(btn, '🌐 开始翻译');
+      }
+    }
+
+    // ============ 格式化 ============
+    async function doFormat() {
+      const apiKey = getApiKey();
+      if (!apiKey) { showToast('⚠️ 请先填写 Groq API Key'); return; }
+      const text = document.getElementById('formatInput').value.trim();
+      if (!text) { showToast('⚠️ 请输入要整理的文本'); return; }
+
+      const btn = document.getElementById('formatBtn');
+      setLoading(btn, 'AI 整理中…');
+
+      try {
+        const resp = await fetch('/api/tool/format', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ transcript: text, api_key: apiKey })
+        });
+        const data = await resp.json();
+
+        if (!resp.ok || data.error) {
+          showToast('❌ ' + (data.error || '格式化失败'));
+          return;
+        }
+
+        document.getElementById('formatOutput').textContent = data.result;
+        document.getElementById('formatResult').classList.remove('hidden');
+        showToast('✅ 整理完成');
+        document.getElementById('formatResult').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      } catch (e) {
+        showToast('❌ 请求失败：' + e.message);
+      } finally {
+        resetBtn(btn, '✏️ AI 整理格式');
+      }
+    }
+
+    // ============ Google 热搜 ============
+    async function doTrends() {
+      const geo = document.getElementById('geoSelect').value;
+      const btn = document.getElementById('trendsBtn');
+      setLoading(btn, '获取中…');
+
+      try {
+        const resp = await fetch('/api/tool/trends?geo=' + geo);
+        const data = await resp.json();
+
+        if (!resp.ok || data.error) {
+          showToast('❌ ' + (data.error || '获取失败'));
+          return;
+        }
+
+        const geoNames = { US:'美国', CN:'中国大陆', TW:'台湾', HK:'香港', JP:'日本', KR:'韩国', GB:'英国', DE:'德国', FR:'法国', SG:'新加坡', AU:'澳大利亚', CA:'加拿大' };
+        document.getElementById('trendsTitle').textContent = `${geoNames[geo] || geo} · 实时热搜 Top ${data.keywords.length}`;
+
+        const list = document.getElementById('trendsList');
+        list.innerHTML = data.keywords.map((kw, i) => `
+          <div class="trend-item">
+            <span class="trend-rank ${i < 3 ? 'top3' : ''}">${i + 1}</span>
+            <span class="text-[14px] text-apple-text-primary flex-1" style="letter-spacing: -0.01em;">${kw}</span>
+            <a href="https://trends.google.com/trends/explore?q=${encodeURIComponent(kw)}&geo=${geo}" target="_blank"
+               class="text-[12px] text-apple-blue hover:underline flex-shrink-0">查看趋势 →</a>
+          </div>
+        `).join('');
+
+        document.getElementById('trendsResult').classList.remove('hidden');
+        showToast('✅ 已获取最新热搜');
+      } catch (e) {
+        showToast('❌ 请求失败：' + e.message);
+      } finally {
+        resetBtn(btn, '🔥 获取实时热搜 Top 20');
+      }
+    }
+
+    // ============ 快捷操作 ============
+    function sendTo(tab) {
+      const text = document.getElementById('transcribeOutput').textContent.trim();
+      if (!text) return;
+      if (tab === 'translate') document.getElementById('translateInput').value = text;
+      if (tab === 'format') document.getElementById('formatInput').value = text;
+      switchTab(tab);
+      showToast('✅ 内容已发送到' + (tab === 'translate' ? '翻译' : '格式化') + '标签');
+    }
+
+    function copyResult(id) {
+      const text = document.getElementById(id).textContent.trim();
+      if (!text) return;
+      navigator.clipboard.writeText(text).then(() => showToast('✅ 已复制到剪贴板'));
+    }
+
+    function downloadResult(id, name) {
+      const text = document.getElementById(id).textContent.trim();
+      if (!text) return;
+      const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = name + '.txt';
+      a.click();
+      URL.revokeObjectURL(a.href);
+      showToast('✅ 下载中…');
+    }
+
+    // ============ UI 工具 ============
+    function setLoading(btn, text) {
+      btn.disabled = true;
+      btn.innerHTML = `<span class="spinner"></span> ${text}`;
+    }
+    function resetBtn(btn, text) {
+      btn.disabled = false;
+      btn.innerHTML = text;
+    }
+
+    let toastTimer;
+    function showToast(msg) {
+      const el = document.getElementById('toast');
+      el.textContent = msg;
+      el.classList.add('show');
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => el.classList.remove('show'), 3000);
+    }
+  </script>
+
+</body>
+</html>

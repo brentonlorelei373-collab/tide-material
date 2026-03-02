@@ -780,6 +780,239 @@ async function handleGenerateImage(request, env) {
   }
 }
 
+// ============ Tool: 通过 Cobalt API 下载 YouTube 音频 ============
+
+async function fetchYoutubeAudioBuffer(videoUrl) {
+  // Step 1: 调用 Cobalt API 获取音频直链
+  const cobaltResp = await fetch('https://api.cobalt.tools/', {
+    method: 'POST',
+    headers: {
+      'Accept': 'application/json',
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      url: videoUrl,
+      downloadMode: 'audio',
+      audioFormat: 'mp3',
+      audioBitrate: '64',
+    }),
+  });
+
+  if (!cobaltResp.ok) {
+    const err = await cobaltResp.json().catch(() => ({}));
+    throw new Error(err.error?.code || `Cobalt 请求失败 (HTTP ${cobaltResp.status})`);
+  }
+
+  const cobaltData = await cobaltResp.json();
+
+  // status 可能是 "tunnel" / "redirect" / "stream"
+  if (cobaltData.status === 'error') {
+    throw new Error(cobaltData.error?.code || '无法解析该视频链接');
+  }
+
+  const audioUrl = cobaltData.url;
+  if (!audioUrl) throw new Error('Cobalt 未返回音频地址，请稍后重试');
+
+  // Step 2: 下载音频数据
+  const audioResp = await fetch(audioUrl, {
+    headers: { 'User-Agent': 'Mozilla/5.0' },
+  });
+  if (!audioResp.ok) throw new Error(`音频下载失败 (HTTP ${audioResp.status})`);
+
+  const audioBuffer = await audioResp.arrayBuffer();
+  if (audioBuffer.byteLength > 25 * 1024 * 1024) {
+    throw new Error('音频文件超过 25 MB（Groq 上限），请尝试较短的视频');
+  }
+
+  return audioBuffer;
+}
+
+// ============ Tool: 音频转录（Groq Whisper） ============
+
+async function handleToolTranscribe(request) {
+  try {
+    const contentType = request.headers.get('Content-Type') || '';
+
+    let apiKey = '';
+    let audioBlob = null;
+    let fileName = 'audio.mp3';
+
+    if (contentType.includes('multipart/form-data')) {
+      // 模式 A：上传音频文件
+      const formData = await request.formData();
+      apiKey = (formData.get('api_key') || '').trim();
+      const audioFile = formData.get('audio');
+      if (!audioFile) return json({ error: '请选择音频文件' }, 400);
+      audioBlob = audioFile;
+      fileName = audioFile.name || 'audio.mp3';
+
+    } else {
+      // 模式 B：传入 YouTube URL（由 Cobalt 下载）
+      const body = await request.json();
+      apiKey = (body.api_key || '').trim();
+      const videoUrl = (body.url || '').trim();
+      if (!videoUrl) return json({ error: '请提供视频链接或上传音频文件' }, 400);
+
+      try {
+        const audioBuffer = await fetchYoutubeAudioBuffer(videoUrl);
+        audioBlob = new Blob([audioBuffer], { type: 'audio/mpeg' });
+        fileName = 'audio.mp3';
+      } catch (e) {
+        return json({ error: '视频下载失败：' + e.message }, 502);
+      }
+    }
+
+    if (!apiKey) return json({ error: '请输入 Groq API Key' }, 400);
+
+    // 调用 Groq Whisper
+    const groqForm = new FormData();
+    groqForm.append('file', audioBlob, fileName);
+    groqForm.append('model', 'whisper-large-v3');
+
+    const groqResp = await fetch('https://api.groq.com/openai/v1/audio/transcriptions', {
+      method: 'POST',
+      headers: { 'Authorization': `Bearer ${apiKey}` },
+      body: groqForm,
+    });
+
+    if (!groqResp.ok) {
+      const err = await groqResp.json().catch(() => ({}));
+      if (groqResp.status === 401) return json({ error: 'Groq API Key 无效，请检查后重试' }, 401);
+      if (groqResp.status === 413) return json({ error: '文件过大，Groq 最大支持 25 MB' }, 413);
+      return json({ error: err.error?.message || `转录失败 (HTTP ${groqResp.status})` }, groqResp.status);
+    }
+
+    const data = await groqResp.json();
+    return json({ success: true, transcript: data.text });
+  } catch (error) {
+    return json({ error: '转录失败: ' + error.message }, 500);
+  }
+}
+
+// ============ Tool: 翻译（Groq LLaMA） ============
+
+async function handleToolTranslate(request) {
+  try {
+    const { text, target = 'zh', api_key } = await request.json();
+    if (!text?.trim()) return json({ error: '没有可翻译的内容' }, 400);
+    if (!api_key?.trim()) return json({ error: '请输入 Groq API Key' }, 400);
+
+    const langName = target === 'zh' ? 'Simplified Chinese (简体中文)' : 'English';
+    const systemPrompt = `You are a professional translator.
+Translate the user's text into ${langName}.
+Rules:
+1. If the text is already written in ${langName}, output exactly the token: ALREADY_TARGET_LANGUAGE — nothing else.
+2. Otherwise output ONLY the translated text.
+3. Preserve paragraph structure (blank lines between paragraphs).
+4. Do NOT add any explanation, prefix, or notes.`;
+
+    const groqResp = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+      method: 'POST',
+      headers: { 'Authorization': `Bearer ${api_key}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'llama-3.3-70b-versatile',
+        messages: [{ role: 'system', content: systemPrompt }, { role: 'user', content: text }],
+        stream: false, max_tokens: 8192, temperature: 0.2,
+      }),
+    });
+
+    if (!groqResp.ok) {
+      if (groqResp.status === 401) return json({ error: 'Groq API Key 无效，请检查后重试' }, 401);
+      return json({ error: '翻译失败，请稍后重试' }, groqResp.status);
+    }
+
+    const data = await groqResp.json();
+    const result = data.choices[0]?.message?.content || '';
+    if (result.includes('ALREADY_TARGET_LANGUAGE')) {
+      const msg = target === 'zh' ? '已经是中文了，无需翻译' : 'Already in English, no translation needed.';
+      return json({ already: true, message: msg });
+    }
+    return json({ success: true, result });
+  } catch (error) {
+    return json({ error: '翻译失败: ' + error.message }, 500);
+  }
+}
+
+// ============ Tool: 格式化（Groq LLaMA） ============
+
+async function handleToolFormat(request) {
+  try {
+    const { transcript, api_key } = await request.json();
+    if (!transcript?.trim()) return json({ error: '没有可整理的内容' }, 400);
+    if (!api_key?.trim()) return json({ error: '请输入 Groq API Key' }, 400);
+
+    const systemPrompt = `You are a professional text editor.
+I will give you a raw auto-transcribed transcript from a video. It may lack punctuation, have messy paragraphs, and contain spoken filler words.
+Your tasks:
+1. Add appropriate punctuation marks.
+2. Split the content into logical paragraphs based on meaning; separate paragraphs with a blank line.
+3. Remove obvious spoken fillers and repetitions (e.g. 'um', 'you know', 'like', '那个', '就是说', '嗯' etc.) to improve readability.
+4. IMPORTANT: Keep the ORIGINAL LANGUAGE exactly as-is. If the transcript is in English, output English. If it is in Chinese, output Chinese. Do NOT translate.
+5. Preserve the core meaning; do not add or remove content.
+6. Output ONLY the edited text. No explanations, no prefixes.`;
+
+    const groqResp = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+      method: 'POST',
+      headers: { 'Authorization': `Bearer ${api_key}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'llama-3.3-70b-versatile',
+        messages: [{ role: 'system', content: systemPrompt }, { role: 'user', content: transcript }],
+        stream: false, max_tokens: 8192, temperature: 0.3,
+      }),
+    });
+
+    if (!groqResp.ok) {
+      if (groqResp.status === 401) return json({ error: 'Groq API Key 无效，请检查后重试' }, 401);
+      return json({ error: '格式化失败，请稍后重试' }, groqResp.status);
+    }
+
+    const data = await groqResp.json();
+    const result = data.choices[0]?.message?.content || '';
+    return json({ success: true, result });
+  } catch (error) {
+    return json({ error: '格式化失败: ' + error.message }, 500);
+  }
+}
+
+// ============ Tool: Google 实时热搜（Trends RSS） ============
+
+async function handleToolTrends(url) {
+  try {
+    const geo = url.searchParams.get('geo') || 'US';
+    const rssUrl = `https://trends.google.com/trending/rss?geo=${geo}`;
+
+    const resp = await fetch(rssUrl, {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36',
+      },
+    });
+
+    if (!resp.ok) {
+      if (resp.status === 404) return json({ error: 'Google Trends 该地区暂不支持热搜榜，请换其他地区' }, 404);
+      throw new Error('HTTP ' + resp.status);
+    }
+
+    const xml = await resp.text();
+
+    // 用正则从 XML 中提取 <title>
+    const keywords = [];
+    const re = /<item>[\s\S]*?<title>([\s\S]*?)<\/title>/g;
+    let m;
+    while ((m = re.exec(xml)) !== null) {
+      const kw = m[1].replace(/<!\[CDATA\[|\]\]>/g, '').trim();
+      if (kw) keywords.push(kw);
+    }
+
+    if (keywords.length === 0) return json({ error: '暂无热搜数据，请稍后重试' }, 500);
+    return json({ status: 'ok', keywords: keywords.slice(0, 20) });
+  } catch (error) {
+    let msg = error.message;
+    if (msg.includes('429') || msg.includes('Too Many Requests')) msg = 'Google Trends 请求过于频繁，请稍后重试（约 1 分钟）';
+    else if (msg.toLowerCase().includes('timeout') || msg.toLowerCase().includes('timed out')) msg = '请求超时，请检查网络后重试';
+    return json({ error: msg }, 500);
+  }
+}
+
 // ============ API 路由 ============
 
 async function handleApi(request, env, url) {
@@ -795,6 +1028,12 @@ async function handleApi(request, env, url) {
       }
     });
   }
+
+  // ── Tool 路由（无需登录，用户自带 API Key）──────────────────────────────────
+  if (path === 'tool/transcribe' && method === 'POST') return await handleToolTranscribe(request);
+  if (path === 'tool/translate'  && method === 'POST') return await handleToolTranslate(request);
+  if (path === 'tool/format'     && method === 'POST') return await handleToolFormat(request);
+  if (path === 'tool/trends'     && method === 'GET')  return await handleToolTrends(url);
 
   if (!env.DB) return json({ error: '数据库未绑定，请检查 Cloudflare D1 Binding 配置（变量名需为 DB）' }, 500);
 
