@@ -200,29 +200,38 @@ async function handleSaveHistory(request, env) {
 // ============ 主路由 ============
 
 export async function onRequest(context) {
-  const { request, env } = context;
-  const url = new URL(request.url);
-  const path = url.pathname.replace('/api/', '');
-  const method = request.method;
+  try {
+    const { request, env } = context;
+    const url = new URL(request.url);
+    const path = url.pathname.replace('/api/', '');
+    const method = request.method;
 
-  // CORS 预检
-  if (method === 'OPTIONS') {
-    return new Response(null, {
-      headers: {
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
-        'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-      }
-    });
+    // CORS 预检
+    if (method === 'OPTIONS') {
+      return new Response(null, {
+        headers: {
+          'Access-Control-Allow-Origin': '*',
+          'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+          'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+        }
+      });
+    }
+
+    // 检查 D1 数据库绑定是否存在
+    if (!env.DB) {
+      return jsonResponse({ error: '数据库未绑定，请在 Cloudflare Pages 设置中绑定 D1 数据库（变量名: DB）' }, 500);
+    }
+
+    // 路由分发
+    if (path === 'register' && method === 'POST') return await handleRegister(request, env);
+    if (path === 'login' && method === 'POST') return await handleLogin(request, env);
+    if (path === 'logout' && method === 'POST') return await handleLogout(request, env);
+    if (path === 'me' && method === 'GET') return await handleMe(request, env);
+    if (path === 'history' && method === 'GET') return await handleGetHistory(request, env);
+    if (path === 'history' && method === 'POST') return await handleSaveHistory(request, env);
+
+    return jsonResponse({ error: 'Not Found' }, 404);
+  } catch (error) {
+    return jsonResponse({ error: '服务器错误: ' + error.message }, 500);
   }
-
-  // 路由分发
-  if (path === 'register' && method === 'POST') return handleRegister(request, env);
-  if (path === 'login' && method === 'POST') return handleLogin(request, env);
-  if (path === 'logout' && method === 'POST') return handleLogout(request, env);
-  if (path === 'me' && method === 'GET') return handleMe(request, env);
-  if (path === 'history' && method === 'GET') return handleGetHistory(request, env);
-  if (path === 'history' && method === 'POST') return handleSaveHistory(request, env);
-
-  return jsonResponse({ error: 'Not Found' }, 404);
 }
