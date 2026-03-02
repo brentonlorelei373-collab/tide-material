@@ -1,0 +1,11 @@
+name = "tide-material"
+main = "_worker.js"
+compatibility_date = "2024-12-01"
+
+[assets]
+directory = "./public"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "tide-material-db"
+database_id = "53f3f5e4-107b-4daf-8cac-1a86eeb3cc7c"
